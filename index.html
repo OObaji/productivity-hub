@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer of Technology Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Serene Dawn -->
+    <!-- Application Structure Plan: The application uses a main flex container to create a two-column layout: a fixed-width vertical sidebar for navigation and a flexible main content area. This structure, inspired by the user's image, is common in modern web apps and provides persistent, easy-to-access navigation. Page views are swapped in the main content area using JavaScript, creating a single-page application feel without page reloads. This is a significant improvement over the previous top-bar navigation, offering better scalability for adding new tools and a cleaner user interface. -->
+    <!-- Visualization & Content Choices: The navigation is now primarily icon-based within the sidebar, with text labels for clarity, matching the user's provided design. An expandable section for "Summer Topics" keeps the main navigation clean while providing access to sub-views. The core content visualizations (progress bar, timeline chart, kanban boards) remain the same but are now presented within the main content view, which is controlled by the new sidebar. This separation of navigation and content is a core principle of good information architecture. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            overflow: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 220px;
+            max-height: 250px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .task-checkbox:checked + label span:first-child {
+            background-color: #4f46e5; /* indigo-600 */
+            border-color: #4f46e5; /* indigo-600 */
+        }
+        .task-checkbox:checked + label span:first-child svg {
+            display: block;
+        }
+        .task-checkbox:checked + label {
+            text-decoration: line-through;
+            color: #6b7280; /* gray-500 */
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .landing-page {
+            background: radial-gradient(ellipse at bottom, #e0e7ff 0%, #f8fafc 70%);
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .hidden-fade {
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+        }
+        .visible-fade {
+            opacity: 1;
+            visibility: visible;
+            display: flex; /* Changed for main layout */
+        }
+        .page-view {
+            display: none;
+        }
+        .page-view.active {
+            display: block;
+        }
+        .kanban-board {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        .kanban-column {
+            flex: 1 0 300px;
+            background-color: #f1f5f9; /* slate-100 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        .kanban-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+        }
+        .sidebar-link.active {
+            background-color: #374151; /* gray-700 */
+            color: white;
+        }
+        .sidebar-topics-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .task-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .task-column {
+            background-color: #f1f5f9; /* slate-100 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        .task-item {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+        }
+        .task-item-checkbox:checked + label {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        
+        #pomodoro.page-view, #shift-timer.page-view {
+            background-size: cover;
+            background-position: center;
+            transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
+        }
+        .overlay {
+            background-color: rgba(0,0,0,0.5);
+        }
+        #pomodoro-timer-container {
+            width: 320px;
+            height: 320px;
+            position: relative;
+        }
+        #pomodoro-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #pomodoro-controls {
+            position: relative;
+            z-index: 10;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight">Your Summer of Tech Mastery</h1>
+            <p class="mt-4 text-lg text-slate-600">Embark on a journey to master the key pillars of modern technology. From Immersive Worlds and AI, to Advanced Web, Mobile Tech, and Cyber Security—your future starts now.</p>
+            <button id="get-started-btn" class="mt-8 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transform hover:scale-105 transition-transform duration-200">
+                Let's Begin
+            </button>
+        </div>
+    </section>
+
+    <div id="app-layout" class="hidden-fade h-screen">
+        <!-- Sidebar -->
+        <nav class="w-64 bg-gray-800 text-gray-300 flex flex-col h-full p-4">
+            <div class="flex items-center mb-8">
+                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                </div>
+                <span class="font-bold text-xl text-white">Productivity Hub</span>
+            </div>
+
+            <div class="flex-grow">
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 rounded-lg hover:bg-gray-700 active" data-view="dashboard-home">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                    Dashboard
+                </a>
+                
+                <div class="mt-2">
+                    <button id="topics-toggle-btn" class="sidebar-link w-full flex items-center p-2 rounded-lg hover:bg-gray-700">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        Summer Topics
+                        <svg id="topics-arrow" class="w-4 h-4 ml-auto transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="topics-submenu" class="sidebar-topics-submenu pl-8 mt-1 space-y-1">
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="all">All Topics</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Immersive Technology">Immersive Tech</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="AI & Machine Learning">Intelligent Systems</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Mobile & Ubiquitous Technology">Mobile & Ubiquitous</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Cyber Security">Cyber Security</a>
+                    </div>
+                </div>
+
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="pomodoro">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Pomodoro Timer
+                </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="schedule">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Schedule
+                </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="spotify">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12-3" /></svg>
+                    Spotify
+                </a>
+                 <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="dissertation">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    Dissertation
+                </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="weekly-goals">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                    Weekly Goals
+                </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="shift-timer">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Shift Timer
+                </a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-4">
+                 <a href="#" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-700">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Settings
+                </a>
+                 <a href="#" id="logout-btn" class="sidebar-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Log Out
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 h-full overflow-y-auto bg-slate-50">
+            <div id="main-content-wrapper" class="h-full">
+                <div id="dashboard-home" class="page-view active container mx-auto px-6 py-8">
+                    <header class="text-center mb-8">
+                        <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Summer Curriculum Dashboard</h1>
+                        <p class="mt-2 text-slate-600">Your interactive roadmap to mastering key technology domains.</p>
+                        <p class="mt-1 text-sm text-slate-500" id="endDateText"></p>
+                    </header>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 md:mb-12">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold text-slate-700">Overall Progress</span>
+                            <span id="progress-percent" class="font-semibold text-indigo-600">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2 my-2">
+                            <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-slate-500">
+                            <span id="progress-subtext">0 of 0 tasks completed</span>
+                            <span>🚀</span>
+                        </div>
+                    </div>
+                    <section class="mb-12 p-6 bg-white rounded-2xl shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">Learning Timeline</h2>
+                        <div class="chart-container">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </section>
+                    <main id="curriculum-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    </main>
+                </div>
+
+                <div id="pomodoro" class="page-view h-full">
+                    <div class="overlay flex flex-col items-center justify-center h-full p-4 text-white">
+                        <div class="w-full max-w-md bg-white/10 backdrop-blur-md p-6 rounded-2xl mb-6">
+                            <label for="focus-task-input" class="text-sm font-medium text-gray-300">What is your main focus?</label>
+                            <input id="focus-task-input" type="text" placeholder="e.g., Finish chapter on Neural Networks" class="w-full bg-transparent border-b-2 border-gray-400 focus:border-white focus:outline-none py-2 mt-1 text-lg">
+                        </div>
+                        <div id="pomodoro-timer-container" class="bg-white/10 backdrop-blur-md rounded-full p-6 flex flex-col items-center justify-between shadow-2xl">
+                            <div class="relative flex items-center justify-center w-full h-full">
+                                <canvas id="pomodoro-canvas" class="absolute top-0 left-0" width="270" height="270"></canvas>
+                                <div id="pomodoro-controls" class="absolute flex flex-col items-center">
+                                    <span id="pomodoro-icon" class="text-4xl">🍅</span>
+                                    <div id="pomodoro-time" class="text-6xl font-bold my-1">25:00</div>
+                                    <div id="pomodoro-mode" class="text-lg tracking-widest uppercase">Focus</div>
+                                    <button id="pomodoro-play-pause" class="mt-2">
+                                        <svg id="play-icon" class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path d="M4.018 15.59a.5.5 0 00.816.372l10-7a.5.5 0 000-.744l-10-7A.5.5 0 004 2v13.59z" /></svg>
+                                        <svg id="pause-icon" class="w-12 h-12 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 mt-6">
+                            <button id="pomodoro-switch-mode" class="px-8 py-3 bg-white/20 backdrop-blur-md rounded-full font-semibold uppercase tracking-wider">Take a Break</button>
+                            <div class="text-center">
+                                <div id="pomodoro-session-count" class="text-2xl font-bold">0</div>
+                                <div class="text-sm">Sessions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="schedule" class="page-view container mx-auto px-6 py-8">
+                     <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-4">My Schedule</h2>
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
+                          <p class="font-bold">Action Required</p>
+                          <p>To view your Google Calendar, you need to get the embed code. Go to your Google Calendar settings, find the "Integrate calendar" section, copy the "Embed code", and paste the `src` URL into the `iframe` below in the HTML.</p>
+                        </div>
+                        <iframe src="https://calendar.google.com/calendar/embed?src=en.uk%23holiday%40group.v.calendar.google.com" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+                    </div>
+                </div>
+
+                <div id="spotify" class="page-view container mx-auto px-6 py-8">
+                     <div class="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-4">Focus Playlist</h2>
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
+                          <p class="font-bold">Action Required</p>
+                          <p>To use your own playlist, go to Spotify, click the "..." on a playlist, select "Share", then "Embed playlist", and paste the `src` URL into the `iframe` below in the HTML.</p>
+                        </div>
+                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator" width="100%" height="580" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                <div id="dissertation" class="page-view container mx-auto px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 mb-6">Dissertation Command Center</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-xl font-bold mb-4">1. Project Overview</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div><strong>Title:</strong> The Impact of AI on Immersive Learning Environments</div>
+                                    <div><strong>Supervisor:</strong> Dr. Evelyn Reed</div>
+                                    <div><strong>Course:</strong> MSc Advanced Computer Science</div>
+                                    <div><strong>Department:</strong> School of Engineering</div>
+                                    <div><strong>Start Date:</strong> 01 July 2025</div>
+                                    <div><strong>Deadline:</strong> <span id="dissertation-deadline-text">01 May 2026</span></div>
+                                </div>
+                                <p class="text-sm mt-4 text-slate-600"><strong>Summary:</strong> An investigation into how artificial intelligence can be leveraged to create more adaptive, personalized, and effective virtual reality experiences for educational purposes.</p>
+                                <div class="mt-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-base font-medium text-indigo-700">Overall Progress</span>
+                                        <span class="text-sm font-medium text-indigo-700" id="writing-progress-percentage">30%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div id="writing-progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-xl font-bold mb-4">✨ 2. AI Research Assistant</h2>
+                                <div class="space-y-3">
+                                    <textarea id="ai-research-query" class="w-full p-2 border rounded-md text-sm" placeholder="Ask a research question... e.g., 'Summarize key arguments for using VR in medical training'"></textarea>
+                                    <button id="ai-research-btn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
+                                        <span id="ai-research-btn-text">Generate Insights</span>
+                                        <div id="ai-research-loader" class="loader hidden ml-2"></div>
+                                    </button>
+                                    <div id="ai-research-output" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm text-slate-700 min-h-[100px]"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm text-center">
+                                <h2 class="text-lg font-bold mb-2">7. Countdown to Submission</h2>
+                                <div id="countdown-timer" class="text-4xl font-bold text-rose-600"></div>
+                                <p class="text-sm text-slate-500">days remaining</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-lg font-bold mb-2">8. Motivation Zone</h2>
+                                <p class="text-slate-600 italic">"The secret of getting ahead is getting started."</p>
+                                <p class="text-right text-sm font-semibold text-slate-700 mt-1">- Mark Twain</p>
+                            </div>
+                             <div class="bg-white p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-lg font-bold mb-2">4. Resources</h2>
+                                <ul class="space-y-2 text-sm list-disc list-inside">
+                                    <li><a href="#" class="text-indigo-600 hover:underline">Key Paper on VR Pedagogy</a></li>
+                                    <li><a href="#" class="text-indigo-600 hover:underline">AI in Education Review</a></li>
+                                    <li><a href="#" class="text-indigo-600 hover:underline">Zotero Library Link</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                         <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-bold mb-4 text-center">5. Task Board</h2>
+                            <div class="kanban-board">
+                                <div class="kanban-column">
+                                    <h3 class="font-bold mb-4">To Do</h3>
+                                    <div class="kanban-card">Read paper on immersive UX</div>
+                                    <div class="kanban-card">Schedule supervisor meeting</div>
+                                </div>
+                                <div class="kanban-column">
+                                    <h3 class="font-bold mb-4">In Progress</h3>
+                                    <div class="kanban-card">Finish Lit Review</div>
+                                     <div class="kanban-card">Draft research questions</div>
+                                </div>
+                                <div class="kanban-column">
+                                    <h3 class="font-bold mb-4">Done</h3>
+                                    <div class="kanban-card">Topic selected</div>
+                                    <div class="kanban-card">Proposal submitted</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="weekly-goals" class="page-view container mx-auto px-6 py-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Weekly Goals</h2>
+                    <p class="text-slate-500 mb-6">Organize your week. Add high-level tasks and use AI to break them down into smaller steps.</p>
+                    <div class="task-board">
+                        <!-- Columns will be generated by JS -->
+                    </div>
+                </div>
+                
+                <div id="shift-timer" class="page-view h-full">
+                    <div class="overlay flex flex-col items-center justify-center h-full p-4 text-white">
+                        <div id="shift-setup" class="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl text-center">
+                            <h2 class="text-2xl font-bold mb-4">Set Shift End Time</h2>
+                            <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
+                            <button id="start-shift-btn" class="mt-8 w-full px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start Shift</button>
+                        </div>
+
+                        <div id="shift-countdown-display" class="hidden text-center">
+                            <h2 id="shift-motivation-quote" class="text-2xl font-semibold tracking-wider mb-4">Let's get this bread!</h2>
+                            <div class="flex items-center justify-center my-4 text-yellow-400" style="text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);">
+                                <div class="mx-2">
+                                    <div id="shift-hours-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div class="text-sm uppercase tracking-widest">Hours</div>
+                                </div>
+                                <div class="text-7xl font-bold">:</div>
+                                <div class="mx-2">
+                                    <div id="shift-minutes-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div class="text-sm uppercase tracking-widest">Minutes</div>
+                                </div>
+                                <div class="text-7xl font-bold">:</div>
+                                <div class="mx-2">
+                                    <div id="shift-seconds-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div class="text-sm uppercase tracking-widest">Seconds</div>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-2xl mx-auto mt-4">
+                                <div class="w-full bg-white/20 rounded-full h-2.5">
+                                    <div id="shift-progress-bar" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs mt-1">
+                                    <span>Shift Started</span>
+                                    <span id="shift-end-time-label"></span>
+                                </div>
+                            </div>
+                             <button id="reset-shift-btn" class="mt-8 px-8 py-3 bg-white/20 backdrop-blur-md rounded-full font-semibold uppercase tracking-wider">Reset Shift</button>
+                        </div>
+                        
+                        <div id="shift-end-message" class="hidden text-center max-w-lg">
+                            <h2 class="text-4xl font-bold">Congratulations!</h2>
+                            <p class="text-xl mt-4">Your shift has now ended. It's time to rest.</p>
+                            <button id="new-shift-btn" class="mt-8 px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start New Shift</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Task Modal -->
+    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-lg font-bold mb-4" id="modal-title">Add New Task</h3>
+            <div class="flex gap-2">
+                <input type="text" id="modal-task-input" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter a large goal...">
+                <button id="ai-breakdown-btn" class="p-2 bg-indigo-500 text-white rounded-md flex items-center justify-center">
+                    <span id="ai-breakdown-btn-text">✨</span>
+                    <div id="ai-breakdown-loader" class="loader hidden"></div>
+                </button>
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-200 rounded-md">Cancel</button>
+                <button id="modal-save-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Add Manually</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const curriculumData = [
+            {
+                module: "Immersive Technology",
+                themeColor: "blue",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9.75l-9-5.25M12 12.75l9 5.25" />`,
+                description: "Master the fundamentals of VR/AR development using industry-standard engines like Unity and Unreal.",
+                topics: [
+                    { title: "Foundations of VR/AR", items: ["Core Concepts (VR/AR/MR)", "Unity & XR Interaction Toolkit", "Unreal Engine VR Template"] },
+                    { title: "Advanced Interaction", items: ["Physics-based Interactions", "Hand Tracking", "UI/UX for VR"] },
+                ]
+            },
+            {
+                module: "AI & Machine Learning",
+                themeColor: "purple",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 3.75H19.5M8.25 3.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM8.25 9.75H19.5M8.25 9.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM8.25 15.75H19.5M8.25 15.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />`,
+                description: "Explore the world of artificial intelligence, from foundational models to practical machine learning applications.",
+                topics: [
+                    { title: "ML Fundamentals", items: ["Supervised vs. Unsupervised Learning", "Intro to Neural Networks", "Data Preprocessing"] },
+                    { title: "Practical AI", items: ["Working with TensorFlow or PyTorch", "Natural Language Processing (NLP) Basics", "Computer Vision Basics"] },
+                ]
+            },
+            {
+                module: "Advanced Web Technology",
+                themeColor: "emerald",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />`,
+                description: "Build modern, high-performance web applications using advanced frontend and backend technologies.",
+                topics: [
+                    { title: "Modern Frontend", items: ["Deep Dive into a JS Framework (React/Vue/Svelte)", "State Management Patterns", "Web Performance Optimization"] },
+                    { title: "Backend & APIs", items: ["Building RESTful APIs with Node.js/Express", "Database Fundamentals (SQL/NoSQL)", "Authentication & Authorization"] },
+                ]
+            },
+            {
+                module: "Mobile & Ubiquitous Technology",
+                themeColor: "amber",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />`,
+                description: "Develop applications for mobile devices and understand the principles of computing everywhere.",
+                topics: [
+                    { title: "Native & Cross-Platform Dev", items: ["Intro to Swift (iOS) or Kotlin (Android)", "Exploring React Native or Flutter", "Mobile UI/UX Design Principles"] },
+                    { title: "Ubiquitous Computing", items: ["IoT Basics & Sensor Networks", "Context-Aware Applications", "Wearable Technology"] },
+                ]
+            },
+            {
+                module: "Cyber Security",
+                themeColor: "rose",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" />`,
+                description: "Learn to protect systems, networks, and programs from digital attacks with fundamental security principles.",
+                topics: [
+                    { title: "Security Principles", items: ["Core Concepts (CIA Triad)", "Network Security Basics", "Cryptography Fundamentals"] },
+                    { title: "Ethical Hacking & Defense", items: ["Vulnerability Assessment", "Penetration Testing Methodologies", "Defensive Security & Incident Response"] },
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const getStartedBtn = document.getElementById('get-started-btn');
+            const landingPage = document.getElementById('landing-page');
+            const appLayout = document.getElementById('app-layout');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            const grid = document.getElementById('curriculum-grid');
+            const endDateText = document.getElementById('endDateText');
+            endDateText.textContent = `End Date: 31/08/2025`;
+
+            let totalTasks = 0;
+            let dashboardInitialized = false;
+
+            function initializeDashboard() {
+                if (dashboardInitialized) return;
+
+                curriculumData.forEach((moduleData, moduleIndex) => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = `module-card bg-white rounded-2xl shadow-sm p-6 flex flex-col`;
+                    moduleCard.dataset.module = moduleData.module;
+
+                    let topicsHtml = '';
+                    moduleData.topics.forEach((topic, topicIndex) => {
+                        let itemsHtml = '<ul class="space-y-3 pt-4">';
+                        topic.items.forEach((item, itemIndex) => {
+                            const checkboxId = `task-${moduleIndex}-${topicIndex}-${itemIndex}`;
+                            totalTasks++;
+                            itemsHtml += `
+                                <li class="flex items-start">
+                                    <input type="checkbox" id="${checkboxId}" class="task-checkbox hidden">
+                                    <label for="${checkboxId}" class="flex items-center cursor-pointer text-slate-700 w-full">
+                                        <span class="w-5 h-5 mr-3 rounded border-2 border-slate-300 flex-shrink-0 flex items-center justify-center">
+                                            <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </span>
+                                        ${item}
+                                    </label>
+                                </li>
+                            `;
+                        });
+                        itemsHtml += '</ul>';
+
+                        topicsHtml += `
+                            <div class="border-b border-slate-200 last:border-b-0">
+                                <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
+                                    <h4 class="font-semibold text-slate-800">${topic.title}</h4>
+                                    <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </button>
+                                <div class="accordion-content">
+                                    ${itemsHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    moduleCard.innerHTML = `
+                        <div>
+                            <div class="w-12 h-12 rounded-lg bg-${moduleData.themeColor}-100 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-${moduleData.themeColor}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${moduleData.icon}</svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900">${moduleData.module}</h3>
+                            <p class="text-slate-600 mt-2 mb-4 h-24">${moduleData.description}</p>
+                        </div>
+                        <div class="flex-grow">
+                            ${topicsHtml}
+                        </div>
+                    `;
+                    grid.appendChild(moduleCard);
+                });
+
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', updateProgress);
+                });
+                
+                document.querySelectorAll('.accordion-toggle').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        const icon = button.querySelector('svg');
+
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                            icon.classList.remove('rotate-180');
+                        } else {
+                            document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                            document.querySelectorAll('.accordion-toggle svg').forEach(i => i.classList.remove('rotate-180'));
+
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            icon.classList.add('rotate-180');
+                        }
+                    });
+                });
+
+                updateProgress();
+                renderTimelineChart();
+                setupNavigation();
+                setupPomodoro();
+                setupWeeklyGoals();
+                setupDissertationPage();
+                setupShiftTimer();
+                dashboardInitialized = true;
+            }
+
+            const updateProgress = () => {
+                const checkedTasks = document.querySelectorAll('.task-checkbox:checked').length;
+                const progress = totalTasks > 0 ? (checkedTasks / totalTasks) * 100 : 0;
+                
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+                document.getElementById('progress-subtext').textContent = `${checkedTasks} of ${totalTasks} tasks completed`;
+            };
+            
+            getStartedBtn.addEventListener('click', () => {
+                initializeDashboard();
+                landingPage.style.opacity = 0;
+                setTimeout(() => {
+                    landingPage.style.display = 'none';
+                    appLayout.classList.remove('hidden-fade');
+                    appLayout.classList.add('visible-fade');
+                }, 500);
+            });
+
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                appLayout.style.opacity = 0;
+                setTimeout(() => {
+                    appLayout.classList.add('hidden-fade');
+                    appLayout.classList.remove('visible-fade');
+                    
+                    landingPage.style.display = 'flex';
+                    setTimeout(() => {
+                        landingPage.style.opacity = 1;
+                    }, 50);
+                }, 500);
+            });
+            
+            function setupNavigation() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const pageViews = document.querySelectorAll('.page-view');
+                const sidebarLinks = document.querySelectorAll('.sidebar-link');
+                const topicsToggleBtn = document.getElementById('topics-toggle-btn');
+                const topicsSubmenu = document.getElementById('topics-submenu');
+                const topicsArrow = document.getElementById('topics-arrow');
+                const topicFilters = document.querySelectorAll('.topic-filter');
+                const mainContentWrapper = document.getElementById('main-content-wrapper');
+
+                function setActiveLink(clickedLink) {
+                    sidebarLinks.forEach(link => link.classList.remove('active'));
+                    if (clickedLink) {
+                       clickedLink.classList.add('active');
+                    }
+                }
+
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const view = link.dataset.view;
+                        
+                        pageViews.forEach(page => {
+                           if(page.id === view) {
+                               page.classList.add('active');
+                               if (page.id === 'pomodoro' || page.id === 'shift-timer') {
+                                   mainContentWrapper.classList.remove('container', 'mx-auto', 'px-6', 'py-8');
+                               } else {
+                                   mainContentWrapper.classList.add('container', 'mx-auto', 'px-6', 'py-8');
+                               }
+                           } else {
+                               page.classList.remove('active');
+                           }
+                        });
+                        
+                        setActiveLink(link);
+                    });
+                });
+
+                topicsToggleBtn.addEventListener('click', () => {
+                    if (topicsSubmenu.style.maxHeight) {
+                        topicsSubmenu.style.maxHeight = null;
+                        topicsArrow.classList.remove('rotate-180');
+                    } else {
+                        topicsSubmenu.style.maxHeight = topicsSubmenu.scrollHeight + "px";
+                        topicsArrow.classList.add('rotate-180');
+                    }
+                });
+
+                topicFilters.forEach(filter => {
+                    filter.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const moduleToShow = filter.dataset.module;
+                        
+                        pageViews.forEach(p => p.classList.remove('active'));
+                        document.getElementById('dashboard-home').classList.add('active');
+                        setActiveLink(document.querySelector('.nav-link[data-view="dashboard-home"]'));
+                         mainContentWrapper.classList.add('container', 'mx-auto', 'px-6', 'py-8');
+
+                        document.querySelectorAll('.module-card').forEach(card => {
+                            card.style.display = (moduleToShow === 'all' || card.dataset.module === moduleToShow) ? 'flex' : 'none';
+                        });
+                    });
+                });
+            }
+            
+            function setupPomodoro() {
+                const pomodoroPage = document.getElementById('pomodoro');
+                const modes = {
+                    pomodoro: {
+                        name: 'Focus',
+                        time: 25,
+                        color: '#F97316', // orange-500
+                        icon: '🍅',
+                        next: 'shortBreak',
+                        background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                    },
+                    shortBreak: {
+                        name: 'Relax',
+                        time: 5,
+                        color: '#3B82F6', // blue-500
+                        icon: '☕',
+                        next: 'pomodoro',
+                        background: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                    },
+                };
+
+                let timer;
+                let currentMode = 'pomodoro';
+                let totalSeconds = modes[currentMode].time * 60;
+                let remainingSeconds = totalSeconds;
+                let isPaused = true;
+                let sessionCount = 0;
+
+                const canvas = document.getElementById('pomodoro-canvas');
+                const ctx = canvas.getContext('2d');
+                const timeDisplay = document.getElementById('pomodoro-time');
+                const modeDisplay = document.getElementById('pomodoro-mode');
+                const iconDisplay = document.getElementById('pomodoro-icon');
+                const playPauseBtn = document.getElementById('pomodoro-play-pause');
+                const playIcon = document.getElementById('play-icon');
+                const pauseIcon = document.getElementById('pause-icon');
+                const switchModeBtn = document.getElementById('pomodoro-switch-mode');
+                const sessionCountDisplay = document.getElementById('pomodoro-session-count');
+
+                function drawCircle(progress) {
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const radius = canvas.width / 2 - 10;
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 12;
+                    ctx.stroke();
+
+                    if (progress > 0) {
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, radius, -0.5 * Math.PI, (progress * 2 * Math.PI) - 0.5 * Math.PI);
+                        ctx.strokeStyle = modes[currentMode].color;
+                        ctx.lineWidth = 12;
+                        ctx.lineCap = 'round';
+                        ctx.stroke();
+                    }
+                }
+
+                function updateDisplay() {
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    const progress = (totalSeconds - remainingSeconds) / totalSeconds;
+                    drawCircle(progress);
+                }
+                
+                function setMode(modeKey) {
+                    currentMode = modeKey;
+                    const mode = modes[currentMode];
+                    totalSeconds = mode.time * 60;
+                    remainingSeconds = totalSeconds;
+                    modeDisplay.textContent = mode.name;
+                    iconDisplay.textContent = mode.icon;
+                    switchModeBtn.textContent = mode.next === 'pomodoro' ? 'Start Focus' : 'Take a Break';
+                    pomodoroPage.style.backgroundImage = `url('${mode.background}')`;
+                    updateDisplay();
+                }
+
+                function countdown() {
+                    if (isPaused) return;
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timer);
+                        isPaused = true;
+                        playIcon.classList.remove('hidden');
+                        pauseIcon.classList.add('hidden');
+                        
+                        if (currentMode === 'pomodoro') {
+                            sessionCount++;
+                            sessionCountDisplay.textContent = sessionCount;
+                        }
+
+                        alert(`${modes[currentMode].name} session is over!`);
+                        setMode(modes[currentMode].next);
+                    }
+                }
+
+                playPauseBtn.addEventListener('click', () => {
+                    isPaused = !isPaused;
+                    if (!isPaused) {
+                        timer = setInterval(countdown, 1000);
+                        playIcon.classList.add('hidden');
+                        pauseIcon.classList.remove('hidden');
+                    } else {
+                        clearInterval(timer);
+                        playIcon.classList.remove('hidden');
+                        pauseIcon.classList.add('hidden');
+                    }
+                });
+
+                switchModeBtn.addEventListener('click', () => {
+                    isPaused = true;
+                    clearInterval(timer);
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                    setMode(modes[currentMode].next);
+                });
+                
+                setMode('pomodoro'); // Initialize
+            }
+
+            function setupWeeklyGoals() {
+                const taskBoard = document.querySelector('#weekly-goals .task-board');
+                const modal = document.getElementById('add-task-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const modalInput = document.getElementById('modal-task-input');
+                const modalCancelBtn = document.getElementById('modal-cancel-btn');
+                const modalSaveBtn = document.getElementById('modal-save-btn');
+                const aiBreakdownBtn = document.getElementById('ai-breakdown-btn');
+                const aiBreakdownLoader = document.getElementById('ai-breakdown-loader');
+                const aiBreakdownBtnText = document.getElementById('ai-breakdown-btn-text');
+                let currentTaskList;
+
+                const columns = ['Daily Tasks', 'Routine Tasks', 'Work Tasks', 'Hobbies', 'Others'];
+                
+                columns.forEach(colName => {
+                    const columnEl = document.createElement('div');
+                    columnEl.className = 'task-column';
+                    columnEl.innerHTML = `
+                        <h3 class="font-bold mb-4 text-slate-800">${colName}</h3>
+                        <div class="task-list space-y-3 mb-4"></div>
+                        <button class="add-task-btn w-full p-2 text-sm text-slate-600 hover:bg-slate-200 rounded-md">+ Add a task</button>
+                    `;
+                    taskBoard.appendChild(columnEl);
+                });
+
+                function addTaskToUI(taskText, list) {
+                     const taskEl = document.createElement('div');
+                    taskEl.className = 'task-item';
+                    const taskId = `task-${Date.now()}-${Math.random()}`;
+                    taskEl.innerHTML = `
+                        <div class="flex items-center">
+                            <input type="checkbox" id="${taskId}" class="task-item-checkbox hidden">
+                            <label for="${taskId}" class="flex items-center cursor-pointer text-slate-700 w-full">
+                                <span class="w-5 h-5 mr-3 rounded-full border-2 border-slate-300 flex-shrink-0 flex items-center justify-center">
+                                     <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </span>
+                                ${taskText}
+                            </label>
+                        </div>
+                    `;
+                    list.appendChild(taskEl);
+                }
+
+                taskBoard.addEventListener('click', e => {
+                    if (e.target.classList.contains('add-task-btn')) {
+                        modal.style.display = 'flex';
+                        modalTitle.textContent = `Add to ${e.target.previousElementSibling.previousElementSibling.textContent}`;
+                        currentTaskList = e.target.previousElementSibling;
+                        modalInput.focus();
+                    }
+                });
+
+                modalCancelBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    modalInput.value = '';
+                });
+
+                modalSaveBtn.addEventListener('click', () => {
+                    const taskText = modalInput.value.trim();
+                    if (taskText) {
+                       addTaskToUI(taskText, currentTaskList);
+                    }
+                    modal.style.display = 'none';
+                    modalInput.value = '';
+                });
+
+                aiBreakdownBtn.addEventListener('click', async () => {
+                    const goal = modalInput.value.trim();
+                    if (!goal) {
+                        alert("Please enter a goal to break down.");
+                        return;
+                    }
+                    
+                    aiBreakdownBtnText.classList.add('hidden');
+                    aiBreakdownLoader.classList.remove('hidden');
+
+                    const prompt = `Break down the following high-level goal into a list of smaller, actionable sub-tasks. The goal is: "${goal}". Return the response as a JSON object with a single key "tasks" which is an array of strings.`;
+                    
+                    try {
+                        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                        const payload = { 
+                            contents: chatHistory,
+                             generationConfig: {
+                                responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: { "tasks": { "type": "ARRAY", "items": { "type": "STRING" } } }
+                                }
+                            }
+                        };
+                        const apiKey = "";
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+                        
+                        if (result.candidates && result.candidates[0].content.parts[0].text) {
+                            const parsed = JSON.parse(result.candidates[0].content.parts[0].text);
+                            parsed.tasks.forEach(task => addTaskToUI(task, currentTaskList));
+                            modal.style.display = 'none';
+                            modalInput.value = '';
+                        } else {
+                            throw new Error("Invalid response from API");
+                        }
+                    } catch (error) {
+                        console.error("Error with Gemini API:", error);
+                        alert("Could not break down the task. Please try adding it manually.");
+                    } finally {
+                        aiBreakdownBtnText.classList.remove('hidden');
+                        aiBreakdownLoader.classList.add('hidden');
+                    }
+                });
+
+                 taskBoard.addEventListener('change', e => {
+                    if (e.target.classList.contains('task-item-checkbox')) {
+                        const label = e.target.nextElementSibling;
+                        if (e.target.checked) {
+                            label.classList.add('line-through', 'text-gray-500');
+                        } else {
+                             label.classList.remove('line-through', 'text-gray-500');
+                        }
+                    }
+                });
+            }
+            
+            function setupDissertationPage() {
+                const aiResearchBtn = document.getElementById('ai-research-btn');
+                const aiResearchBtnText = document.getElementById('ai-research-btn-text');
+                const aiResearchLoader = document.getElementById('ai-research-loader');
+                const aiResearchQuery = document.getElementById('ai-research-query');
+                const aiResearchOutput = document.getElementById('ai-research-output');
+
+                aiResearchBtn.addEventListener('click', async () => {
+                    const query = aiResearchQuery.value.trim();
+                    if (!query) {
+                        alert("Please enter a research query.");
+                        return;
+                    }
+
+                    aiResearchBtnText.classList.add('hidden');
+                    aiResearchLoader.classList.remove('hidden');
+                    aiResearchOutput.innerHTML = '';
+
+                    const prompt = `Act as a research assistant. Provide a concise summary and key insights for the following query: "${query}"`;
+
+                    try {
+                        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                        const payload = { contents: chatHistory };
+                        const apiKey = "";
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+
+                        if (result.candidates && result.candidates[0].content.parts[0].text) {
+                            aiResearchOutput.textContent = result.candidates[0].content.parts[0].text;
+                        } else {
+                             throw new Error("Invalid response from API");
+                        }
+                    } catch (error) {
+                        console.error("Error with Gemini API:", error);
+                        aiResearchOutput.textContent = "Sorry, I couldn't fetch insights for that query. Please try again.";
+                    } finally {
+                        aiResearchBtnText.classList.remove('hidden');
+                        aiResearchLoader.classList.add('hidden');
+                    }
+                });
+            }
+
+            function setupShiftTimer() {
+                const shiftTimerPage = document.getElementById('shift-timer');
+                const setupView = document.getElementById('shift-setup');
+                const countdownView = document.getElementById('shift-countdown-display');
+                const endView = document.getElementById('shift-end-message');
+                const startBtn = document.getElementById('start-shift-btn');
+                const resetBtn = document.getElementById('reset-shift-btn');
+                const newShiftBtn = document.getElementById('new-shift-btn');
+                const endTimeInput = document.getElementById('shift-end-time-input');
+                const endTimeLabel = document.getElementById('shift-end-time-label');
+                const motivationQuote = document.getElementById('shift-motivation-quote');
+                const shiftProgressBar = document.getElementById('shift-progress-bar');
+
+
+                let shiftTimer;
+                let shiftStartTime;
+                let shiftEndTime;
+                let totalShiftDuration;
+
+                const backgroundColors = {
+                    start: '#ef4444', // red-500
+                    mid: '#f59e0b',   // amber-500
+                    end: '#22c55e',   // green-500
+                    finished: '#3b82f6' // blue-500
+                };
+
+                const quotes = {
+                    start: "A new shift begins. Let's make it a great one!",
+                    mid: "Keep up the momentum. You're doing great!",
+                    end: "The final stretch. Finish strong!"
+                };
+
+                function updateShiftDisplay(remainingMs) {
+                    const h = Math.floor(remainingMs / (1000 * 60 * 60));
+                    const m = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+                    document.getElementById('shift-hours-display').textContent = h.toString().padStart(2, '0');
+                    document.getElementById('shift-minutes-display').textContent = m.toString().padStart(2, '0');
+                    document.getElementById('shift-seconds-display').textContent = s.toString().padStart(2, '0');
+                }
+
+                function updateShiftVisuals() {
+                    const now = new Date();
+                    const remainingMs = shiftEndTime - now;
+                    const elapsedMs = now - shiftStartTime;
+                    const percentage = (elapsedMs / totalShiftDuration) * 100;
+                    const remainingHours = remainingMs / (1000 * 60 * 60);
+                    
+                    shiftProgressBar.style.width = `${Math.min(percentage, 100)}%`;
+
+                    if (remainingHours > 9) {
+                        shiftTimerPage.style.backgroundColor = backgroundColors.start;
+                        motivationQuote.textContent = quotes.start;
+                    } else if (remainingHours > 5) {
+                        shiftTimerPage.style.backgroundColor = backgroundColors.mid;
+                        motivationQuote.textContent = quotes.mid;
+                    } else {
+                        shiftTimerPage.style.backgroundColor = backgroundColors.end;
+                         motivationQuote.textContent = quotes.end;
+                    }
+                }
+
+                function shiftCountdown() {
+                    const now = new Date();
+                    const remainingMs = shiftEndTime - now;
+
+                    if (remainingMs > 0) {
+                        updateShiftDisplay(remainingMs);
+                        updateShiftVisuals();
+                    } else {
+                        clearInterval(shiftTimer);
+                        updateShiftDisplay(0);
+                        countdownView.classList.add('hidden');
+                        endView.classList.remove('hidden');
+                        shiftTimerPage.style.backgroundColor = backgroundColors.finished;
+                    }
+                }
+
+                function resetShiftTimer() {
+                    clearInterval(shiftTimer);
+                    setupView.classList.remove('hidden');
+                    countdownView.classList.add('hidden');
+                    endView.classList.add('hidden');
+                    shiftTimerPage.style.backgroundColor = backgroundColors.start;
+                }
+
+                startBtn.addEventListener('click', () => {
+                    const endTimeValue = endTimeInput.value;
+                    if (!endTimeValue) {
+                        alert("Please select an end date and time.");
+                        return;
+                    }
+                    
+                    shiftStartTime = new Date();
+                    shiftEndTime = new Date(endTimeValue);
+
+                    if (shiftEndTime <= shiftStartTime) {
+                        alert("End time must be in the future.");
+                        return;
+                    }
+
+                    totalShiftDuration = (shiftEndTime - shiftStartTime);
+                    
+                    setupView.classList.add('hidden');
+                    countdownView.classList.remove('hidden');
+                    
+                    endTimeLabel.textContent = `Ends at ${shiftEndTime.toLocaleTimeString()}`;
+                    
+                    shiftCountdown(); // Initial call
+                    shiftTimer = setInterval(shiftCountdown, 1000);
+                });
+
+                resetBtn.addEventListener('click', resetShiftTimer);
+                newShiftBtn.addEventListener('click', resetShiftTimer);
+                
+                resetShiftTimer(); // Initialize view
+            }
+
+        });
+
+        function renderTimelineChart() {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            const data = {
+                labels: ['Immersive Tech', 'AI & ML', 'Advanced Web', 'Mobile Tech', 'Cyber Security'],
+                datasets: [{
+                    label: 'Learning Path',
+                    data: [
+                        [0, 3], 
+                        [3, 5],
+                        [5, 7],
+                        [7, 9],
+                        [9, 12]
+                    ],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.5)',
+                        'rgba(139, 92, 246, 0.5)',
+                        'rgba(16, 185, 129, 0.5)',
+                        'rgba(245, 158, 11, 0.5)',
+                        'rgba(244, 63, 94, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(244, 63, 94, 1)'
+                    ],
+                    borderWidth: 1,
+                    barPercentage: 0.6,
+                    borderSkipped: false,
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    return `Weeks ${value[0]} - ${value[1]}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 12,
+                            title: {
+                                display: true,
+                                text: 'Weeks'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
