@@ -1138,15 +1138,42 @@
                         countdownView.classList.add('hidden');
                         endView.classList.remove('hidden');
                         shiftTimerPage.style.backgroundColor = backgroundColors.finished;
+                        localStorage.removeItem('shiftEndTime');
+                        localStorage.removeItem('shiftStartTime');
                     }
                 }
 
                 function resetShiftTimer() {
                     clearInterval(shiftTimer);
+                    localStorage.removeItem('shiftEndTime');
+                    localStorage.removeItem('shiftStartTime');
                     setupView.classList.remove('hidden');
                     countdownView.classList.add('hidden');
                     endView.classList.add('hidden');
                     shiftTimerPage.style.backgroundColor = backgroundColors.start;
+                }
+
+                function checkStoredShift() {
+                    const storedEndTime = localStorage.getItem('shiftEndTime');
+                    const storedStartTime = localStorage.getItem('shiftStartTime');
+
+                    if (storedEndTime && storedStartTime) {
+                        shiftEndTime = new Date(storedEndTime);
+                        shiftStartTime = new Date(storedStartTime);
+                        
+                        if (shiftEndTime > new Date()) {
+                            totalShiftDuration = shiftEndTime - shiftStartTime;
+                            setupView.classList.add('hidden');
+                            countdownView.classList.remove('hidden');
+                            endTimeLabel.textContent = `Ends at ${shiftEndTime.toLocaleTimeString()}`;
+                            shiftCountdown();
+                            shiftTimer = setInterval(shiftCountdown, 1000);
+                        } else {
+                            resetShiftTimer();
+                        }
+                    } else {
+                        resetShiftTimer();
+                    }
                 }
 
                 startBtn.addEventListener('click', () => {
@@ -1164,6 +1191,9 @@
                         return;
                     }
 
+                    localStorage.setItem('shiftStartTime', shiftStartTime.toISOString());
+                    localStorage.setItem('shiftEndTime', shiftEndTime.toISOString());
+
                     totalShiftDuration = (shiftEndTime - shiftStartTime);
                     
                     setupView.classList.add('hidden');
@@ -1178,7 +1208,7 @@
                 resetBtn.addEventListener('click', resetShiftTimer);
                 newShiftBtn.addEventListener('click', resetShiftTimer);
                 
-                resetShiftTimer(); // Initialize view
+                checkStoredShift();
             }
 
         });
