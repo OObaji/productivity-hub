@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer of Technology Mastery</title>
+    <title>MyndArc - Your Productivity Hub</title>å
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,8 +50,17 @@
             transition: max-height 0.3s ease-out;
         }
         .landing-page {
-            background: radial-gradient(ellipse at bottom, #e0e7ff 0%, #f8fafc 70%);
+            position: relative;
+            background-color: #f0f4f8;
             transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #landing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
         .hidden-fade {
             opacity: 0;
@@ -168,11 +177,12 @@
 <body class="text-slate-800">
 
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
-        <div class="max-w-3xl">
-            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight">Your Summer of Tech Mastery</h1>
-            <p class="mt-4 text-lg text-slate-600">Embark on a journey to master the key pillars of modern technology. From Immersive Worlds and AI, to Advanced Web, Mobile Tech, and Cyber Security—your future starts now.</p>
+        <canvas id="landing-canvas"></canvas>
+        <div class="relative z-10 max-w-3xl">
+            <h1 class="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight">Find Your Focus.</h1>
+            <p class="mt-4 text-lg text-slate-600">A central hub for all your tasks, goals, and learning. Organize your life and achieve more, one day at a time.</p>
             <button id="get-started-btn" class="mt-8 px-8 py-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transform hover:scale-105 transition-transform duration-200">
-                Let's Begin
+                Enter Hub
             </button>
         </div>
     </section>
@@ -434,6 +444,10 @@
                         <div id="shift-setup" class="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl text-center">
                             <h2 class="text-2xl font-bold mb-4">Set Shift End Time</h2>
                             <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
+                             <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+                                <button id="preset-normal-btn" class="p-2 bg-indigo-500/50 rounded-lg">Normal Shift (7AM)</button>
+                                <button id="preset-overtime-btn" class="p-2 bg-indigo-500/50 rounded-lg">Overtime (5AM)</button>
+                            </div>
                             <button id="start-shift-btn" class="mt-8 w-full px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start Shift</button>
                         </div>
 
@@ -559,6 +573,7 @@
             const openSidebarBtn = document.getElementById('open-sidebar-btn');
             const closeSidebarBtn = document.getElementById('close-sidebar-btn');
             const sidebar = document.getElementById('sidebar');
+            const landingCanvas = document.getElementById('landing-canvas');
             
             const grid = document.getElementById('curriculum-grid');
             const endDateText = document.getElementById('endDateText');
@@ -1074,6 +1089,8 @@
                 const endTimeLabel = document.getElementById('shift-end-time-label');
                 const motivationQuote = document.getElementById('shift-motivation-quote');
                 const shiftProgressBar = document.getElementById('shift-progress-bar');
+                const presetNormalBtn = document.getElementById('preset-normal-btn');
+                const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
 
 
                 let shiftTimer;
@@ -1093,6 +1110,25 @@
                     mid: "Keep up the momentum. You're doing great!",
                     end: "The final stretch. Finish strong!"
                 };
+
+                function formatDateTimeForInput(date) {
+                    const pad = (num) => num.toString().padStart(2, '0');
+                    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+                }
+
+                presetNormalBtn.addEventListener('click', () => {
+                    const nextDay = new Date();
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    nextDay.setHours(7, 0, 0, 0);
+                    endTimeInput.value = formatDateTimeForInput(nextDay);
+                });
+
+                presetOvertimeBtn.addEventListener('click', () => {
+                    const nextDay = new Date();
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    nextDay.setHours(5, 0, 0, 0);
+                    endTimeInput.value = formatDateTimeForInput(nextDay);
+                });
 
                 function updateShiftDisplay(remainingMs) {
                     const h = Math.floor(remainingMs / (1000 * 60 * 60));
@@ -1210,6 +1246,67 @@
                 
                 checkStoredShift();
             }
+            
+            function initLandingPageAnimation() {
+                const canvas = landingCanvas;
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 2 + 1;
+                        this.speedX = Math.random() * 1 - 0.5;
+                        this.speedY = Math.random() * 1 - 0.5;
+                        this.color = `rgba(165, 180, 252, ${Math.random() * 0.5 + 0.2})`;
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+
+                        if (this.size > 0.2) this.size -= 0.01;
+                        if (this.size <= 0.2) {
+                            this.x = Math.random() * canvas.width;
+                            this.y = Math.random() * canvas.height;
+                            this.size = Math.random() * 2 + 1;
+                            this.speedX = Math.random() * 1 - 0.5;
+                            this.speedY = Math.random() * 1 - 0.5;
+                        }
+                    }
+                    draw() {
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function initParticles() {
+                    for (let i = 0; i < 100; i++) {
+                        particles.push(new Particle());
+                    }
+                }
+                initParticles();
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw();
+                    }
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            }
+            initLandingPageAnimation();
 
         });
 
