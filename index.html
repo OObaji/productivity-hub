@@ -133,10 +133,13 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view, #shift-timer.page-view {
+        #pomodoro.page-view {
             background-size: cover;
             background-position: center;
-            transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
+            transition: background-image 0.5s ease-in-out;
+        }
+        #shift-timer.page-view {
+            background-color: #111827;
         }
         .overlay {
             background-color: rgba(0,0,0,0.5);
@@ -171,6 +174,14 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        #shift-timer-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
     </style>
 </head>
@@ -439,9 +450,10 @@
                     </div>
                 </div>
                 
-                <div id="shift-timer" class="page-view h-full">
-                    <div class="overlay flex flex-col items-center justify-center h-full p-4 text-white">
-                        <div id="shift-setup" class="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl text-center">
+                <div id="shift-timer" class="page-view h-full relative">
+                    <canvas id="shift-timer-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full p-4 text-white">
+                        <div id="shift-setup" class="w-full max-w-md bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
                             <h2 class="text-2xl font-bold mb-4">Set Shift End Time</h2>
                             <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
                              <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
@@ -1091,7 +1103,6 @@
                 const shiftProgressBar = document.getElementById('shift-progress-bar');
                 const presetNormalBtn = document.getElementById('preset-normal-btn');
                 const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
-
 
                 let shiftTimer;
                 let shiftStartTime;
