@@ -8,11 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chosen Palette: Serene Dawn -->
-    <!-- Application Structure Plan: The application uses a main flex container to create a two-column layout: a fixed-width vertical sidebar for navigation and a flexible main content area. This structure, inspired by the user's image, is common in modern web apps and provides persistent, easy-to-access navigation. Page views are swapped in the main content area using JavaScript, creating a single-page application feel without page reloads. This is a significant improvement over the previous top-bar navigation, offering better scalability for adding new tools and a cleaner user interface. -->
-    <!-- Visualization & Content Choices: The navigation is now primarily icon-based within the sidebar, with text labels for clarity, matching the user's provided design. An expandable section for "Summer Topics" keeps the main navigation clean while providing access to sub-views. The core content visualizations (progress bar, timeline chart, kanban boards) remain the same but are now presented within the main content view, which is controlled by the new sidebar. This separation of navigation and content is a core principle of good information architecture. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -180,6 +175,26 @@
             height: 100%;
             z-index: 0;
         }
+        #idea-board {
+            background-image: url('https://www.transparenttextures.com/patterns/cork-wallet.png');
+            background-color: #d2b48c;
+        }
+        .sticky-note {
+            box-shadow: 5px 5px 7px rgba(33,33,33,.7);
+            transition: transform .15s linear;
+            cursor: grab;
+        }
+        .sticky-note.dragging {
+            transform: scale(1.05);
+            z-index: 50;
+            cursor: grabbing;
+        }
+        #add-note-btn {
+            cursor: grab;
+        }
+        #add-note-btn:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -265,6 +280,10 @@
                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="hour-calculator">
                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                             Hour Calculator
+                        </a>
+                        <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="idea-board">
+                           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707m-9.192 9.192l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Idea Board
                         </a>
                     </div>
                 </div>
@@ -539,6 +558,12 @@
                         </div>
                     </div>
                 </div>
+                <div id="idea-board" class="page-view h-full relative overflow-hidden">
+                    <div id="idea-board-container" class="w-full h-full"></div>
+                    <button id="add-note-btn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-yellow-400 text-gray-800 font-semibold rounded-full shadow-lg hover:bg-yellow-500 z-20">
+                        + Add Note
+                    </button>
+                </div>
             </div>
         </main>
     </div>
@@ -720,6 +745,7 @@
                 setupDissertationPage();
                 setupShiftTimer();
                 setupHourCalculator();
+                setupIdeaBoard();
                 dashboardInitialized = true;
             }
 
@@ -1668,6 +1694,106 @@
 
             // Initial rows
             for(let i=0; i<5; i++) createTimeRow();
+        }
+        
+        function setupIdeaBoard() {
+            const ideaBoard = document.getElementById('idea-board');
+            const addNoteBtn = document.getElementById('add-note-btn');
+            const ideaBoardContainer = document.getElementById('idea-board-container');
+            let notes = JSON.parse(localStorage.getItem('sticky-notes')) || [];
+            let activeNote = null;
+            let offsetX, offsetY;
+
+            const colors = ['bg-yellow-200', 'bg-green-200', 'bg-pink-200', 'bg-blue-200', 'bg-purple-200'];
+
+            function saveNotes() {
+                localStorage.setItem('sticky-notes', JSON.stringify(notes));
+            }
+
+            function createNoteElement(note) {
+                const noteEl = document.createElement('div');
+                noteEl.id = note.id;
+                noteEl.className = `sticky-note absolute w-60 h-60 p-4 flex flex-col ${note.color}`;
+                noteEl.style.left = `${note.x}px`;
+                noteEl.style.top = `${note.y}px`;
+                noteEl.innerHTML = `
+                    <div class="flex-grow overflow-auto">
+                        <textarea class="w-full h-full bg-transparent resize-none focus:outline-none text-gray-800">${note.content}</textarea>
+                    </div>
+                    <div class="flex justify-end items-center mt-2 space-x-2">
+                        <button class="copy-note-btn text-gray-600 hover:text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                        <button class="delete-note-btn text-gray-600 hover:text-red-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+                ideaBoardContainer.appendChild(noteEl);
+
+                noteEl.addEventListener('mousedown', (e) => {
+                    if (e.target.tagName.toLowerCase() === 'textarea') return;
+                    activeNote = noteEl;
+                    activeNote.classList.add('dragging');
+                    offsetX = e.clientX - noteEl.offsetLeft;
+                    offsetY = e.clientY - noteEl.offsetTop;
+                });
+
+                const textarea = noteEl.querySelector('textarea');
+                textarea.addEventListener('input', () => {
+                    const noteToUpdate = notes.find(n => n.id === note.id);
+                    noteToUpdate.content = textarea.value;
+                    saveNotes();
+                });
+
+                noteEl.querySelector('.delete-note-btn').addEventListener('click', () => {
+                    notes = notes.filter(n => n.id !== note.id);
+                    saveNotes();
+                    noteEl.remove();
+                });
+
+                noteEl.querySelector('.copy-note-btn').addEventListener('click', () => {
+                     const tempInput = document.createElement('textarea');
+                     tempInput.value = textarea.value;
+                     document.body.appendChild(tempInput);
+                     tempInput.select();
+                     document.execCommand('copy');
+                     document.body.removeChild(tempInput);
+                     alert('Note content copied!');
+                });
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                if (!activeNote) return;
+                activeNote.style.left = `${e.clientX - offsetX}px`;
+                activeNote.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (activeNote) {
+                    const noteToUpdate = notes.find(n => n.id === activeNote.id);
+                    noteToUpdate.x = activeNote.offsetLeft;
+                    noteToUpdate.y = activeNote.offsetTop;
+                    saveNotes();
+                    activeNote.classList.remove('dragging');
+                }
+                activeNote = null;
+            });
+
+            addNoteBtn.addEventListener('click', () => {
+                const newNote = {
+                    id: `note-${Date.now()}`,
+                    content: '',
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    x: Math.random() * (ideaBoard.offsetWidth - 240),
+                    y: Math.random() * (ideaBoard.offsetHeight - 240)
+                };
+                notes.push(newNote);
+                createNoteElement(newNote);
+                saveNotes();
+            });
+
+            notes.forEach(createNoteElement);
         }
     </script>
 </body>
