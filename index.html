@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +8,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <script>
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-            overflow-x: hidden;
         }
         .chart-container {
             position: relative;
@@ -86,15 +93,8 @@
         }
         .kanban-column {
             flex: 1 0 300px;
-            background-color: #f1f5f9; /* slate-100 */
-            border-radius: 0.75rem;
-            padding: 1rem;
         }
         .kanban-card {
-            background-color: white;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
             box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
         }
         .sidebar-link.active {
@@ -112,15 +112,8 @@
             gap: 1.5rem;
         }
         .task-column {
-            background-color: #f1f5f9; /* slate-100 */
-            border-radius: 0.75rem;
-            padding: 1rem;
         }
         .task-item {
-            background-color: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
             box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
         }
         .task-item-checkbox:checked + label {
@@ -183,6 +176,8 @@
             box-shadow: 5px 5px 7px rgba(33,33,33,.7);
             transition: transform .15s linear;
             cursor: grab;
+            resize: both;
+            overflow: hidden;
         }
         .sticky-note.dragging {
             transform: scale(1.05);
@@ -197,7 +192,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
 
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
         <canvas id="landing-canvas"></canvas>
@@ -290,7 +285,7 @@
             </div>
             
             <div class="border-t border-gray-700 pt-4">
-                 <a href="#" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-700">
+                 <a href="#" class="sidebar-link nav-link flex items-center p-2 rounded-lg hover:bg-gray-700" data-view="settings">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     Settings
                 </a>
@@ -302,8 +297,8 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-1 h-full overflow-y-auto bg-slate-50">
-             <header class="p-4 bg-white shadow-md lg:hidden flex justify-between items-center sticky top-0 z-10">
+        <main class="flex-1 h-full overflow-y-auto bg-slate-50 dark:bg-gray-800">
+             <header class="p-4 bg-white dark:bg-gray-800 shadow-md lg:hidden flex justify-between items-center sticky top-0 z-10">
                 <span class="font-bold text-xl text-indigo-600">Productivity Hub</span>
                 <button id="open-sidebar-btn">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -312,25 +307,25 @@
             <div id="main-content-wrapper" class="h-full">
                 <div id="dashboard-home" class="page-view active container mx-auto px-4 sm:px-6 py-8">
                     <header class="text-center mb-8">
-                        <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Summer Curriculum Dashboard</h1>
-                        <p class="mt-2 text-slate-600">Your interactive roadmap to mastering key technology domains.</p>
-                        <p class="mt-1 text-sm text-slate-500" id="endDateText"></p>
+                        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Summer Curriculum Dashboard</h1>
+                        <p class="mt-2 text-slate-600 dark:text-slate-400">Your interactive roadmap to mastering key technology domains.</p>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-500" id="endDateText"></p>
                     </header>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 md:mb-12">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-8 md:mb-12">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="font-semibold text-slate-700">Overall Progress</span>
-                            <span id="progress-percent" class="font-semibold text-indigo-600">0%</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-300">Overall Progress</span>
+                            <span id="progress-percent" class="font-semibold text-indigo-600 dark:text-indigo-400">0%</span>
                         </div>
-                        <div class="w-full bg-slate-200 rounded-full h-2 my-2">
+                        <div class="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2 my-2">
                             <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
-                        <div class="flex justify-between text-sm text-slate-500">
+                        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
                             <span id="progress-subtext">0 of 0 tasks completed</span>
                             <span>🚀</span>
                         </div>
                     </div>
-                    <section class="mb-12 p-6 bg-white rounded-2xl shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">Learning Timeline</h2>
+                    <section class="mb-12 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Learning Timeline</h2>
                         <div class="chart-container">
                             <canvas id="timelineChart"></canvas>
                         </div>
@@ -370,8 +365,8 @@
                 </div>
                 
                 <div id="schedule" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-4">My Schedule</h2>
+                     <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">My Schedule</h2>
                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
                           <p class="font-bold">Action Required</p>
                           <p>To view your Google Calendar, you need to get the embed code. Go to your Google Calendar settings, find the "Integrate calendar" section, copy the "Embed code", and paste the `src` URL into the `iframe` below in the HTML.</p>
@@ -381,8 +376,8 @@
                 </div>
 
                 <div id="spotify" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-4">Focus Playlist</h2>
+                     <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">Focus Playlist</h2>
                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
                           <p class="font-bold">Action Required</p>
                           <p>To use your own playlist, go to Spotify, click the "..." on a playlist, select "Share", then "Embed playlist", and paste the `src` URL into the `iframe` below in the HTML.</p>
@@ -392,11 +387,11 @@
                 </div>
 
                 <div id="dissertation" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                    <h1 class="text-3xl font-bold text-slate-900 mb-6">Dissertation Command Center</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Dissertation Command Center</h1>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-xl font-bold mb-4">1. Project Overview</h2>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-xl font-bold mb-4 dark:text-white">1. Project Overview</h2>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div><strong>Title:</strong> The Impact of AI on Immersive Learning Environments</div>
                                     <div><strong>Supervisor:</strong> Dr. Evelyn Reed</div>
@@ -405,66 +400,66 @@
                                     <div><strong>Start Date:</strong> 01 July 2025</div>
                                     <div><strong>Deadline:</strong> <span id="dissertation-deadline-text">01 May 2026</span></div>
                                 </div>
-                                <p class="text-sm mt-4 text-slate-600"><strong>Summary:</strong> An investigation into how artificial intelligence can be leveraged to create more adaptive, personalized, and effective virtual reality experiences for educational purposes.</p>
+                                <p class="text-sm mt-4 text-slate-600 dark:text-slate-400"><strong>Summary:</strong> An investigation into how artificial intelligence can be leveraged to create more adaptive, personalized, and effective virtual reality experiences for educational purposes.</p>
                                 <div class="mt-4">
                                     <div class="flex justify-between mb-1">
-                                        <span class="text-base font-medium text-indigo-700">Overall Progress</span>
-                                        <span class="text-sm font-medium text-indigo-700" id="writing-progress-percentage">30%</span>
+                                        <span class="text-base font-medium text-indigo-700 dark:text-indigo-400">Overall Progress</span>
+                                        <span class="text-sm font-medium text-indigo-700 dark:text-indigo-400" id="writing-progress-percentage">30%</span>
                                     </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                                         <div id="writing-progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 30%"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-xl font-bold mb-4">✨ 2. AI Research Assistant</h2>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-xl font-bold mb-4 dark:text-white">✨ 2. AI Research Assistant</h2>
                                 <div class="space-y-3">
-                                    <textarea id="ai-research-query" class="w-full p-2 border rounded-md text-sm" placeholder="Ask a research question... e.g., 'Summarize key arguments for using VR in medical training'"></textarea>
+                                    <textarea id="ai-research-query" class="w-full p-2 border rounded-md text-sm bg-gray-100 dark:bg-gray-700 dark:text-white" placeholder="Ask a research question... e.g., 'Summarize key arguments for using VR in medical training'"></textarea>
                                     <button id="ai-research-btn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
                                         <span id="ai-research-btn-text">Generate Insights</span>
                                         <div id="ai-research-loader" class="loader hidden ml-2"></div>
                                     </button>
-                                    <div id="ai-research-output" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm text-slate-700 min-h-[100px]"></div>
+                                    <div id="ai-research-output" class="mt-4 p-4 bg-slate-50 dark:bg-gray-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 min-h-[100px]"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="space-y-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm text-center">
-                                <h2 class="text-lg font-bold mb-2">7. Countdown to Submission</h2>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm text-center">
+                                <h2 class="text-lg font-bold mb-2 dark:text-white">7. Countdown to Submission</h2>
                                 <div id="countdown-timer" class="text-4xl font-bold text-rose-600"></div>
-                                <p class="text-sm text-slate-500">days remaining</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">days remaining</p>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-lg font-bold mb-2">8. Motivation Zone</h2>
-                                <p class="text-slate-600 italic">"The secret of getting ahead is getting started."</p>
-                                <p class="text-right text-sm font-semibold text-slate-700 mt-1">- Mark Twain</p>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-lg font-bold mb-2 dark:text-white">8. Motivation Zone</h2>
+                                <p class="text-slate-600 dark:text-slate-400 italic">"The secret of getting ahead is getting started."</p>
+                                <p class="text-right text-sm font-semibold text-slate-700 dark:text-slate-300 mt-1">- Mark Twain</p>
                             </div>
-                             <div class="bg-white p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-lg font-bold mb-2">4. Resources</h2>
+                             <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                                <h2 class="text-lg font-bold mb-2 dark:text-white">4. Resources</h2>
                                 <ul class="space-y-2 text-sm list-disc list-inside">
-                                    <li><a href="#" class="text-indigo-600 hover:underline">Key Paper on VR Pedagogy</a></li>
-                                    <li><a href="#" class="text-indigo-600 hover:underline">AI in Education Review</a></li>
-                                    <li><a href="#" class="text-indigo-600 hover:underline">Zotero Library Link</a></li>
+                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">Key Paper on VR Pedagogy</a></li>
+                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">AI in Education Review</a></li>
+                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">Zotero Library Link</a></li>
                                 </ul>
                             </div>
                         </div>
-                         <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm">
-                            <h2 class="text-xl font-bold mb-4 text-center">5. Task Board</h2>
+                         <div class="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-bold mb-4 text-center dark:text-white">5. Task Board</h2>
                             <div class="kanban-board">
-                                <div class="kanban-column">
-                                    <h3 class="font-bold mb-4">To Do</h3>
-                                    <div class="kanban-card">Read paper on immersive UX</div>
-                                    <div class="kanban-card">Schedule supervisor meeting</div>
+                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
+                                    <h3 class="font-bold mb-4 dark:text-white">To Do</h3>
+                                    <div class="kanban-card bg-white dark:bg-gray-900">Read paper on immersive UX</div>
+                                    <div class="kanban-card bg-white dark:bg-gray-900">Schedule supervisor meeting</div>
                                 </div>
-                                <div class="kanban-column">
-                                    <h3 class="font-bold mb-4">In Progress</h3>
-                                    <div class="kanban-card">Finish Lit Review</div>
-                                     <div class="kanban-card">Draft research questions</div>
+                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
+                                    <h3 class="font-bold mb-4 dark:text-white">In Progress</h3>
+                                    <div class="kanban-card bg-white dark:bg-gray-900">Finish Lit Review</div>
+                                     <div class="kanban-card bg-white dark:bg-gray-900">Draft research questions</div>
                                 </div>
-                                <div class="kanban-column">
-                                    <h3 class="font-bold mb-4">Done</h3>
-                                    <div class="kanban-card">Topic selected</div>
-                                    <div class="kanban-card">Proposal submitted</div>
+                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
+                                    <h3 class="font-bold mb-4 dark:text-white">Done</h3>
+                                    <div class="kanban-card bg-white dark:bg-gray-900">Topic selected</div>
+                                    <div class="kanban-card bg-white dark:bg-gray-900">Proposal submitted</div>
                                 </div>
                             </div>
                         </div>
@@ -472,8 +467,8 @@
                 </div>
 
                 <div id="weekly-goals" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Weekly Goals</h2>
-                    <p class="text-slate-500 mb-6">Organize your week. Add high-level tasks and use AI to break them down into smaller steps.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Weekly Goals</h2>
+                    <p class="text-slate-500 dark:text-slate-400 mb-6">Organize your week. Add high-level tasks and use AI to break them down into smaller steps.</p>
                     <div class="task-board">
                         <!-- Columns will be generated by JS -->
                     </div>
@@ -531,25 +526,25 @@
                 </div>
 
                  <div id="hour-calculator" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                    <h1 class="text-3xl font-bold text-slate-900 mb-4">Hour Calculator</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Hour Calculator</h1>
                     <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                             <h2 class="text-lg font-semibold text-white bg-blue-600 -mx-6 -mt-6 mb-6 px-6 py-3 rounded-t-lg">Enter Time:</h2>
                             <div id="time-entries" class="space-y-2">
                                 <!-- Time entries will be generated here -->
                             </div>
-                            <button id="add-time-row" class="mt-4 text-blue-600 hover:underline text-sm font-semibold">+ Add More Lines</button>
+                            <button id="add-time-row" class="mt-4 text-blue-600 dark:text-blue-400 hover:underline text-sm font-semibold">+ Add More Lines</button>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                             <h2 class="text-lg font-semibold text-white bg-blue-600 -mx-6 -mt-6 mb-6 px-6 py-3 rounded-t-lg">See Your Total:</h2>
                              <div class="space-y-4">
-                                <div class="bg-gray-200 p-4 rounded-lg text-center">
-                                    <div id="total-time-hms" class="text-3xl font-bold text-gray-800">00:00:00</div>
-                                    <div class="text-sm text-gray-500">HH:MM:SS</div>
+                                <div class="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg text-center">
+                                    <div id="total-time-hms" class="text-3xl font-bold text-gray-800 dark:text-white">00:00:00</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">HH:MM:SS</div>
                                 </div>
-                                <div class="bg-gray-200 p-4 rounded-lg text-center">
-                                    <div id="total-time-decimal" class="text-3xl font-bold text-gray-800">0.00</div>
-                                     <div class="text-sm text-gray-500">In Hours</div>
+                                <div class="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg text-center">
+                                    <div id="total-time-decimal" class="text-3xl font-bold text-gray-800 dark:text-white">0.00</div>
+                                     <div class="text-sm text-gray-500 dark:text-gray-400">In Hours</div>
                                 </div>
                                 <button id="calculate-time-btn" class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Calculate</button>
                                 <button id="clear-time-btn" class="w-full py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700">Clear</button>
@@ -557,6 +552,21 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div id="settings" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                     <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Settings</h1>
+                     <div class="space-y-8 max-w-2xl mx-auto">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-semibold mb-4 border-b pb-2 dark:border-gray-700">Appearance</h2>
+                            <div class="flex items-center justify-between">
+                                <label for="dark-mode-toggle" class="font-medium text-slate-700 dark:text-slate-300">Dark Mode</label>
+                                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                     </div>
                 </div>
                 <div id="idea-board" class="page-view h-full relative overflow-hidden">
                     <div id="idea-board-container" class="w-full h-full"></div>
@@ -664,7 +674,7 @@
 
                 curriculumData.forEach((moduleData, moduleIndex) => {
                     const moduleCard = document.createElement('div');
-                    moduleCard.className = `module-card bg-white rounded-2xl shadow-sm p-6 flex flex-col`;
+                    moduleCard.className = `module-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 flex flex-col`;
                     moduleCard.dataset.module = moduleData.module;
 
                     let topicsHtml = '';
@@ -676,8 +686,8 @@
                             itemsHtml += `
                                 <li class="flex items-start">
                                     <input type="checkbox" id="${checkboxId}" class="task-checkbox hidden">
-                                    <label for="${checkboxId}" class="flex items-center cursor-pointer text-slate-700 w-full">
-                                        <span class="w-5 h-5 mr-3 rounded border-2 border-slate-300 flex-shrink-0 flex items-center justify-center">
+                                    <label for="${checkboxId}" class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 w-full">
+                                        <span class="w-5 h-5 mr-3 rounded border-2 border-slate-300 dark:border-gray-600 flex-shrink-0 flex items-center justify-center">
                                             <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         </span>
                                         ${item}
@@ -688,9 +698,9 @@
                         itemsHtml += '</ul>';
 
                         topicsHtml += `
-                            <div class="border-b border-slate-200 last:border-b-0">
+                            <div class="border-b border-slate-200 dark:border-gray-700 last:border-b-0">
                                 <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
-                                    <h4 class="font-semibold text-slate-800">${topic.title}</h4>
+                                    <h4 class="font-semibold text-slate-800 dark:text-white">${topic.title}</h4>
                                     <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 <div class="accordion-content">
@@ -705,8 +715,8 @@
                             <div class="w-12 h-12 rounded-lg bg-${moduleData.themeColor}-100 flex items-center justify-center mb-4">
                                 <svg class="w-6 h-6 text-${moduleData.themeColor}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${moduleData.icon}</svg>
                             </div>
-                            <h3 class="text-xl font-bold text-slate-900">${moduleData.module}</h3>
-                            <p class="text-slate-600 mt-2 mb-4 h-24">${moduleData.description}</p>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">${moduleData.module}</h3>
+                            <p class="text-slate-600 dark:text-slate-400 mt-2 mb-4 h-24">${moduleData.description}</p>
                         </div>
                         <div class="flex-grow">
                             ${topicsHtml}
@@ -746,6 +756,7 @@
                 setupShiftTimer();
                 setupHourCalculator();
                 setupIdeaBoard();
+                setupSettings();
                 dashboardInitialized = true;
             }
 
@@ -1651,11 +1662,11 @@
                 const row = document.createElement('div');
                 row.className = 'flex items-center space-x-2';
                 row.innerHTML = `
-                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0">
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0">
                     <span class="font-bold">:</span>
-                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0" max="59">
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0" max="59">
                     <span class="font-bold">:</span>
-                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0" max="59">
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0" max="59">
                 `;
                 timeEntriesContainer.appendChild(row);
             }
@@ -1752,14 +1763,22 @@
                     noteEl.remove();
                 });
 
-                noteEl.querySelector('.copy-note-btn').addEventListener('click', () => {
+                noteEl.querySelector('.copy-note-btn').addEventListener('click', (e) => {
+                     const button = e.currentTarget;
+                     const originalIcon = button.innerHTML;
+                     const checkIcon = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                     
                      const tempInput = document.createElement('textarea');
                      tempInput.value = textarea.value;
                      document.body.appendChild(tempInput);
                      tempInput.select();
                      document.execCommand('copy');
                      document.body.removeChild(tempInput);
-                     alert('Note content copied!');
+
+                     button.innerHTML = checkIcon;
+                     setTimeout(() => {
+                        button.innerHTML = originalIcon;
+                     }, 1500)
                 });
             }
 
@@ -1794,6 +1813,45 @@
             });
 
             notes.forEach(createNoteElement);
+        }
+        
+        function setupSettings() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+            // Change the icons inside the button based on previous settings
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                themeToggleLightIcon.classList.remove('hidden');
+            } else {
+                themeToggleDarkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                // toggle icons inside button
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                // if set via local storage previously
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                // if NOT set via local storage previously
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
         }
     </script>
 </body>
