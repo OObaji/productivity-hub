@@ -255,6 +255,19 @@
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Shift Timer
                 </a>
+                <div class="mt-2">
+                    <button id="tools-toggle-btn" class="sidebar-link w-full flex items-center p-2 rounded-lg hover:bg-gray-700">
+                       <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Tools
+                        <svg id="tools-arrow" class="w-4 h-4 ml-auto transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="tools-submenu" class="sidebar-topics-submenu pl-8 mt-1 space-y-1">
+                        <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="hour-calculator">
+                           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Hour Calculator
+                        </a>
+                    </div>
+                </div>
             </div>
             
             <div class="border-t border-gray-700 pt-4">
@@ -497,6 +510,35 @@
                         </div>
                     </div>
                 </div>
+
+                 <div id="hour-calculator" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 mb-4">Hour Calculator</h1>
+                    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <h2 class="text-lg font-semibold text-white bg-blue-600 -mx-6 -mt-6 mb-6 px-6 py-3 rounded-t-lg">Enter Time:</h2>
+                            <div id="time-entries" class="space-y-2">
+                                <!-- Time entries will be generated here -->
+                            </div>
+                            <button id="add-time-row" class="mt-4 text-blue-600 hover:underline text-sm font-semibold">+ Add More Lines</button>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <h2 class="text-lg font-semibold text-white bg-blue-600 -mx-6 -mt-6 mb-6 px-6 py-3 rounded-t-lg">See Your Total:</h2>
+                             <div class="space-y-4">
+                                <div class="bg-gray-200 p-4 rounded-lg text-center">
+                                    <div id="total-time-hms" class="text-3xl font-bold text-gray-800">00:00:00</div>
+                                    <div class="text-sm text-gray-500">HH:MM:SS</div>
+                                </div>
+                                <div class="bg-gray-200 p-4 rounded-lg text-center">
+                                    <div id="total-time-decimal" class="text-3xl font-bold text-gray-800">0.00</div>
+                                     <div class="text-sm text-gray-500">In Hours</div>
+                                </div>
+                                <button id="calculate-time-btn" class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Calculate</button>
+                                <button id="clear-time-btn" class="w-full py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700">Clear</button>
+                                <button id="print-time-btn" class="w-full py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700">Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -677,6 +719,7 @@
                 setupWeeklyGoals();
                 setupDissertationPage();
                 setupShiftTimer();
+                setupHourCalculator();
                 dashboardInitialized = true;
             }
 
@@ -719,7 +762,10 @@
                 const sidebarLinks = document.querySelectorAll('.sidebar-link');
                 const topicsToggleBtn = document.getElementById('topics-toggle-btn');
                 const topicsSubmenu = document.getElementById('topics-submenu');
+                const toolsToggleBtn = document.getElementById('tools-toggle-btn');
+                const toolsSubmenu = document.getElementById('tools-submenu');
                 const topicsArrow = document.getElementById('topics-arrow');
+                const toolsArrow = document.getElementById('tools-arrow');
                 const topicFilters = document.querySelectorAll('.topic-filter');
                 const mainContentWrapper = document.getElementById('main-content-wrapper');
 
@@ -741,7 +787,7 @@
                         pageViews.forEach(page => {
                            if(page.id === view) {
                                page.classList.add('active');
-                               if (page.id === 'pomodoro' || page.id === 'shift-timer') {
+                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board') {
                                    mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                                } else {
                                    mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -763,6 +809,16 @@
                     } else {
                         topicsSubmenu.style.maxHeight = topicsSubmenu.scrollHeight + "px";
                         topicsArrow.classList.add('rotate-180');
+                    }
+                });
+                
+                toolsToggleBtn.addEventListener('click', () => {
+                    if (toolsSubmenu.style.maxHeight) {
+                        toolsSubmenu.style.maxHeight = null;
+                        toolsArrow.classList.remove('rotate-180');
+                    } else {
+                        toolsSubmenu.style.maxHeight = toolsSubmenu.scrollHeight + "px";
+                        toolsArrow.classList.add('rotate-180');
                     }
                 });
 
@@ -1554,6 +1610,64 @@
                     }
                 }
             });
+        }
+
+        function setupHourCalculator() {
+            const timeEntriesContainer = document.getElementById('time-entries');
+            const addRowBtn = document.getElementById('add-time-row');
+            const calculateBtn = document.getElementById('calculate-time-btn');
+            const clearBtn = document.getElementById('clear-time-btn');
+            const printBtn = document.getElementById('print-time-btn');
+            const totalHms = document.getElementById('total-time-hms');
+            const totalDecimal = document.getElementById('total-time-decimal');
+
+            function createTimeRow() {
+                const row = document.createElement('div');
+                row.className = 'flex items-center space-x-2';
+                row.innerHTML = `
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0">
+                    <span class="font-bold">:</span>
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0" max="59">
+                    <span class="font-bold">:</span>
+                    <input type="number" class="time-input w-16 p-2 border rounded-md text-center" placeholder="00" min="0" max="59">
+                `;
+                timeEntriesContainer.appendChild(row);
+            }
+
+            addRowBtn.addEventListener('click', createTimeRow);
+
+            calculateBtn.addEventListener('click', () => {
+                let totalSeconds = 0;
+                const rows = timeEntriesContainer.querySelectorAll('.flex');
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('.time-input');
+                    const hours = parseInt(inputs[0].value) || 0;
+                    const minutes = parseInt(inputs[1].value) || 0;
+                    const seconds = parseInt(inputs[2].value) || 0;
+                    totalSeconds += (hours * 3600) + (minutes * 60) + seconds;
+                });
+
+                const totalHours = Math.floor(totalSeconds / 3600);
+                const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
+                const remainingSeconds = totalSeconds % 60;
+
+                totalHms.textContent = `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                totalDecimal.textContent = (totalSeconds / 3600).toFixed(2);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                timeEntriesContainer.innerHTML = '';
+                for(let i=0; i<5; i++) createTimeRow();
+                totalHms.textContent = '00:00:00';
+                totalDecimal.textContent = '0.00';
+            });
+            
+            printBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            // Initial rows
+            for(let i=0; i<5; i++) createTimeRow();
         }
     </script>
 </body>
