@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> The Kaizen Space </title>
+    <title>MyndArc - Your Productivity Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
         }
         .chart-container {
             position: relative;
@@ -121,7 +122,7 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view, #shift-timer.page-view {
+        #pomodoro.page-view, #shift-timer.page-view, #pg-plan.page-view, #idea-board.page-view {
             background-size: cover;
             background-position: center;
             transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
@@ -168,7 +169,7 @@
             height: 100%;
             z-index: 0;
         }
-        #idea-board {
+        #idea-board, #pg-plan {
             background-image: url('https://www.transparenttextures.com/patterns/cork-wallet.png');
             background-color: #d2b48c;
         }
@@ -184,10 +185,10 @@
             z-index: 50;
             cursor: grabbing;
         }
-        #add-note-btn {
+        #add-note-btn, #add-pg-note-btn {
             cursor: grab;
         }
-        #add-note-btn:active {
+        #add-note-btn:active, #add-pg-note-btn:active {
             cursor: grabbing;
         }
     </style>
@@ -261,6 +262,10 @@
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                     Weekly Goals
                 </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="pg-plan">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 14l-4-4m0 0l4-4m-4 4h12"></path></svg>
+                    PG Plan
+                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="shift-timer">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Shift Timer
@@ -297,7 +302,7 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-1 h-full overflow-y-auto bg-slate-50 dark:bg-gray-800">
+        <main id="main-container" class="flex-1 h-full overflow-y-auto bg-slate-50 dark:bg-gray-800">
              <header class="p-4 bg-white dark:bg-gray-800 shadow-md lg:hidden flex justify-between items-center sticky top-0 z-10">
                 <span class="font-bold text-xl text-indigo-600">Productivity Hub</span>
                 <button id="open-sidebar-btn">
@@ -367,25 +372,22 @@
                 <div id="schedule" class="page-view container mx-auto px-4 sm:px-6 py-8">
                      <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">My Schedule</h2>
-                <iframe 
-                  src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FLondon&src=d39539fe8caf1493fe398711479b903c3916b1d258ad8db8200e8cfb27371473%40group.calendar.google.com&src=5898e02f577fb07264972baa9f7e7df72fbb40e419e6f4f83271b86222f4356f%40group.calendar.google.com&src=2cf75c10acdae3f473fd85791ca5ed5974c066754d0a964eb9a9748fdbb8dcb7%40group.calendar.google.com&src=934a7e189d74901c1fd96f1e7f7381bcafd27834b5e84713bf87965e4caa1e42%40group.calendar.google.com&src=90abe9ac507cab74d3df947fdcdd24960d1ce7498cf3a72bbf149ce4914aca47%40group.calendar.google.com&src=08c9a66082c947407e115cf79f6e6661ce664692d86d03d71e4e403515a2eec9%40group.calendar.google.com&src=7fd8003fa22ebcfb8535cf853b002ad987fdbdce8bef9e9afbb752f71ee27e2e%40group.calendar.google.com&src=43002634e7dfbf15e2502db950ff6ea7f201c781d0b1b3536916a1434ef0f232%40group.calendar.google.com&src=8972ab22507aad0719e148a744cdced5dcf2402a68b4db32c4431c701cb45661%40group.calendar.google.com"
-                  style="border:0" 
-                  width="100%" 
-                  height="600" 
-                  frameborder="0" 
-                  scrolling="no">
-                </iframe>
-
-
+                        <iframe 
+                          src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FLondon&src=d39539fe8caf1493fe398711479b903c3916b1d258ad8db8200e8cfb27371473%40group.calendar.google.com&src=5898e02f577fb07264972baa9f7e7df72fbb40e419e6f4f83271b86222f4356f%40group.calendar.google.com&src=2cf75c10acdae3f473fd85791ca5ed5974c066754d0a964eb9a9748fdbb8dcb7%40group.calendar.google.com&src=934a7e189d74901c1fd96f1e7f7381bcafd27834b5e84713bf87965e4caa1e42%40group.calendar.google.com&src=90abe9ac507cab74d3df947fdcdd24960d1ce7498cf3a72bbf149ce4914aca47%40group.calendar.google.com&src=08c9a66082c947407e115cf79f6e6661ce664692d86d03d71e4e403515a2eec9%40group.calendar.google.com&src=7fd8003fa22ebcfb8535cf853b002ad987fdbdce8bef9e9afbb752f71ee27e2e%40group.calendar.google.com&src=43002634e7dfbf15e2502db950ff6ea7f201c781d0b1b3536916a1434ef0f232%40group.calendar.google.com&src=8972ab22507aad0719e148a744cdced5dcf2402a68b4db32c4431c701cb45661%40group.calendar.google.com"
+                          style="border:0" 
+                          width="100%" 
+                          height="600" 
+                          frameborder="0" 
+                          scrolling="no">
+                        </iframe>
                      </div>
                 </div>
 
                 <div id="spotify" class="page-view container mx-auto px-4 sm:px-6 py-8">
                      <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">Focus Playlist</h2>
-                 </div>
-                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/46iQn1DHoYNlHwBIOnfAxi?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-                    </div>
+                     </div>
+                     <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/46iQn1DHoYNlHwBIOnfAxi?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                 </div>
 
                 <div id="dissertation" class="page-view container mx-auto px-4 sm:px-6 py-8">
@@ -478,7 +480,7 @@
                 
                 <div id="shift-timer" class="page-view h-full relative">
                     <canvas id="shift-timer-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
-                    <div class="relative z-10 flex flex-col items-center justify-center h-full p-4 text-white">
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
                         <div id="shift-setup" class="w-full max-w-md bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
                             <h2 class="text-2xl font-bold mb-4">Set Shift End Time</h2>
                             <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
@@ -493,21 +495,21 @@
                             <h2 id="shift-motivation-quote" class="text-2xl font-semibold tracking-wider mb-4">Let's get this bread!</h2>
                             <div class="flex items-center justify-center my-4 text-yellow-400" style="text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);">
                                 <div class="mx-2">
-                                    <div id="shift-hours-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div id="shift-hours-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
                                     <div class="text-sm uppercase tracking-widest">Hours</div>
                                 </div>
-                                <div class="text-7xl font-bold">:</div>
+                                <div class="text-6xl sm:text-8xl md:text-9xl font-bold">:</div>
                                 <div class="mx-2">
-                                    <div id="shift-minutes-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div id="shift-minutes-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
                                     <div class="text-sm uppercase tracking-widest">Minutes</div>
                                 </div>
-                                <div class="text-7xl font-bold">:</div>
+                                <div class="text-6xl sm:text-8xl md:text-9xl font-bold">:</div>
                                 <div class="mx-2">
-                                    <div id="shift-seconds-display" class="text-8xl md:text-9xl font-bold">00</div>
+                                    <div id="shift-seconds-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
                                     <div class="text-sm uppercase tracking-widest">Seconds</div>
                                 </div>
                             </div>
-                            <div class="w-full max-w-2xl mx-auto mt-4">
+                            <div class="w-full max-w-2xl mx-auto mt-4 px-4">
                                 <div class="w-full bg-white/20 rounded-full h-2.5">
                                     <div id="shift-progress-bar" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
                                 </div>
@@ -573,6 +575,12 @@
                 <div id="idea-board" class="page-view h-full relative overflow-hidden">
                     <div id="idea-board-container" class="w-full h-full"></div>
                     <button id="add-note-btn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-yellow-400 text-gray-800 font-semibold rounded-full shadow-lg hover:bg-yellow-500 z-20">
+                        + Add Note
+                    </button>
+                </div>
+                <div id="pg-plan" class="page-view h-full relative overflow-hidden">
+                    <div id="pg-plan-container" class="w-full h-full"></div>
+                    <button id="add-pg-note-btn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-yellow-400 text-gray-800 font-semibold rounded-full shadow-lg hover:bg-yellow-500 z-20">
                         + Add Note
                     </button>
                 </div>
@@ -758,6 +766,7 @@
                 setupShiftTimer();
                 setupHourCalculator();
                 setupIdeaBoard();
+                setupPgPlan();
                 setupSettings();
                 dashboardInitialized = true;
             }
@@ -826,7 +835,7 @@
                         pageViews.forEach(page => {
                            if(page.id === view) {
                                page.classList.add('active');
-                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board') {
+                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board' || page.id === 'pg-plan') {
                                    mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                                } else {
                                    mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -1141,6 +1150,25 @@
                 const aiResearchLoader = document.getElementById('ai-research-loader');
                 const aiResearchQuery = document.getElementById('ai-research-query');
                 const aiResearchOutput = document.getElementById('ai-research-output');
+                const countdownTimerEl = document.getElementById('countdown-timer');
+                const deadlineTextEl = document.getElementById('dissertation-deadline-text');
+
+                function updateDissertationCountdown() {
+                    const deadlineDate = new Date('2026-05-01T00:00:00');
+                    const now = new Date();
+                    const timeDifference = deadlineDate.getTime() - now.getTime();
+                    const daysRemaining = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+                    if (daysRemaining > 0) {
+                        countdownTimerEl.textContent = daysRemaining;
+                    } else {
+                        countdownTimerEl.textContent = "0";
+                        deadlineTextEl.textContent = "Deadline has passed!";
+                    }
+                }
+
+                updateDissertationCountdown();
+                setInterval(updateDissertationCountdown, 1000 * 60 * 60 * 24); // Update once a day
 
                 aiResearchBtn.addEventListener('click', async () => {
                     const query = aiResearchQuery.value.trim();
@@ -1808,6 +1836,114 @@
                     color: colors[Math.floor(Math.random() * colors.length)],
                     x: Math.random() * (ideaBoard.offsetWidth - 240),
                     y: Math.random() * (ideaBoard.offsetHeight - 240)
+                };
+                notes.push(newNote);
+                createNoteElement(newNote);
+                saveNotes();
+            });
+
+            notes.forEach(createNoteElement);
+        }
+
+        function setupPgPlan() {
+            const pgPlanBoard = document.getElementById('pg-plan');
+            const addNoteBtn = document.getElementById('add-pg-note-btn');
+            const pgPlanContainer = document.getElementById('pg-plan-container');
+            let notes = JSON.parse(localStorage.getItem('pg-plan-notes')) || [];
+            let activeNote = null;
+            let offsetX, offsetY;
+
+            const colors = ['bg-yellow-200', 'bg-green-200', 'bg-pink-200', 'bg-blue-200', 'bg-purple-200'];
+
+            function saveNotes() {
+                localStorage.setItem('pg-plan-notes', JSON.stringify(notes));
+            }
+
+            function createNoteElement(note) {
+                const noteEl = document.createElement('div');
+                noteEl.id = note.id;
+                noteEl.className = `sticky-note absolute w-60 h-60 p-4 flex flex-col ${note.color}`;
+                noteEl.style.left = `${note.x}px`;
+                noteEl.style.top = `${note.y}px`;
+                noteEl.innerHTML = `
+                    <div class="flex-grow overflow-auto">
+                        <textarea class="w-full h-full bg-transparent resize-none focus:outline-none text-gray-800">${note.content}</textarea>
+                    </div>
+                    <div class="flex justify-end items-center mt-2 space-x-2">
+                        <button class="copy-note-btn text-gray-600 hover:text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                        <button class="delete-note-btn text-gray-600 hover:text-red-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+                pgPlanContainer.appendChild(noteEl);
+
+                noteEl.addEventListener('mousedown', (e) => {
+                    if (e.target.tagName.toLowerCase() === 'textarea') return;
+                    activeNote = noteEl;
+                    activeNote.classList.add('dragging');
+                    offsetX = e.clientX - noteEl.offsetLeft;
+                    offsetY = e.clientY - noteEl.offsetTop;
+                });
+
+                const textarea = noteEl.querySelector('textarea');
+                textarea.addEventListener('input', () => {
+                    const noteToUpdate = notes.find(n => n.id === note.id);
+                    noteToUpdate.content = textarea.value;
+                    saveNotes();
+                });
+
+                noteEl.querySelector('.delete-note-btn').addEventListener('click', () => {
+                    notes = notes.filter(n => n.id !== note.id);
+                    saveNotes();
+                    noteEl.remove();
+                });
+
+                noteEl.querySelector('.copy-note-btn').addEventListener('click', (e) => {
+                   const button = e.currentTarget;
+                   const originalIcon = button.innerHTML;
+                   const checkIcon = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                   
+                   const tempInput = document.createElement('textarea');
+                   tempInput.value = textarea.value;
+                   document.body.appendChild(tempInput);
+                   tempInput.select();
+                   document.execCommand('copy');
+                   document.body.removeChild(tempInput);
+
+                   button.innerHTML = checkIcon;
+                   setTimeout(() => {
+                       button.innerHTML = originalIcon;
+                   }, 1500)
+                });
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                if (!activeNote) return;
+                activeNote.style.left = `${e.clientX - offsetX}px`;
+                activeNote.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (activeNote) {
+                    const noteToUpdate = notes.find(n => n.id === activeNote.id);
+                    noteToUpdate.x = activeNote.offsetLeft;
+                    noteToUpdate.y = activeNote.offsetTop;
+                    saveNotes();
+                    activeNote.classList.remove('dragging');
+                }
+                activeNote = null;
+            });
+
+            addNoteBtn.addEventListener('click', () => {
+                const newNote = {
+                    id: `note-${Date.now()}`,
+                    content: '',
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    x: Math.random() * (pgPlanBoard.offsetWidth - 240),
+                    y: Math.random() * (pgPlanBoard.offsetHeight - 240)
                 };
                 notes.push(newNote);
                 createNoteElement(newNote);
