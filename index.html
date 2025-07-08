@@ -133,13 +133,10 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view {
+        #pomodoro.page-view, #shift-timer.page-view {
             background-size: cover;
             background-position: center;
-            transition: background-image 0.5s ease-in-out;
-        }
-        #shift-timer.page-view {
-            background-color: #111827;
+            transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
         }
         .overlay {
             background-color: rgba(0,0,0,0.5);
@@ -593,6 +590,7 @@
 
             let totalTasks = 0;
             let dashboardInitialized = false;
+            let timelineChart = null;
 
             function initializeDashboard() {
                 if (dashboardInitialized) return;
@@ -1099,7 +1097,6 @@
                 const newShiftBtn = document.getElementById('new-shift-btn');
                 const endTimeInput = document.getElementById('shift-end-time-input');
                 const endTimeLabel = document.getElementById('shift-end-time-label');
-                const motivationQuote = document.getElementById('shift-motivation-quote');
                 const shiftProgressBar = document.getElementById('shift-progress-bar');
                 const presetNormalBtn = document.getElementById('preset-normal-btn');
                 const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
@@ -1108,20 +1105,12 @@
                 let shiftStartTime;
                 let shiftEndTime;
                 let totalShiftDuration;
-
-                const backgroundColors = {
-                    start: '#ef4444', // red-500
-                    mid: '#f59e0b',   // amber-500
-                    end: '#22c55e',   // green-500
-                    finished: '#3b82f6' // blue-500
-                };
-
-                const quotes = {
-                    start: "A new shift begins. Let's make it a great one!",
-                    mid: "Keep up the momentum. You're doing great!",
-                    end: "The final stretch. Finish strong!"
-                };
-
+                let activeAnimationId;
+                
+                const canvas = document.getElementById('shift-timer-canvas');
+                const ctx = canvas.getContext('2d');
+                const mouse = { x: null, y: null, radius: 150 };
+                
                 function formatDateTimeForInput(date) {
                     const pad = (num) => num.toString().padStart(2, '0');
                     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -1153,23 +1142,9 @@
 
                 function updateShiftVisuals() {
                     const now = new Date();
-                    const remainingMs = shiftEndTime - now;
                     const elapsedMs = now - shiftStartTime;
                     const percentage = (elapsedMs / totalShiftDuration) * 100;
-                    const remainingHours = remainingMs / (1000 * 60 * 60);
-                    
                     shiftProgressBar.style.width = `${Math.min(percentage, 100)}%`;
-
-                    if (remainingHours > 9) {
-                        shiftTimerPage.style.backgroundColor = backgroundColors.start;
-                        motivationQuote.textContent = quotes.start;
-                    } else if (remainingHours > 5) {
-                        shiftTimerPage.style.backgroundColor = backgroundColors.mid;
-                        motivationQuote.textContent = quotes.mid;
-                    } else {
-                        shiftTimerPage.style.backgroundColor = backgroundColors.end;
-                         motivationQuote.textContent = quotes.end;
-                    }
                 }
 
                 function shiftCountdown() {
@@ -1184,7 +1159,7 @@
                         updateShiftDisplay(0);
                         countdownView.classList.add('hidden');
                         endView.classList.remove('hidden');
-                        shiftTimerPage.style.backgroundColor = backgroundColors.finished;
+                        stopActiveAnimation();
                         localStorage.removeItem('shiftEndTime');
                         localStorage.removeItem('shiftStartTime');
                     }
@@ -1192,12 +1167,12 @@
 
                 function resetShiftTimer() {
                     clearInterval(shiftTimer);
+                    stopActiveAnimation();
                     localStorage.removeItem('shiftEndTime');
                     localStorage.removeItem('shiftStartTime');
                     setupView.classList.remove('hidden');
                     countdownView.classList.add('hidden');
                     endView.classList.add('hidden');
-                    shiftTimerPage.style.backgroundColor = backgroundColors.start;
                 }
 
                 function checkStoredShift() {
@@ -1215,6 +1190,7 @@
                             endTimeLabel.textContent = `Ends at ${shiftEndTime.toLocaleTimeString()}`;
                             shiftCountdown();
                             shiftTimer = setInterval(shiftCountdown, 1000);
+                            startRandomAnimation();
                         } else {
                             resetShiftTimer();
                         }
@@ -1250,11 +1226,172 @@
                     
                     shiftCountdown(); // Initial call
                     shiftTimer = setInterval(shiftCountdown, 1000);
+                    startRandomAnimation();
                 });
 
                 resetBtn.addEventListener('click', resetShiftTimer);
                 newShiftBtn.addEventListener('click', resetShiftTimer);
                 
+                // Animation Functions
+                const animations = [initDigitalRain, initConstellation];
+                let currentAnimationId;
+
+                function startRandomAnimation() {
+                    stopActiveAnimation();
+                    const randomIndex = Math.floor(Math.random() * animations.length);
+                    animations[randomIndex]();
+                }
+
+                function stopActiveAnimation() {
+                    if (currentAnimationId) {
+                        cancelAnimationFrame(currentAnimationId);
+                    }
+                    window.removeEventListener('resize', resizeCanvas);
+                    shiftTimerPage.removeEventListener('mousemove', ()=>{});
+                    shiftTimerPage.removeEventListener('mouseout', ()=>{});
+                }
+
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+
+                function initDigitalRain() {
+                    let columns;
+                    let fontSize = 16;
+                    let drops = [];
+                    const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789';
+
+                    function localResize() {
+                        resizeCanvas();
+                        columns = Math.floor(canvas.width / fontSize);
+                        for(let i = 0; i < columns; i++) {
+                            drops[i] = 1;
+                        }
+                    }
+                    localResize();
+                    window.addEventListener('resize', localResize);
+                    
+                    shiftTimerPage.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                    shiftTimerPage.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+                    function draw() {
+                        ctx.fillStyle = 'rgba(17, 24, 39, 0.1)';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        for(let i = 0; i < drops.length; i++) {
+                            const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                            const x = i * fontSize;
+                            const y = drops[i] * fontSize;
+
+                            let dx = mouse.x - x;
+                            let dy = mouse.y - y;
+                            let distance = dx * dx + dy * dy;
+
+                            if (distance < mouse.radius) {
+                                ctx.fillStyle = '#a7f3d0'; // emerald-200
+                                ctx.font = `${fontSize + 2}px monospace`;
+                            } else {
+                                ctx.fillStyle = '#059669'; // emerald-600
+                                ctx.font = `${fontSize}px monospace`;
+                            }
+                            
+                            ctx.fillText(text, x, y);
+                            
+                            if(y > canvas.height && Math.random() > 0.975) {
+                                drops[i] = 0;
+                            }
+                            drops[i]++;
+                        }
+                    }
+                    
+                    function animate() {
+                        draw();
+                        currentAnimationId = requestAnimationFrame(animate);
+                    }
+                    animate();
+                }
+
+                function initConstellation() {
+                    let particles = [];
+                    const numParticles = 100;
+                    
+                    function localResize() {
+                        resizeCanvas();
+                        particles = [];
+                        for(let i = 0; i < numParticles; i++) {
+                            particles.push({
+                                x: Math.random() * canvas.width,
+                                y: Math.random() * canvas.height,
+                                vx: Math.random() * 0.4 - 0.2,
+                                vy: Math.random() * 0.4 - 0.2,
+                                radius: Math.random() * 1.5 + 1
+                            });
+                        }
+                    }
+                    localResize();
+                    window.addEventListener('resize', localResize);
+                    
+                    shiftTimerPage.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                    shiftTimerPage.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+                    function draw() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = '#111827';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        for(let i = 0; i < particles.length; i++) {
+                            const p = particles[i];
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            p.x += p.vx;
+                            p.y += p.vy;
+
+                            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                            for(let j = i + 1; j < particles.length; j++) {
+                                const p2 = particles[j];
+                                const dx = p.x - p2.x;
+                                const dy = p.y - p2.y;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                                if (dist < 120) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(p.x, p.y);
+                                    ctx.lineTo(p2.x, p2.y);
+                                    ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist/120})`;
+                                    ctx.lineWidth = 0.5;
+                                    ctx.stroke();
+                                }
+                            }
+                            
+                            if (mouse.x) {
+                                const mdx = p.x - mouse.x;
+                                const mdy = p.y - mouse.y;
+                                const mDist = Math.sqrt(mdx*mdx + mdy*mdy);
+                                if (mDist < 150) {
+                                     ctx.beginPath();
+                                    ctx.moveTo(p.x, p.y);
+                                    ctx.lineTo(mouse.x, mouse.y);
+                                    ctx.strokeStyle = `rgba(250, 204, 21, ${1 - mDist/150})`;
+                                    ctx.lineWidth = 0.5;
+                                    ctx.stroke();
+                                }
+                            }
+                        }
+                    }
+
+                    function animate() {
+                        draw();
+                        currentAnimationId = requestAnimationFrame(animate);
+                    }
+                    animate();
+                }
+
                 checkStoredShift();
             }
             
@@ -1348,40 +1485,41 @@
 
         function renderTimelineChart() {
             const ctx = document.getElementById('timelineChart').getContext('2d');
-            const data = {
-                labels: ['Immersive Tech', 'AI & ML', 'Advanced Web', 'Mobile Tech', 'Cyber Security'],
-                datasets: [{
-                    label: 'Learning Path',
-                    data: [
-                        [0, 3], 
-                        [3, 5],
-                        [5, 7],
-                        [7, 9],
-                        [9, 12]
-                    ],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.5)',
-                        'rgba(139, 92, 246, 0.5)',
-                        'rgba(16, 185, 129, 0.5)',
-                        'rgba(245, 158, 11, 0.5)',
-                        'rgba(244, 63, 94, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(139, 92, 246, 1)',
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(245, 158, 11, 1)',
-                        'rgba(244, 63, 94, 1)'
-                    ],
-                    borderWidth: 1,
-                    barPercentage: 0.6,
-                    borderSkipped: false,
-                }]
-            };
-
-            new Chart(ctx, {
+            if (window.myTimelineChart) {
+                window.myTimelineChart.destroy();
+            }
+            window.myTimelineChart = new Chart(ctx, {
                 type: 'bar',
-                data: data,
+                data: {
+                    labels: ['Immersive Tech', 'AI & ML', 'Advanced Web', 'Mobile Tech', 'Cyber Security'],
+                    datasets: [{
+                        label: 'Learning Path',
+                        data: [
+                            [0, 3], 
+                            [3, 5],
+                            [5, 7],
+                            [7, 9],
+                            [9, 12]
+                        ],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.5)',
+                            'rgba(139, 92, 246, 0.5)',
+                            'rgba(16, 185, 129, 0.5)',
+                            'rgba(245, 158, 11, 0.5)',
+                            'rgba(244, 63, 94, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(244, 63, 94, 1)'
+                        ],
+                        borderWidth: 1,
+                        barPercentage: 0.6,
+                        borderSkipped: false,
+                    }]
+                },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
