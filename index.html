@@ -122,7 +122,7 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view, #shift-timer.page-view, #pg-plan.page-view, #idea-board.page-view {
+        #pomodoro.page-view, #shift-timer.page-view, #idea-board.page-view {
             background-size: cover;
             background-position: center;
             transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
@@ -169,7 +169,7 @@
             height: 100%;
             z-index: 0;
         }
-        #idea-board, #pg-plan {
+        #idea-board {
             background-image: url('https://www.transparenttextures.com/patterns/cork-wallet.png');
             background-color: #d2b48c;
         }
@@ -185,11 +185,27 @@
             z-index: 50;
             cursor: grabbing;
         }
-        #add-note-btn, #add-pg-note-btn {
+        #add-note-btn {
             cursor: grab;
         }
-        #add-note-btn:active, #add-pg-note-btn:active {
+        #add-note-btn:active {
             cursor: grabbing;
+        }
+        .breach-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .dark .breach-item {
+            border-bottom-color: #374151; /* gray-700 */
+        }
+        .breach-item:last-child {
+            border-bottom: none;
+        }
+        .breach-item-checkbox:checked + label {
+            text-decoration: line-through;
+            color: #6b7280; /* gray-500 */
         }
     </style>
 </head>
@@ -254,21 +270,13 @@
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12-3" /></svg>
                     Spotify
                 </a>
-                 <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="dissertation">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    Dissertation
-                </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="weekly-goals">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                    Weekly Goals
-                </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="pg-plan">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 14l-4-4m0 0l4-4m-4 4h12"></path></svg>
-                    PG Plan
-                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="shift-timer">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Shift Timer
+                </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="breach-list">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Breach List
                 </a>
                 <div class="mt-2">
                     <button id="tools-toggle-btn" class="sidebar-link w-full flex items-center p-2 rounded-lg hover:bg-gray-700">
@@ -390,94 +398,6 @@
                      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/46iQn1DHoYNlHwBIOnfAxi?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                 </div>
 
-                <div id="dissertation" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Dissertation Command Center</h1>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-xl font-bold mb-4 dark:text-white">1. Project Overview</h2>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div><strong>Title:</strong> The Impact of AI on Immersive Learning Environments</div>
-                                    <div><strong>Supervisor:</strong> Dr. Evelyn Reed</div>
-                                    <div><strong>Course:</strong> MSc Advanced Computer Science</div>
-                                    <div><strong>Department:</strong> School of Engineering</div>
-                                    <div><strong>Start Date:</strong> 01 July 2025</div>
-                                    <div><strong>Deadline:</strong> <span id="dissertation-deadline-text">01 May 2026</span></div>
-                                </div>
-                                <p class="text-sm mt-4 text-slate-600 dark:text-slate-400"><strong>Summary:</strong> An investigation into how artificial intelligence can be leveraged to create more adaptive, personalized, and effective virtual reality experiences for educational purposes.</p>
-                                <div class="mt-4">
-                                    <div class="flex justify-between mb-1">
-                                        <span class="text-base font-medium text-indigo-700 dark:text-indigo-400">Overall Progress</span>
-                                        <span class="text-sm font-medium text-indigo-700 dark:text-indigo-400" id="writing-progress-percentage">30%</span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                                        <div id="writing-progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 30%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-xl font-bold mb-4 dark:text-white">✨ 2. AI Research Assistant</h2>
-                                <div class="space-y-3">
-                                    <textarea id="ai-research-query" class="w-full p-2 border rounded-md text-sm bg-gray-100 dark:bg-gray-700 dark:text-white" placeholder="Ask a research question... e.g., 'Summarize key arguments for using VR in medical training'"></textarea>
-                                    <button id="ai-research-btn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
-                                        <span id="ai-research-btn-text">Generate Insights</span>
-                                        <div id="ai-research-loader" class="loader hidden ml-2"></div>
-                                    </button>
-                                    <div id="ai-research-output" class="mt-4 p-4 bg-slate-50 dark:bg-gray-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 min-h-[100px]"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="space-y-6">
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm text-center">
-                                <h2 class="text-lg font-bold mb-2 dark:text-white">7. Countdown to Submission</h2>
-                                <div id="countdown-timer" class="text-4xl font-bold text-rose-600"></div>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">days remaining</p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-lg font-bold mb-2 dark:text-white">8. Motivation Zone</h2>
-                                <p class="text-slate-600 dark:text-slate-400 italic">"The secret of getting ahead is getting started."</p>
-                                <p class="text-right text-sm font-semibold text-slate-700 dark:text-slate-300 mt-1">- Mark Twain</p>
-                            </div>
-                             <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                                <h2 class="text-lg font-bold mb-2 dark:text-white">4. Resources</h2>
-                                <ul class="space-y-2 text-sm list-disc list-inside">
-                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">Key Paper on VR Pedagogy</a></li>
-                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">AI in Education Review</a></li>
-                                    <li><a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">Zotero Library Link</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                         <div class="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                            <h2 class="text-xl font-bold mb-4 text-center dark:text-white">5. Task Board</h2>
-                            <div class="kanban-board">
-                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
-                                    <h3 class="font-bold mb-4 dark:text-white">To Do</h3>
-                                    <div class="kanban-card bg-white dark:bg-gray-900">Read paper on immersive UX</div>
-                                    <div class="kanban-card bg-white dark:bg-gray-900">Schedule supervisor meeting</div>
-                                </div>
-                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
-                                    <h3 class="font-bold mb-4 dark:text-white">In Progress</h3>
-                                    <div class="kanban-card bg-white dark:bg-gray-900">Finish Lit Review</div>
-                                     <div class="kanban-card bg-white dark:bg-gray-900">Draft research questions</div>
-                                </div>
-                                <div class="kanban-column bg-slate-100 dark:bg-gray-700">
-                                    <h3 class="font-bold mb-4 dark:text-white">Done</h3>
-                                    <div class="kanban-card bg-white dark:bg-gray-900">Topic selected</div>
-                                    <div class="kanban-card bg-white dark:bg-gray-900">Proposal submitted</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="weekly-goals" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Weekly Goals</h2>
-                    <p class="text-slate-500 dark:text-slate-400 mb-6">Organize your week. Add high-level tasks and use AI to break them down into smaller steps.</p>
-                    <div class="task-board">
-                        <!-- Columns will be generated by JS -->
-                    </div>
-                </div>
-                
                 <div id="shift-timer" class="page-view h-full relative">
                     <canvas id="shift-timer-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
                     <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
@@ -578,35 +498,39 @@
                         + Add Note
                     </button>
                 </div>
-                <div id="pg-plan" class="page-view h-full relative overflow-hidden">
-                    <div id="pg-plan-container" class="w-full h-full"></div>
-                    <button id="add-pg-note-btn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-yellow-400 text-gray-800 font-semibold rounded-full shadow-lg hover:bg-yellow-500 z-20">
-                        + Add Note
-                    </button>
+                <div id="breach-list" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Breach List</h1>
+                    <!-- Counters -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm text-center">
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Total Items</p>
+                            <p id="breach-total-count" class="text-2xl font-bold text-slate-900 dark:text-white">0</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm text-center">
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Completed</p>
+                            <p id="breach-completed-count" class="text-2xl font-bold text-green-500">0</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm text-center">
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Uncompleted</p>
+                            <p id="breach-uncompleted-count" class="text-2xl font-bold text-red-500">0</p>
+                        </div>
+                    </div>
+                    <!-- Add Item Form -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm mb-6">
+                        <div class="flex gap-4">
+                            <input type="text" id="breach-item-input" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-slate-900 dark:text-white" placeholder="Add a new breach item...">
+                            <button id="add-breach-item-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-md font-semibold">Add</button>
+                        </div>
+                    </div>
+                    <!-- To-Do List -->
+                    <div id="breach-list-container" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm space-y-2">
+                        <!-- Items will be generated by JS -->
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Add Task Modal -->
-    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            <h3 class="text-lg font-bold mb-4" id="modal-title">Add New Task</h3>
-            <div class="flex gap-2">
-                <input type="text" id="modal-task-input" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter a large goal...">
-                <button id="ai-breakdown-btn" class="p-2 bg-indigo-500 text-white rounded-md flex items-center justify-center">
-                    <span id="ai-breakdown-btn-text">✨</span>
-                    <div id="ai-breakdown-loader" class="loader hidden"></div>
-                </button>
-            </div>
-            <div class="mt-4 flex justify-end space-x-2">
-                <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-200 rounded-md">Cancel</button>
-                <button id="modal-save-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Add Manually</button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
         const curriculumData = [
             {
@@ -761,13 +685,11 @@
                 renderTimelineChart();
                 setupNavigation();
                 setupPomodoro();
-                setupWeeklyGoals();
-                setupDissertationPage();
                 setupShiftTimer();
                 setupHourCalculator();
                 setupIdeaBoard();
-                setupPgPlan();
                 setupSettings();
+                setupBreachList();
                 dashboardInitialized = true;
             }
 
@@ -835,7 +757,7 @@
                         pageViews.forEach(page => {
                            if(page.id === view) {
                                page.classList.add('active');
-                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board' || page.id === 'pg-plan') {
+                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board') {
                                    mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                                } else {
                                    mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -1015,201 +937,7 @@
                 
                 setMode('pomodoro'); // Initialize
             }
-
-            function setupWeeklyGoals() {
-                const taskBoard = document.querySelector('#weekly-goals .task-board');
-                const modal = document.getElementById('add-task-modal');
-                const modalTitle = document.getElementById('modal-title');
-                const modalInput = document.getElementById('modal-task-input');
-                const modalCancelBtn = document.getElementById('modal-cancel-btn');
-                const modalSaveBtn = document.getElementById('modal-save-btn');
-                const aiBreakdownBtn = document.getElementById('ai-breakdown-btn');
-                const aiBreakdownLoader = document.getElementById('ai-breakdown-loader');
-                const aiBreakdownBtnText = document.getElementById('ai-breakdown-btn-text');
-                let currentTaskList;
-
-                const columns = ['Daily Tasks', 'Routine Tasks', 'Work Tasks', 'Hobbies', 'Others'];
-                
-                columns.forEach(colName => {
-                    const columnEl = document.createElement('div');
-                    columnEl.className = 'task-column';
-                    columnEl.innerHTML = `
-                        <h3 class="font-bold mb-4 text-slate-800">${colName}</h3>
-                        <div class="task-list space-y-3 mb-4"></div>
-                        <button class="add-task-btn w-full p-2 text-sm text-slate-600 hover:bg-slate-200 rounded-md">+ Add a task</button>
-                    `;
-                    taskBoard.appendChild(columnEl);
-                });
-
-                function addTaskToUI(taskText, list) {
-                     const taskEl = document.createElement('div');
-                    taskEl.className = 'task-item';
-                    const taskId = `task-${Date.now()}-${Math.random()}`;
-                    taskEl.innerHTML = `
-                        <div class="flex items-center">
-                            <input type="checkbox" id="${taskId}" class="task-item-checkbox hidden">
-                            <label for="${taskId}" class="flex items-center cursor-pointer text-slate-700 w-full">
-                                <span class="w-5 h-5 mr-3 rounded-full border-2 border-slate-300 flex-shrink-0 flex items-center justify-center">
-                                     <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                </span>
-                                ${taskText}
-                            </label>
-                        </div>
-                    `;
-                    list.appendChild(taskEl);
-                }
-
-                taskBoard.addEventListener('click', e => {
-                    if (e.target.classList.contains('add-task-btn')) {
-                        modal.style.display = 'flex';
-                        modalTitle.textContent = `Add to ${e.target.previousElementSibling.previousElementSibling.textContent}`;
-                        currentTaskList = e.target.previousElementSibling;
-                        modalInput.focus();
-                    }
-                });
-
-                modalCancelBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                    modalInput.value = '';
-                });
-
-                modalSaveBtn.addEventListener('click', () => {
-                    const taskText = modalInput.value.trim();
-                    if (taskText) {
-                       addTaskToUI(taskText, currentTaskList);
-                    }
-                    modal.style.display = 'none';
-                    modalInput.value = '';
-                });
-
-                aiBreakdownBtn.addEventListener('click', async () => {
-                    const goal = modalInput.value.trim();
-                    if (!goal) {
-                        alert("Please enter a goal to break down.");
-                        return;
-                    }
-                    
-                    aiBreakdownBtnText.classList.add('hidden');
-                    aiBreakdownLoader.classList.remove('hidden');
-
-                    const prompt = `Break down the following high-level goal into a list of smaller, actionable sub-tasks. The goal is: "${goal}". Return the response as a JSON object with a single key "tasks" which is an array of strings.`;
-                    
-                    try {
-                        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                        const payload = { 
-                            contents: chatHistory,
-                             generationConfig: {
-                                responseMimeType: "application/json",
-                                responseSchema: {
-                                    type: "OBJECT",
-                                    properties: { "tasks": { "type": "ARRAY", "items": { "type": "STRING" } } }
-                                }
-                            }
-                        };
-                        const apiKey = "";
-                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await response.json();
-                        
-                        if (result.candidates && result.candidates[0].content.parts[0].text) {
-                            const parsed = JSON.parse(result.candidates[0].content.parts[0].text);
-                            parsed.tasks.forEach(task => addTaskToUI(task, currentTaskList));
-                            modal.style.display = 'none';
-                            modalInput.value = '';
-                        } else {
-                            throw new Error("Invalid response from API");
-                        }
-                    } catch (error) {
-                        console.error("Error with Gemini API:", error);
-                        alert("Could not break down the task. Please try adding it manually.");
-                    } finally {
-                        aiBreakdownBtnText.classList.remove('hidden');
-                        aiBreakdownLoader.classList.add('hidden');
-                    }
-                });
-
-                 taskBoard.addEventListener('change', e => {
-                    if (e.target.classList.contains('task-item-checkbox')) {
-                        const label = e.target.nextElementSibling;
-                        if (e.target.checked) {
-                            label.classList.add('line-through', 'text-gray-500');
-                        } else {
-                             label.classList.remove('line-through', 'text-gray-500');
-                        }
-                    }
-                });
-            }
             
-            function setupDissertationPage() {
-                const aiResearchBtn = document.getElementById('ai-research-btn');
-                const aiResearchBtnText = document.getElementById('ai-research-btn-text');
-                const aiResearchLoader = document.getElementById('ai-research-loader');
-                const aiResearchQuery = document.getElementById('ai-research-query');
-                const aiResearchOutput = document.getElementById('ai-research-output');
-                const countdownTimerEl = document.getElementById('countdown-timer');
-                const deadlineTextEl = document.getElementById('dissertation-deadline-text');
-
-                function updateDissertationCountdown() {
-                    const deadlineDate = new Date('2026-05-01T00:00:00');
-                    const now = new Date();
-                    const timeDifference = deadlineDate.getTime() - now.getTime();
-                    const daysRemaining = Math.ceil(timeDifference / (1000 * 3600 * 24));
-
-                    if (daysRemaining > 0) {
-                        countdownTimerEl.textContent = daysRemaining;
-                    } else {
-                        countdownTimerEl.textContent = "0";
-                        deadlineTextEl.textContent = "Deadline has passed!";
-                    }
-                }
-
-                updateDissertationCountdown();
-                setInterval(updateDissertationCountdown, 1000 * 60 * 60 * 24); // Update once a day
-
-                aiResearchBtn.addEventListener('click', async () => {
-                    const query = aiResearchQuery.value.trim();
-                    if (!query) {
-                        alert("Please enter a research query.");
-                        return;
-                    }
-
-                    aiResearchBtnText.classList.add('hidden');
-                    aiResearchLoader.classList.remove('hidden');
-                    aiResearchOutput.innerHTML = '';
-
-                    const prompt = `Act as a research assistant. Provide a concise summary and key insights for the following query: "${query}"`;
-
-                    try {
-                        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                        const payload = { contents: chatHistory };
-                        const apiKey = "";
-                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await response.json();
-
-                        if (result.candidates && result.candidates[0].content.parts[0].text) {
-                            aiResearchOutput.textContent = result.candidates[0].content.parts[0].text;
-                        } else {
-                             throw new Error("Invalid response from API");
-                        }
-                    } catch (error) {
-                        console.error("Error with Gemini API:", error);
-                        aiResearchOutput.textContent = "Sorry, I couldn't fetch insights for that query. Please try again.";
-                    } finally {
-                        aiResearchBtnText.classList.remove('hidden');
-                        aiResearchLoader.classList.add('hidden');
-                    }
-                });
-            }
-
             function setupShiftTimer() {
                 const shiftTimerPage = document.getElementById('shift-timer');
                 const setupView = document.getElementById('shift-setup');
@@ -1844,114 +1572,6 @@
 
             notes.forEach(createNoteElement);
         }
-
-        function setupPgPlan() {
-            const pgPlanBoard = document.getElementById('pg-plan');
-            const addNoteBtn = document.getElementById('add-pg-note-btn');
-            const pgPlanContainer = document.getElementById('pg-plan-container');
-            let notes = JSON.parse(localStorage.getItem('pg-plan-notes')) || [];
-            let activeNote = null;
-            let offsetX, offsetY;
-
-            const colors = ['bg-yellow-200', 'bg-green-200', 'bg-pink-200', 'bg-blue-200', 'bg-purple-200'];
-
-            function saveNotes() {
-                localStorage.setItem('pg-plan-notes', JSON.stringify(notes));
-            }
-
-            function createNoteElement(note) {
-                const noteEl = document.createElement('div');
-                noteEl.id = note.id;
-                noteEl.className = `sticky-note absolute w-60 h-60 p-4 flex flex-col ${note.color}`;
-                noteEl.style.left = `${note.x}px`;
-                noteEl.style.top = `${note.y}px`;
-                noteEl.innerHTML = `
-                    <div class="flex-grow overflow-auto">
-                        <textarea class="w-full h-full bg-transparent resize-none focus:outline-none text-gray-800">${note.content}</textarea>
-                    </div>
-                    <div class="flex justify-end items-center mt-2 space-x-2">
-                        <button class="copy-note-btn text-gray-600 hover:text-black">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        </button>
-                        <button class="delete-note-btn text-gray-600 hover:text-red-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
-                `;
-                pgPlanContainer.appendChild(noteEl);
-
-                noteEl.addEventListener('mousedown', (e) => {
-                    if (e.target.tagName.toLowerCase() === 'textarea') return;
-                    activeNote = noteEl;
-                    activeNote.classList.add('dragging');
-                    offsetX = e.clientX - noteEl.offsetLeft;
-                    offsetY = e.clientY - noteEl.offsetTop;
-                });
-
-                const textarea = noteEl.querySelector('textarea');
-                textarea.addEventListener('input', () => {
-                    const noteToUpdate = notes.find(n => n.id === note.id);
-                    noteToUpdate.content = textarea.value;
-                    saveNotes();
-                });
-
-                noteEl.querySelector('.delete-note-btn').addEventListener('click', () => {
-                    notes = notes.filter(n => n.id !== note.id);
-                    saveNotes();
-                    noteEl.remove();
-                });
-
-                noteEl.querySelector('.copy-note-btn').addEventListener('click', (e) => {
-                   const button = e.currentTarget;
-                   const originalIcon = button.innerHTML;
-                   const checkIcon = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                   
-                   const tempInput = document.createElement('textarea');
-                   tempInput.value = textarea.value;
-                   document.body.appendChild(tempInput);
-                   tempInput.select();
-                   document.execCommand('copy');
-                   document.body.removeChild(tempInput);
-
-                   button.innerHTML = checkIcon;
-                   setTimeout(() => {
-                       button.innerHTML = originalIcon;
-                   }, 1500)
-                });
-            }
-
-            document.addEventListener('mousemove', (e) => {
-                if (!activeNote) return;
-                activeNote.style.left = `${e.clientX - offsetX}px`;
-                activeNote.style.top = `${e.clientY - offsetY}px`;
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (activeNote) {
-                    const noteToUpdate = notes.find(n => n.id === activeNote.id);
-                    noteToUpdate.x = activeNote.offsetLeft;
-                    noteToUpdate.y = activeNote.offsetTop;
-                    saveNotes();
-                    activeNote.classList.remove('dragging');
-                }
-                activeNote = null;
-            });
-
-            addNoteBtn.addEventListener('click', () => {
-                const newNote = {
-                    id: `note-${Date.now()}`,
-                    content: '',
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    x: Math.random() * (pgPlanBoard.offsetWidth - 240),
-                    y: Math.random() * (pgPlanBoard.offsetHeight - 240)
-                };
-                notes.push(newNote);
-                createNoteElement(newNote);
-                saveNotes();
-            });
-
-            notes.forEach(createNoteElement);
-        }
         
         function setupSettings() {
             const themeToggleBtn = document.getElementById('theme-toggle');
@@ -1991,6 +1611,109 @@
                 }
             });
         }
+
+        function setupBreachList() {
+            const listContainer = document.getElementById('breach-list-container');
+            const itemInput = document.getElementById('breach-item-input');
+            const addBtn = document.getElementById('add-breach-item-btn');
+            const totalCountEl = document.getElementById('breach-total-count');
+            const completedCountEl = document.getElementById('breach-completed-count');
+            const uncompletedCountEl = document.getElementById('breach-uncompleted-count');
+
+            let breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
+
+            function saveItems() {
+                localStorage.setItem('breachItems', JSON.stringify(breachItems));
+            }
+
+            function updateCounters() {
+                const total = breachItems.length;
+                const completed = breachItems.filter(item => item.completed).length;
+                const uncompleted = total - completed;
+
+                totalCountEl.textContent = total;
+                completedCountEl.textContent = completed;
+                uncompletedCountEl.textContent = uncompleted;
+            }
+
+            function renderList() {
+                listContainer.innerHTML = ''; // Clear the list first
+
+                if (breachItems.length === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-slate-500 dark:text-slate-400">No breach items yet. Add one above!</p>`;
+                    updateCounters();
+                    return;
+                }
+
+                breachItems.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'breach-item';
+                    itemEl.dataset.id = item.id;
+
+                    itemEl.innerHTML = `
+                        <input type="checkbox" id="breach-${item.id}" class="breach-item-checkbox hidden" ${item.completed ? 'checked' : ''}>
+                        <label for="breach-${item.id}" class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 w-full">
+                            <span class="w-5 h-5 mr-4 rounded border-2 border-slate-300 dark:border-gray-600 flex-shrink-0 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </span>
+                            <span class="flex-grow">${item.text}</span>
+                        </label>
+                        <button class="delete-breach-item ml-4 text-slate-400 hover:text-red-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    `;
+                    listContainer.appendChild(itemEl);
+                });
+
+                updateCounters();
+            }
+
+            addBtn.addEventListener('click', () => {
+                const text = itemInput.value.trim();
+                if (text) {
+                    breachItems.push({
+                        id: Date.now(),
+                        text: text,
+                        completed: false
+                    });
+                    itemInput.value = '';
+                    saveItems();
+                    renderList();
+                }
+            });
+            
+            itemInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addBtn.click();
+                }
+            });
+
+            listContainer.addEventListener('click', (e) => {
+                const targetLabel = e.target.closest('label');
+                const deleteBtn = e.target.closest('.delete-breach-item');
+
+                if (targetLabel) {
+                    const checkboxId = targetLabel.getAttribute('for');
+                    const checkbox = document.getElementById(checkboxId);
+                    const itemId = checkbox.closest('.breach-item').dataset.id;
+                    const item = breachItems.find(i => i.id == itemId);
+                    item.completed = !checkbox.checked; // This is counter-intuitive, but the event fires before the check state updates
+                    saveItems();
+                    renderList();
+                }
+
+                if (deleteBtn) {
+                    const itemId = deleteBtn.closest('.breach-item').dataset.id;
+                    breachItems = breachItems.filter(i => i.id != itemId);
+                    saveItems();
+                    renderList();
+                }
+            });
+
+            // Initial render
+            renderList();
+        }
+
     </script>
 </body>
 </html>
