@@ -233,6 +233,20 @@
         </div>
     </div>
 
+    <!-- Principle Details Modal -->
+    <div id="principle-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-lg text-left relative transform scale-95 transition-transform duration-300">
+            <button id="principle-modal-close-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 id="principle-modal-title" class="text-2xl font-bold text-slate-900 dark:text-white mb-4"></h2>
+            <p id="principle-modal-description" class="text-slate-600 dark:text-slate-400 mb-6"></p>
+            <div id="principle-modal-tasks" class="max-h-60 overflow-y-auto pr-2"></div>
+            <button id="principle-modal-ok-btn" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">Got it!</button>
+        </div>
+    </div>
+
+
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
         <canvas id="landing-canvas"></canvas>
         <div class="relative z-10 max-w-3xl">
@@ -344,22 +358,8 @@
                     <header class="text-center mb-8">
                         <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Productivity Dashboard</h1>
                         <p class="mt-2 text-slate-600 dark:text-slate-400">Your interactive guide to productivity principles and task management.</p>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-500" id="endDateText"></p>
                     </header>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-8 md:mb-12">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-semibold text-slate-700 dark:text-slate-300">Principle Task Progress</span>
-                            <span id="progress-percent" class="font-semibold text-indigo-600 dark:text-indigo-400">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2 my-2">
-                            <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
-                        </div>
-                        <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                            <span id="progress-subtext">0 of 0 tasks completed</span>
-                            <span>💡</span>
-                        </div>
-                    </div>
-
+                    
                     <!-- Dashboard Metrics Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                         <section id="breach-stats-card" class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex flex-col">
@@ -632,15 +632,12 @@
             const landingCanvas = document.getElementById('landing-canvas');
             
             const grid = document.getElementById('curriculum-grid');
-            const endDateText = document.getElementById('endDateText');
-            endDateText.textContent = ``; // Remove date text
 
             // Modal elements
             const alertModal = document.getElementById('alert-modal');
             const alertMessage = document.getElementById('alert-message');
             const alertCloseBtn = document.getElementById('alert-close-btn');
 
-            let totalTasks = 0;
             let dashboardInitialized = false;
 
             // --- Generic Modal Functions ---
@@ -661,85 +658,37 @@
             function initializeDashboard() {
                 if (dashboardInitialized) return;
 
-                curriculumData.forEach((moduleData, moduleIndex) => {
+                grid.innerHTML = ''; // Clear existing grid items
+
+                curriculumData.forEach((moduleData) => {
                     const moduleCard = document.createElement('div');
                     moduleCard.className = `module-card bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 flex flex-col`;
                     moduleCard.dataset.module = moduleData.module;
-
-                    let topicsHtml = '';
-                    moduleData.topics.forEach((topic, topicIndex) => {
-                        let itemsHtml = '<ul class="space-y-3 pt-4">';
-                        topic.items.forEach((item, itemIndex) => {
-                            const checkboxId = `task-${moduleIndex}-${topicIndex}-${itemIndex}`;
-                            totalTasks++;
-                            itemsHtml += `
-                                <li class="flex items-start">
-                                    <input type="checkbox" id="${checkboxId}" class="task-checkbox hidden">
-                                    <label for="${checkboxId}" class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 w-full">
-                                        <span class="w-5 h-5 mr-3 rounded border-2 border-slate-300 dark:border-gray-600 flex-shrink-0 flex items-center justify-center">
-                                            <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                        </span>
-                                        ${item}
-                                    </label>
-                                </li>
-                            `;
-                        });
-                        itemsHtml += '</ul>';
-
-                        topicsHtml += `
-                            <div class="border-b border-slate-200 dark:border-gray-700 last:border-b-0">
-                                <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
-                                    <h4 class="font-semibold text-slate-800 dark:text-white">${topic.title}</h4>
-                                    <svg class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                                <div class="accordion-content">
-                                    ${itemsHtml}
-                                </div>
-                            </div>
-                        `;
-                    });
                     
                     moduleCard.innerHTML = `
-                        <div>
-                            <div class="w-12 h-12 rounded-lg bg-${moduleData.themeColor}-100 flex items-center justify-center mb-4">
-                                <svg class="w-6 h-6 text-${moduleData.themeColor}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${moduleData.icon}</svg>
+                        <div class="flex-grow">
+                            <div class="w-12 h-12 rounded-lg bg-${moduleData.themeColor}-100 dark:bg-${moduleData.themeColor}-900/50 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-${moduleData.themeColor}-600 dark:text-${moduleData.themeColor}-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${moduleData.icon}</svg>
                             </div>
                             <h3 class="text-xl font-bold text-slate-900 dark:text-white">${moduleData.module}</h3>
                             <p class="text-slate-600 dark:text-slate-400 mt-2 mb-4 h-24">${moduleData.description}</p>
                         </div>
-                        <div class="flex-grow">
-                            ${topicsHtml}
+                        <div class="mt-auto pt-4">
+                            <button class="learn-more-btn w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75"
+                                data-module="${moduleData.module}"
+                                data-description="${moduleData.description}"
+                                data-topics='${JSON.stringify(moduleData.topics)}'>
+                                Learn More
+                            </button>
                         </div>
                     `;
                     grid.appendChild(moduleCard);
                 });
 
-                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', updateProgress);
-                });
-                
-                document.querySelectorAll('.accordion-toggle').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const content = button.nextElementSibling;
-                        const icon = button.querySelector('svg');
-
-                        if (content.style.maxHeight) {
-                            content.style.maxHeight = null;
-                            icon.classList.remove('rotate-180');
-                        } else {
-                            document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
-                            document.querySelectorAll('.accordion-toggle svg').forEach(i => i.classList.remove('rotate-180'));
-
-                            content.style.maxHeight = content.scrollHeight + "px";
-                            icon.classList.add('rotate-180');
-                        }
-                    });
-                });
-
-                updateProgress();
                 renderBreachCompletionTable(); 
                 renderBreachStats();
                 setupNavigation();
+                setupPrincipleModals();
                 setupPomodoro();
                 setupShiftTimer();
                 setupHourCalculator();
@@ -748,15 +697,6 @@
                 setupBreachList();
                 dashboardInitialized = true;
             }
-
-            const updateProgress = () => {
-                const checkedTasks = document.querySelectorAll('.task-checkbox:checked').length;
-                const progress = totalTasks > 0 ? (checkedTasks / totalTasks) * 100 : 0;
-                
-                document.getElementById('progress-bar').style.width = `${progress}%`;
-                document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
-                document.getElementById('progress-subtext').textContent = `${checkedTasks} of ${totalTasks} tasks completed`;
-            };
             
             getStartedBtn.addEventListener('click', () => {
                 initializeDashboard();
@@ -864,6 +804,68 @@
                         sidebar.classList.add('-translate-x-full');
                     });
                 });
+            }
+
+            function setupPrincipleModals() {
+                const modal = document.getElementById('principle-modal');
+                const modalContent = modal.querySelector('.transform');
+                const modalTitle = document.getElementById('principle-modal-title');
+                const modalDescription = document.getElementById('principle-modal-description');
+                const modalTasks = document.getElementById('principle-modal-tasks');
+                const closeBtn = document.getElementById('principle-modal-close-btn');
+                const okBtn = document.getElementById('principle-modal-ok-btn');
+
+                function showModal() {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                        modalContent.classList.remove('scale-95');
+                    }, 10);
+                }
+
+                function hideModal() {
+                    modal.classList.add('opacity-0');
+                    modalContent.classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 300);
+                }
+
+                document.getElementById('curriculum-grid').addEventListener('click', (e) => {
+                    const learnMoreBtn = e.target.closest('.learn-more-btn');
+                    if (learnMoreBtn) {
+                        const title = learnMoreBtn.dataset.module;
+                        const description = learnMoreBtn.dataset.description;
+                        const topics = JSON.parse(learnMoreBtn.dataset.topics);
+
+                        modalTitle.textContent = title;
+                        modalDescription.textContent = description;
+                        
+                        modalTasks.innerHTML = ''; // Clear previous content
+                        let tasksHtml = '';
+                        topics.forEach(topic => {
+                            tasksHtml += `<h4 class="font-semibold text-lg mt-4 mb-2 text-slate-800 dark:text-white">${topic.title}</h4>`;
+                            tasksHtml += '<ul class="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">';
+                            topic.items.forEach(item => {
+                                tasksHtml += `<li>${item}</li>`;
+                            });
+                            tasksHtml += '</ul>';
+                        });
+                        modalTasks.innerHTML = tasksHtml;
+
+                        showModal();
+                    }
+                });
+
+                closeBtn.addEventListener('click', hideModal);
+                okBtn.addEventListener('click', hideModal);
+                modal.addEventListener('click', (e) => {
+                    if(e.target === modal) {
+                        hideModal();
+                    }
+                })
             }
             
             function setupPomodoro() {
