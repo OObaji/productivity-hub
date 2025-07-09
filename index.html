@@ -817,7 +817,7 @@
                         name: 'Focus',
                         time: 25,
                         color: '#F97316', // orange-500
-                        icon: '🍅',
+                        icon: '�',
                         next: 'shortBreak',
                         background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
                     },
@@ -1084,7 +1084,7 @@
                 newShiftBtn.addEventListener('click', resetShiftTimer);
                 
                 // Animation Functions
-                const animations = [initDigitalRain, initConstellation];
+                const animations = [initConstellation];
                 let currentAnimationId;
 
                 function startRandomAnimation() {
@@ -1105,62 +1105,6 @@
                 function resizeCanvas() {
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
-                }
-
-                function initDigitalRain() {
-                    let columns;
-                    let fontSize = 16;
-                    let drops = [];
-                    const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789';
-
-                    function localResize() {
-                        resizeCanvas();
-                        columns = Math.floor(canvas.width / fontSize);
-                        for(let i = 0; i < columns; i++) {
-                            drops[i] = 1;
-                        }
-                    }
-                    localResize();
-                    window.addEventListener('resize', localResize);
-                    
-                    shiftTimerPage.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-                    shiftTimerPage.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
-
-                    function draw() {
-                        ctx.fillStyle = 'rgba(17, 24, 39, 0.1)';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        
-                        for(let i = 0; i < drops.length; i++) {
-                            const text = characters.charAt(Math.floor(Math.random() * characters.length));
-                            const x = i * fontSize;
-                            const y = drops[i] * fontSize;
-
-                            let dx = mouse.x - x;
-                            let dy = mouse.y - y;
-                            let distance = dx * dx + dy * dy;
-
-                            if (distance < mouse.radius) {
-                                ctx.fillStyle = '#a7f3d0'; // emerald-200
-                                ctx.font = `${fontSize + 2}px monospace`;
-                            } else {
-                                ctx.fillStyle = '#059669'; // emerald-600
-                                ctx.font = `${fontSize}px monospace`;
-                            }
-                            
-                            ctx.fillText(text, x, y);
-                            
-                            if(y > canvas.height && Math.random() > 0.975) {
-                                drops[i] = 0;
-                            }
-                            drops[i]++;
-                        }
-                    }
-                    
-                    function animate() {
-                        draw();
-                        currentAnimationId = requestAnimationFrame(animate);
-                    }
-                    animate();
                 }
 
                 function initConstellation() {
@@ -1717,3 +1661,4 @@
     </script>
 </body>
 </html>
+�
