@@ -207,6 +207,20 @@
             text-decoration: line-through;
             color: #6b7280; /* gray-500 */
         }
+        /* Accordion for breach log */
+        #breach-log-container details > summary {
+            list-style: none;
+            cursor: pointer;
+        }
+        #breach-log-container details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #breach-log-container details .summary-arrow {
+            transition: transform 0.2s;
+        }
+        #breach-log-container details[open] .summary-arrow {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
@@ -253,16 +267,16 @@
                 
                 <div class="mt-2">
                     <button id="topics-toggle-btn" class="sidebar-link w-full flex items-center p-2 rounded-lg hover:bg-gray-700">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                        Summer Topics
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707m-9.192 9.192l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Productivity Principles
                         <svg id="topics-arrow" class="w-4 h-4 ml-auto transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div id="topics-submenu" class="sidebar-topics-submenu pl-8 mt-1 space-y-1">
-                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="all">All Topics</a>
-                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Immersive Technology">Immersive Tech</a>
-                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="AI & Machine Learning">Intelligent Systems</a>
-                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Mobile & Ubiquitous Technology">Mobile & Ubiquitous</a>
-                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Cyber Security">Cyber Security</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="all">All Principles</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Ikigai (生き甲斐)">Ikigai (生き甲斐)</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Eisenhower Matrix">Eisenhower Matrix</a>
+                        <a href="#" class="block text-sm p-1 rounded hover:bg-gray-700 topic-filter" data-module="Pareto Principle (80/20)">Pareto Principle (80/20)</a>
+                        <a href="#" class="nav-link block text-sm p-1 rounded hover:bg-gray-700" data-view="pomodoro">Pomodoro Technique</a>
                     </div>
                 </div>
 
@@ -328,13 +342,13 @@
             <div id="main-content-wrapper" class="h-full">
                 <div id="dashboard-home" class="page-view active container mx-auto px-4 sm:px-6 py-8">
                     <header class="text-center mb-8">
-                        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Summer Curriculum Dashboard</h1>
-                        <p class="mt-2 text-slate-600 dark:text-slate-400">Your interactive roadmap to mastering key technology domains.</p>
+                        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Productivity Dashboard</h1>
+                        <p class="mt-2 text-slate-600 dark:text-slate-400">Your interactive guide to productivity principles and task management.</p>
                         <p class="mt-1 text-sm text-slate-500 dark:text-slate-500" id="endDateText"></p>
                     </header>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-8 md:mb-12">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="font-semibold text-slate-700 dark:text-slate-300">Overall Progress</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-300">Principle Task Progress</span>
                             <span id="progress-percent" class="font-semibold text-indigo-600 dark:text-indigo-400">0%</span>
                         </div>
                         <div class="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2 my-2">
@@ -342,32 +356,42 @@
                         </div>
                         <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
                             <span id="progress-subtext">0 of 0 tasks completed</span>
-                            <span>🚀</span>
+                            <span>💡</span>
                         </div>
                     </div>
 
                     <!-- Dashboard Metrics Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                        <section class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
-                            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Learning Timeline</h2>
-                            <div class="chart-container">
-                                <canvas id="timelineChart"></canvas>
+                        <section id="breach-stats-card" class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex flex-col">
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Breach List Stats</h2>
+                            <div class="flex-grow flex flex-col justify-center space-y-4">
+                                <div class="flex justify-between text-sm">
+                                    <span>Total</span>
+                                    <span id="breach-stats-total" class="font-semibold">0</span>
+                                </div>
+                                <div class="flex justify-between text-sm text-green-500">
+                                    <span>Completed</span>
+                                    <span id="breach-stats-completed" class="font-semibold">0</span>
+                                </div>
+                                <div class="flex justify-between text-sm text-red-500">
+                                    <span>Pending</span>
+                                    <span id="breach-stats-pending" class="font-semibold">0</span>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Completion Rate</span>
+                                        <span id="breach-stats-progress-percent" class="font-semibold text-indigo-600 dark:text-indigo-400 text-sm">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div id="breach-stats-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
                             </div>
                         </section>
                         <section class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex flex-col">
                             <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Daily Breach Completions</h2>
-                            <div class="flex-grow h-[250px] overflow-y-auto">
-                                <table id="breach-completion-table" class="w-full text-sm text-left text-slate-500 dark:text-slate-400">
-                                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-gray-700 dark:text-slate-400 sticky top-0">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 rounded-l-lg">Date</th>
-                                            <th scope="col" class="px-6 py-3 text-center rounded-r-lg">Completed</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="breach-completion-tbody">
-                                        <!-- Rows will be injected here -->
-                                    </tbody>
-                                </table>
+                            <div id="breach-log-container" class="flex-grow h-[250px] overflow-y-auto space-y-2">
+                                <!-- Accordion items will be injected here -->
                             </div>
                         </section>
                     </div>
@@ -563,53 +587,36 @@
     <script>
         const curriculumData = [
             {
-                module: "Immersive Technology",
-                themeColor: "blue",
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9.75l-9-5.25M12 12.75l9 5.25" />`,
-                description: "Master the fundamentals of VR/AR development using industry-standard engines like Unity and Unreal.",
-                topics: [
-                    { title: "Foundations of VR/AR", items: ["Core Concepts (VR/AR/MR)", "Unity & XR Interaction Toolkit", "Unreal Engine VR Template"] },
-                    { title: "Advanced Interaction", items: ["Physics-based Interactions", "Hand Tracking", "UI/UX for VR"] },
-                ]
-            },
-            {
-                module: "AI & Machine Learning",
-                themeColor: "purple",
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 3.75H19.5M8.25 3.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM8.25 9.75H19.5M8.25 9.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM8.25 15.75H19.5M8.25 15.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />`,
-                description: "Explore the world of artificial intelligence, from foundational models to practical machine learning applications.",
-                topics: [
-                    { title: "ML Fundamentals", items: ["Supervised vs. Unsupervised Learning", "Intro to Neural Networks", "Data Preprocessing"] },
-                    { title: "Practical AI", items: ["Working with TensorFlow or PyTorch", "Natural Language Processing (NLP) Basics", "Computer Vision Basics"] },
-                ]
-            },
-            {
-                module: "Advanced Web Technology",
-                themeColor: "emerald",
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />`,
-                description: "Build modern, high-performance web applications using advanced frontend and backend technologies.",
-                topics: [
-                    { title: "Modern Frontend", items: ["Deep Dive into a JS Framework (React/Vue/Svelte)", "State Management Patterns", "Web Performance Optimization"] },
-                    { title: "Backend & APIs", items: ["Building RESTful APIs with Node.js/Express", "Database Fundamentals (SQL/NoSQL)", "Authentication & Authorization"] },
-                ]
-            },
-            {
-                module: "Mobile & Ubiquitous Technology",
-                themeColor: "amber",
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />`,
-                description: "Develop applications for mobile devices and understand the principles of computing everywhere.",
-                topics: [
-                    { title: "Native & Cross-Platform Dev", items: ["Intro to Swift (iOS) or Kotlin (Android)", "Exploring React Native or Flutter", "Mobile UI/UX Design Principles"] },
-                    { title: "Ubiquitous Computing", items: ["IoT Basics & Sensor Networks", "Context-Aware Applications", "Wearable Technology"] },
-                ]
-            },
-            {
-                module: "Cyber Security",
+                module: "Ikigai (生き甲斐)",
                 themeColor: "rose",
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" />`,
-                description: "Learn to protect systems, networks, and programs from digital attacks with fundamental security principles.",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
+                description: "Discover your 'reason for being' by finding the intersection of what you love, what you're good at, what the world needs, and what you can be paid for.",
                 topics: [
-                    { title: "Security Principles", items: ["Core Concepts (CIA Triad)", "Network Security Basics", "Cryptography Fundamentals"] },
-                    { title: "Ethical Hacking & Defense", items: ["Vulnerability Assessment", "Penetration Testing Methodologies", "Defensive Security & Incident Response"] },
+                    { title: "Passion", items: ["What do you love?", "What are you good at?"] },
+                    { title: "Mission", items: ["What does the world need?", "What can you contribute?"] },
+                    { title: "Vocation & Profession", items: ["What can you be paid for?", "Synthesizing your Ikigai"] },
+                ]
+            },
+            {
+                module: "Eisenhower Matrix",
+                themeColor: "blue",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2z" />`,
+                description: "Organize tasks by urgency and importance to prioritize effectively and eliminate time-wasting activities.",
+                topics: [
+                    { title: "Quadrant 1: Urgent & Important", items: ["Identify crises and deadlines", "Strategy: Do immediately"] },
+                    { title: "Quadrant 2: Not Urgent & Important", items: ["Focus on long-term goals", "Strategy: Schedule and plan"] },
+                    { title: "Quadrant 3: Urgent & Not Important", items: ["Minimize interruptions", "Strategy: Delegate if possible"] },
+                    { title: "Quadrant 4: Not Urgent & Not Important", items: ["Recognize time-wasters", "Strategy: Eliminate or reduce"] },
+                ]
+            },
+            {
+                module: "Pareto Principle (80/20)",
+                themeColor: "emerald",
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" d="M15.5,6.8l-3.6,9.5c-0.2,0.5-0.9,0.5-1.1,0L5.5,6.8C5.3,6.3,5.6,5.7,6.2,5.7h12.6C19.4,5.7,19.7,6.3,19.5,6.8z M12.5,18.8c0,0.6-0.4,1-1,1h-3c-0.6,0-1-0.4-1-1v-2.5h5V18.8z"/>`,
+                description: "Focus on the 20% of activities that will yield 80% of the results, maximizing your effort and impact.",
+                topics: [
+                    { title: "Core Concept", items: ["Understanding the 80/20 ratio", "Separating the vital few from the trivial many"] },
+                    { title: "Application", items: ["Analyze tasks and efforts", "Identify your high-impact activities", "Focus energy on the 20%"] },
                 ]
             }
         ];
@@ -626,7 +633,7 @@
             
             const grid = document.getElementById('curriculum-grid');
             const endDateText = document.getElementById('endDateText');
-            endDateText.textContent = `End Date: 31/08/2025`;
+            endDateText.textContent = ``; // Remove date text
 
             // Modal elements
             const alertModal = document.getElementById('alert-modal');
@@ -635,7 +642,6 @@
 
             let totalTasks = 0;
             let dashboardInitialized = false;
-            let timelineChart = null;
 
             // --- Generic Modal Functions ---
             function showAlert(message) {
@@ -731,8 +737,8 @@
                 });
 
                 updateProgress();
-                renderTimelineChart();
-                renderBreachCompletionTable(); // New
+                renderBreachCompletionTable(); 
+                renderBreachStats();
                 setupNavigation();
                 setupPomodoro();
                 setupShiftTimer();
@@ -1330,79 +1336,6 @@
 
         });
 
-        function renderTimelineChart() {
-            const ctx = document.getElementById('timelineChart').getContext('2d');
-            if (window.myTimelineChart) {
-                window.myTimelineChart.destroy();
-            }
-            window.myTimelineChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Immersive Tech', 'AI & ML', 'Advanced Web', 'Mobile Tech', 'Cyber Security'],
-                    datasets: [{
-                        label: 'Learning Path',
-                        data: [
-                            [0, 3], 
-                            [3, 5],
-                            [5, 7],
-                            [7, 9],
-                            [9, 12]
-                        ],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.5)',
-                            'rgba(139, 92, 246, 0.5)',
-                            'rgba(16, 185, 129, 0.5)',
-                            'rgba(245, 158, 11, 0.5)',
-                            'rgba(244, 63, 94, 0.5)'
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(139, 92, 246, 1)',
-                            'rgba(16, 185, 129, 1)',
-                            'rgba(245, 158, 11, 1)',
-                            'rgba(244, 63, 94, 1)'
-                        ],
-                        borderWidth: 1,
-                        barPercentage: 0.6,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw;
-                                    return `Weeks ${value[0]} - ${value[1]}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            min: 0,
-                            max: 12,
-                            title: {
-                                display: true,
-                                text: 'Weeks'
-                            }
-                        },
-                        y: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
         function setupHourCalculator() {
             const timeEntriesContainer = document.getElementById('time-entries');
             const addRowBtn = document.getElementById('add-time-row');
@@ -1608,44 +1541,90 @@
             });
         }
 
-        function updateDailyBreachCount(isIncrement) {
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-            let counts = JSON.parse(localStorage.getItem('dailyBreachCounts')) || {};
+        function updateBreachLog(item, wasCompleted) {
+            let log = JSON.parse(localStorage.getItem('dailyBreachLog')) || {};
             
-            if (isIncrement) {
-                counts[today] = (counts[today] || 0) + 1;
-            } else {
-                counts[today] = Math.max(0, (counts[today] || 1) - 1);
+            // If the item was just completed
+            if (item.completed && !wasCompleted) {
+                const completedDate = new Date(item.completedAt).toISOString().split('T')[0];
+                if (!log[completedDate]) {
+                    log[completedDate] = [];
+                }
+                // Avoid duplicates
+                if (!log[completedDate].some(entry => entry.id === item.id)) {
+                    log[completedDate].push({ id: item.id, text: item.text });
+                }
+            } 
+            // If the item was just un-completed
+            else if (!item.completed && wasCompleted) {
+                // Find the date it was completed on to remove it from the log
+                const completedDate = new Date(item.completedAt).toISOString().split('T')[0];
+                if (log[completedDate]) {
+                    log[completedDate] = log[completedDate].filter(entry => entry.id !== item.id);
+                    // If the day's log is now empty, remove the date key
+                    if (log[completedDate].length === 0) {
+                        delete log[completedDate];
+                    }
+                }
             }
-
-            localStorage.setItem('dailyBreachCounts', JSON.stringify(counts));
+            localStorage.setItem('dailyBreachLog', JSON.stringify(log));
         }
 
         function renderBreachCompletionTable() {
-            const tbody = document.getElementById('breach-completion-tbody');
-            const counts = JSON.parse(localStorage.getItem('dailyBreachCounts')) || {};
+            const container = document.getElementById('breach-log-container');
+            const log = JSON.parse(localStorage.getItem('dailyBreachLog')) || {};
             
-            tbody.innerHTML = ''; // Clear existing rows
+            container.innerHTML = ''; // Clear existing items
 
-            const sortedDates = Object.keys(counts).sort((a,b) => new Date(b) - new Date(a));
+            const sortedDates = Object.keys(log).sort((a, b) => new Date(b) - new Date(a));
 
             if (sortedDates.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">No completed items recorded yet.</td></tr>`;
+                container.innerHTML = `<p class="text-center p-4 text-slate-500">No completed items recorded yet.</p>`;
                 return;
             }
 
             sortedDates.forEach(date => {
-                const count = counts[date];
-                if (count > 0) {
-                    const row = document.createElement('tr');
-                    row.className = 'bg-white dark:bg-gray-800 border-b dark:border-gray-700';
-                    row.innerHTML = `
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${date}</td>
-                        <td class="px-6 py-4 text-center">${count}</td>
+                const items = log[date];
+                if (items.length > 0) {
+                    const detailsEl = document.createElement('details');
+                    detailsEl.className = 'bg-slate-50 dark:bg-gray-700/50 rounded-lg';
+
+                    let listItemsHTML = '';
+                    items.forEach(item => {
+                        listItemsHTML += `<li class="text-slate-600 dark:text-slate-300">${item.text}</li>`;
+                    });
+
+                    detailsEl.innerHTML = `
+                        <summary class="p-4 flex justify-between items-center font-semibold text-slate-800 dark:text-white">
+                            <span>${date}</span>
+                            <div class="flex items-center gap-x-2">
+                                <span class="text-sm px-2 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 rounded-md">${items.length} completed</span>
+                                <svg class="w-5 h-5 summary-arrow text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-slate-200 dark:border-gray-600">
+                            <ul class="list-disc list-inside space-y-2">
+                                ${listItemsHTML}
+                            </ul>
+                        </div>
                     `;
-                    tbody.appendChild(row);
+                    container.appendChild(detailsEl);
                 }
             });
+        }
+
+        function renderBreachStats() {
+            const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
+            const total = breachItems.length;
+            const completed = breachItems.filter(item => item.completed).length;
+            const pending = total - completed;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+
+            document.getElementById('breach-stats-total').textContent = total;
+            document.getElementById('breach-stats-completed').textContent = completed;
+            document.getElementById('breach-stats-pending').textContent = pending;
+            document.getElementById('breach-stats-progress-bar').style.width = `${percentage}%`;
+            document.getElementById('breach-stats-progress-percent').textContent = `${Math.round(percentage)}%`;
         }
 
         function setupBreachList() {
@@ -1723,6 +1702,7 @@
                     itemInput.value = '';
                     saveItems();
                     renderList();
+                    renderBreachStats();
                 }
             });
             
@@ -1743,30 +1723,39 @@
                     const item = breachItems.find(i => i.id == itemId);
                     
                     const wasCompleted = item.completed;
-                    item.completed = !checkbox.checked; // This is counter-intuitive, but the event fires before the check state updates
-                    
+                    item.completed = !checkbox.checked; 
+
                     if (item.completed && !wasCompleted) {
-                        updateDailyBreachCount(true); // Increment
-                    } else if (!item.completed && wasCompleted) {
-                        updateDailyBreachCount(false); // Decrement
+                        item.completedAt = new Date().toISOString();
+                    }
+                    
+                    updateBreachLog(item, wasCompleted);
+                    
+                    if (!item.completed) {
+                        delete item.completedAt;
                     }
 
                     saveItems();
                     renderList();
                     renderBreachCompletionTable();
+                    renderBreachStats();
                 }
 
                 if (deleteBtn) {
                     const itemId = deleteBtn.closest('.breach-item').dataset.id;
                     const item = breachItems.find(i => i.id == itemId);
-                    // If a completed item is deleted, we should also decrement the daily count
+                    
                     if (item && item.completed) {
-                        updateDailyBreachCount(false);
+                        // This logic ensures the log is correctly updated when a completed item is deleted.
+                        const tempUncompletedItem = { ...item, completed: false };
+                        updateBreachLog(tempUncompletedItem, true);
                     }
+
                     breachItems = breachItems.filter(i => i.id != itemId);
                     saveItems();
                     renderList();
                     renderBreachCompletionTable();
+                    renderBreachStats();
                 }
             });
 
