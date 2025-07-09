@@ -211,6 +211,14 @@
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
 
+    <!-- Generic Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm text-center">
+            <p id="alert-message" class="text-lg text-slate-800 dark:text-slate-200 mb-6"></p>
+            <button id="alert-close-btn" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">OK</button>
+        </div>
+    </div>
+
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
         <canvas id="landing-canvas"></canvas>
         <div class="relative z-10 max-w-3xl">
@@ -337,12 +345,33 @@
                             <span>🚀</span>
                         </div>
                     </div>
-                    <section class="mb-12 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Learning Timeline</h2>
-                        <div class="chart-container">
-                            <canvas id="timelineChart"></canvas>
-                        </div>
-                    </section>
+
+                    <!-- Dashboard Metrics Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <section class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Learning Timeline</h2>
+                            <div class="chart-container">
+                                <canvas id="timelineChart"></canvas>
+                            </div>
+                        </section>
+                        <section class="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex flex-col">
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Daily Breach Completions</h2>
+                            <div class="flex-grow h-[250px] overflow-y-auto">
+                                <table id="breach-completion-table" class="w-full text-sm text-left text-slate-500 dark:text-slate-400">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-gray-700 dark:text-slate-400 sticky top-0">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 rounded-l-lg">Date</th>
+                                            <th scope="col" class="px-6 py-3 text-center rounded-r-lg">Completed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="breach-completion-tbody">
+                                        <!-- Rows will be injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+
                     <main id="curriculum-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                     </main>
                 </div>
@@ -405,9 +434,9 @@
                             <h2 class="text-2xl font-bold mb-4">Set Shift End Time</h2>
                             <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
                              <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
-                                <button id="preset-normal-btn" class="p-2 bg-indigo-500/50 rounded-lg">Normal Shift (7AM)</button>
-                                <button id="preset-overtime-btn" class="p-2 bg-indigo-500/50 rounded-lg">Overtime (5AM)</button>
-                            </div>
+                                 <button id="preset-normal-btn" class="p-2 bg-indigo-500/50 rounded-lg">Normal Shift (7AM)</button>
+                                 <button id="preset-overtime-btn" class="p-2 bg-indigo-500/50 rounded-lg">Overtime (5AM)</button>
+                             </div>
                             <button id="start-shift-btn" class="mt-8 w-full px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start Shift</button>
                         </div>
 
@@ -599,9 +628,29 @@
             const endDateText = document.getElementById('endDateText');
             endDateText.textContent = `End Date: 31/08/2025`;
 
+            // Modal elements
+            const alertModal = document.getElementById('alert-modal');
+            const alertMessage = document.getElementById('alert-message');
+            const alertCloseBtn = document.getElementById('alert-close-btn');
+
             let totalTasks = 0;
             let dashboardInitialized = false;
             let timelineChart = null;
+
+            // --- Generic Modal Functions ---
+            function showAlert(message) {
+                alertMessage.textContent = message;
+                alertModal.classList.remove('hidden');
+                alertModal.classList.add('flex');
+            }
+
+            function hideAlert() {
+                alertModal.classList.add('hidden');
+                alertModal.classList.remove('flex');
+            }
+
+            alertCloseBtn.addEventListener('click', hideAlert);
+            // --- End Modal Functions ---
 
             function initializeDashboard() {
                 if (dashboardInitialized) return;
@@ -683,6 +732,7 @@
 
                 updateProgress();
                 renderTimelineChart();
+                renderBreachCompletionTable(); // New
                 setupNavigation();
                 setupPomodoro();
                 setupShiftTimer();
@@ -745,7 +795,7 @@
                 function setActiveLink(clickedLink) {
                     sidebarLinks.forEach(link => link.classList.remove('active'));
                     if (clickedLink) {
-                       clickedLink.classList.add('active');
+                        clickedLink.classList.add('active');
                     }
                 }
 
@@ -756,14 +806,14 @@
                         
                         pageViews.forEach(page => {
                            if(page.id === view) {
-                               page.classList.add('active');
-                               if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board') {
-                                   mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
-                               } else {
-                                   mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
-                               }
+                                page.classList.add('active');
+                                if (page.id === 'pomodoro' || page.id === 'shift-timer' || page.id === 'idea-board') {
+                                    mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
+                                } else {
+                                    mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
+                                }
                            } else {
-                               page.classList.remove('active');
+                                page.classList.remove('active');
                            }
                         });
                         
@@ -817,7 +867,7 @@
                         name: 'Focus',
                         time: 25,
                         color: '#F97316', // orange-500
-                        icon: '�',
+                        icon: '🍅',
                         next: 'shortBreak',
                         background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
                     },
@@ -909,12 +959,13 @@
                             sessionCountDisplay.textContent = sessionCount;
                         }
 
-                        alert(`${modes[currentMode].name} session is over!`);
+                        showAlert(`${modes[currentMode].name} session is over!`);
                         setMode(modes[currentMode].next);
                     }
                 }
 
                 playPauseBtn.addEventListener('click', () => {
+                    hideAlert();
                     isPaused = !isPaused;
                     if (!isPaused) {
                         timer = setInterval(countdown, 1000);
@@ -928,6 +979,7 @@
                 });
 
                 switchModeBtn.addEventListener('click', () => {
+                    hideAlert();
                     isPaused = true;
                     clearInterval(timer);
                     playIcon.classList.remove('hidden');
@@ -1053,7 +1105,7 @@
                 startBtn.addEventListener('click', () => {
                     const endTimeValue = endTimeInput.value;
                     if (!endTimeValue) {
-                        alert("Please select an end date and time.");
+                        showAlert("Please select an end date and time.");
                         return;
                     }
                     
@@ -1061,7 +1113,7 @@
                     shiftEndTime = new Date(endTimeValue);
 
                     if (shiftEndTime <= shiftStartTime) {
-                        alert("End time must be in the future.");
+                        showAlert("End time must be in the future.");
                         return;
                     }
 
@@ -1556,6 +1608,46 @@
             });
         }
 
+        function updateDailyBreachCount(isIncrement) {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            let counts = JSON.parse(localStorage.getItem('dailyBreachCounts')) || {};
+            
+            if (isIncrement) {
+                counts[today] = (counts[today] || 0) + 1;
+            } else {
+                counts[today] = Math.max(0, (counts[today] || 1) - 1);
+            }
+
+            localStorage.setItem('dailyBreachCounts', JSON.stringify(counts));
+        }
+
+        function renderBreachCompletionTable() {
+            const tbody = document.getElementById('breach-completion-tbody');
+            const counts = JSON.parse(localStorage.getItem('dailyBreachCounts')) || {};
+            
+            tbody.innerHTML = ''; // Clear existing rows
+
+            const sortedDates = Object.keys(counts).sort((a,b) => new Date(b) - new Date(a));
+
+            if (sortedDates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">No completed items recorded yet.</td></tr>`;
+                return;
+            }
+
+            sortedDates.forEach(date => {
+                const count = counts[date];
+                if (count > 0) {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white dark:bg-gray-800 border-b dark:border-gray-700';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${date}</td>
+                        <td class="px-6 py-4 text-center">${count}</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
         function setupBreachList() {
             const listContainer = document.getElementById('breach-list-container');
             const itemInput = document.getElementById('breach-item-input');
@@ -1594,13 +1686,20 @@
                     itemEl.className = 'breach-item';
                     itemEl.dataset.id = item.id;
 
+                    const timestampHTML = item.createdAt 
+                        ? `<div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Created: ${new Date(item.createdAt).toLocaleString()}</div>` 
+                        : '';
+
                     itemEl.innerHTML = `
                         <input type="checkbox" id="breach-${item.id}" class="breach-item-checkbox hidden" ${item.completed ? 'checked' : ''}>
                         <label for="breach-${item.id}" class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 w-full">
                             <span class="w-5 h-5 mr-4 rounded border-2 border-slate-300 dark:border-gray-600 flex-shrink-0 flex items-center justify-center">
                                 <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </span>
-                            <span class="flex-grow">${item.text}</span>
+                            <div class="flex-grow">
+                                <span class="flex-grow">${item.text}</span>
+                                ${timestampHTML}
+                            </div>
                         </label>
                         <button class="delete-breach-item ml-4 text-slate-400 hover:text-red-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1618,7 +1717,8 @@
                     breachItems.push({
                         id: Date.now(),
                         text: text,
-                        completed: false
+                        completed: false,
+                        createdAt: new Date().toISOString()
                     });
                     itemInput.value = '';
                     saveItems();
@@ -1641,16 +1741,32 @@
                     const checkbox = document.getElementById(checkboxId);
                     const itemId = checkbox.closest('.breach-item').dataset.id;
                     const item = breachItems.find(i => i.id == itemId);
+                    
+                    const wasCompleted = item.completed;
                     item.completed = !checkbox.checked; // This is counter-intuitive, but the event fires before the check state updates
+                    
+                    if (item.completed && !wasCompleted) {
+                        updateDailyBreachCount(true); // Increment
+                    } else if (!item.completed && wasCompleted) {
+                        updateDailyBreachCount(false); // Decrement
+                    }
+
                     saveItems();
                     renderList();
+                    renderBreachCompletionTable();
                 }
 
                 if (deleteBtn) {
                     const itemId = deleteBtn.closest('.breach-item').dataset.id;
+                    const item = breachItems.find(i => i.id == itemId);
+                    // If a completed item is deleted, we should also decrement the daily count
+                    if (item && item.completed) {
+                        updateDailyBreachCount(false);
+                    }
                     breachItems = breachItems.filter(i => i.id != itemId);
                     saveItems();
                     renderList();
+                    renderBreachCompletionTable();
                 }
             });
 
@@ -1661,4 +1777,3 @@
     </script>
 </body>
 </html>
-�
