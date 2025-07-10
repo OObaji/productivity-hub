@@ -360,6 +360,16 @@
                         <p class="mt-2 text-slate-600 dark:text-slate-400">Your interactive guide to productivity principles and task management.</p>
                     </header>
                     
+                    <section id="time-weather-section" class="mb-8 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-center">
+                        <div class="text-center md:text-left">
+                            <p id="time-display" class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">12:00:00 PM</p>
+                            <p id="date-display" class="text-slate-500 dark:text-slate-400">Thursday, July 10, 2025</p>
+                        </div>
+                        <div id="weather-display" class="text-center md:text-right mt-4 md:mt-0 flex items-center gap-4">
+                            <!-- Weather data will be injected here -->
+                        </div>
+                    </section>
+
                     <section id="daily-quote-section" class="mb-8 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm text-center">
                         <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Quote of the Day</h2>
                         <blockquote class="text-lg italic text-slate-600 dark:text-slate-400">
@@ -696,6 +706,7 @@
                 renderBreachCompletionTable(); 
                 renderBreachStats();
                 setupDailyQuote();
+                setupTimeAndWeather();
                 setupNavigation();
                 setupPrincipleModals();
                 setupPomodoro();
@@ -1821,6 +1832,55 @@
             }
 
             getDailyQuote();
+        }
+
+        function setupTimeAndWeather() {
+            const timeEl = document.getElementById('time-display');
+            const dateEl = document.getElementById('date-display');
+            const weatherEl = document.getElementById('weather-display');
+
+            function updateTime() {
+                const now = new Date();
+                timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
+            async function fetchWeather() {
+                try {
+                    const response = await fetch('https://wttr.in/Manchester?format=j1');
+                    const data = await response.json();
+                    const condition = data.current_condition[0];
+                    
+                    weatherEl.innerHTML = `
+                        <div class="text-3xl">${getWeatherIcon(condition.weatherCode)}</div>
+                        <div>
+                            <p class="font-semibold text-xl">${condition.temp_C}°C</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">${condition.weatherDesc[0].value}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    weatherEl.innerHTML = `<p class="text-sm text-red-500">Could not fetch weather.</p>`;
+                    console.error("Error fetching weather:", error);
+                }
+            }
+
+            function getWeatherIcon(code) {
+                if (code >= 200 && code < 300) return '⛈️'; // Thunderstorm
+                if (code >= 300 && code < 400) return '🌧️'; // Drizzle
+                if (code >= 500 && code < 600) return '🌧️'; // Rain
+                if (code >= 600 && code < 700) return '❄️'; // Snow
+                if (code >= 700 && code < 800) return '🌫️'; // Atmosphere
+                if (code === 800) return '☀️'; // Clear
+                if (code === 801) return '🌤️'; // Few clouds
+                if (code === 802) return '⛅️'; // Scattered clouds
+                if (code === 803 || code === 804) return '☁️'; // Broken/overcast clouds
+                return '🌍'; // Default
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+            fetchWeather();
+            setInterval(fetchWeather, 900000); // every 15 minutes
         }
 
     </script>
