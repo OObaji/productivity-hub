@@ -1926,4 +1926,21 @@
                 if (code >= 200 && code < 300) return '⛈️'; // Thunderstorm
                 if (code >= 300 && code < 400) return '🌧️'; // Drizzle
                 if (code >= 500 && code < 600) return '🌧️'; // Rain
-                if (code >= 600 && code < 700) ret
+                if (code >= 600 && code < 700) return '❄️'; // Snow
+                if (code >= 700 && code < 800) return '🌫️'; // Atmosphere
+                if (code === 800) return '☀️'; // Clear
+                if (code === 801) return '🌤️'; // Few clouds
+                if (code === 802) return '⛅️'; // Scattered clouds
+                if (code === 803 || code === 804) return '☁️'; // Broken/overcast clouds
+                return '🌍'; // Default
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+            fetchWeather();
+            setInterval(fetchWeather, 900000); // every 15 minutes
+        }
+
+    </script>
+</body>
+</html>
