@@ -2320,13 +2320,27 @@
 
             copyBtn.addEventListener('click', () => {
                 const textToCopy = outputEl.textContent;
+                if (!textToCopy || textToCopy === 'Your generated call log will appear here...') {
+                    showAlert("Nothing to copy!");
+                    return;
+                }
                 const tempTextarea = document.createElement('textarea');
+                tempTextarea.style.position = 'absolute';
+                tempTextarea.style.left = '-9999px';
                 tempTextarea.value = textToCopy;
                 document.body.appendChild(tempTextarea);
                 tempTextarea.select();
-                document.execCommand('copy');
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showAlert("Log copied to clipboard!");
+                    } else {
+                        showAlert("Copying failed. Please try again.");
+                    }
+                } catch (err) {
+                    showAlert("Copying failed. Please try again.");
+                }
                 document.body.removeChild(tempTextarea);
-                showAlert("Log copied to clipboard!");
             });
         }
 
