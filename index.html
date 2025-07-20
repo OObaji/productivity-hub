@@ -122,7 +122,7 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view, #shift-timer.page-view, #idea-board.page-view {
+        #pomodoro.page-view, #shift-timer.page-view, #idea-board.page-view, #mindfulness.page-view, #call-log-generator.page-view {
             background-size: cover;
             background-position: center;
             transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
@@ -203,9 +203,16 @@
         .breach-item:last-child {
             border-bottom: none;
         }
-        .breach-item-checkbox:checked + label {
+        .breach-item-checkbox:checked ~ .item-content .item-text {
             text-decoration: line-through;
             color: #6b7280; /* gray-500 */
+        }
+        .breach-item-checkbox:checked ~ label span {
+             background-color: #4f46e5; /* indigo-600 */
+            border-color: #4f46e5; /* indigo-600 */
+        }
+        .breach-item-checkbox:checked ~ label span svg {
+            display: block;
         }
         /* Accordion for breach log */
         .log-container details > summary {
@@ -220,6 +227,30 @@
         }
         .log-container details[open] .summary-arrow {
             transform: rotate(90deg);
+        }
+        /* Mindfulness styles */
+        #mindfulness {
+            background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+        }
+        .dark #mindfulness {
+            background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+        }
+        #breathing-visualizer {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: transform 4s ease-in-out;
+            position: relative;
+        }
+        #breathing-visualizer.breathing {
+            animation: breathe 10s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0% { transform: scale(1); } /* Start */
+            40% { transform: scale(1.3); } /* Inhale (4s) */
+            60% { transform: scale(1.3); } /* Hold (2s) */
+            100% { transform: scale(1); } /* Exhale (4s) */
         }
     </style>
 </head>
@@ -298,6 +329,10 @@
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Pomodoro Timer
                 </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="mindfulness">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v5a3 3 0 003 3h2a3 3 0 003-3v-5m-8 0a5 5 0 1110 0m-5-9a5 5 0 110 10 5 5 0 010-10z"></path></svg>
+                    Mindfulness
+                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-2 mt-2 rounded-lg hover:bg-gray-700" data-view="schedule">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     Schedule
@@ -318,7 +353,7 @@
                     <button id="tools-toggle-btn" class="sidebar-link w-full flex items-center p-2 rounded-lg hover:bg-gray-700">
                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         Tools
-                        <svg id="topics-arrow" class="w-4 h-4 ml-auto transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg id="tools-arrow" class="w-4 h-4 ml-auto transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div id="tools-submenu" class="sidebar-topics-submenu pl-8 mt-1 space-y-1">
                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="hour-calculator">
@@ -329,6 +364,10 @@
                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707m-9.192 9.192l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                             Idea Board
                         </a>
+                        <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="call-log-generator">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                             Call Log Generator
+                         </a>
                     </div>
                 </div>
             </div>
@@ -448,25 +487,55 @@
                     </div>
                 </div>
                 
+                <div id="mindfulness" class="page-view h-full">
+                    <div class="flex flex-col items-center justify-center h-full p-4 text-white text-center">
+                        <h1 class="text-4xl font-bold mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2)">Mindful Breathing</h1>
+                        <p class="mb-8 max-w-md" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2)">Take a moment to center yourself. Follow the guide below to regulate your breathing and find your calm.</p>
+
+                        <div id="breathing-visualizer" class="flex items-center justify-center mb-6">
+                            <span id="breathing-instruction" class="text-2xl font-semibold text-white/80 transition-opacity duration-500">Ready?</span>
+                        </div>
+
+                        <div id="mindfulness-controls" class="w-full max-w-sm bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <label for="mindfulness-duration" class="font-medium">Session Length:</label>
+                                <select id="mindfulness-duration" class="bg-white/20 rounded p-2">
+                                    <option value="60">1 Minute</option>
+                                    <option value="180">3 Minutes</option>
+                                    <option value="300">5 Minutes</option>
+                                </select>
+                            </div>
+                            <button id="mindfulness-start-btn" class="w-full px-8 py-3 bg-white/80 text-indigo-700 font-bold rounded-lg shadow-md hover:bg-white transition-colors">
+                                Start Session
+                            </button>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <div id="mindfulness-session-count" class="text-2xl font-bold">0</div>
+                            <div class="text-sm">Sessions Completed</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="schedule" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">My Schedule</h2>
-                        <iframe 
-                          src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FLondon&src=d39539fe8caf1493fe398711479b903c3916b1d258ad8db8200e8cfb27371473%40group.calendar.google.com&src=5898e02f577fb07264972baa9f7e7df72fbb40e419e6f4f83271b86222f4356f%40group.calendar.google.com&src=2cf75c10acdae3f473fd85791ca5ed5974c066754d0a964eb9a9748fdbb8dcb7%40group.calendar.google.com&src=934a7e189d74901c1fd96f1e7f7381bcafd27834b5e84713bf87965e4caa1e42%40group.calendar.google.com&src=90abe9ac507cab74d3df947fdcdd24960d1ce7498cf3a72bbf149ce4914aca47%40group.calendar.google.com&src=08c9a66082c947407e115cf79f6e6661ce664692d86d03d71e4e403515a2eec9%40group.calendar.google.com&src=7fd8003fa22ebcfb8535cf853b002ad987fdbdce8bef9e9afbb752f71ee27e2e%40group.calendar.google.com&src=43002634e7dfbf15e2502db950ff6ea7f201c781d0b1b3536916a1434ef0f232%40group.calendar.google.com&src=8972ab22507aad0719e148a744cdced5dcf2402a68b4db32c4431c701cb45661%40group.calendar.google.com"
-                          style="border:0" 
-                          width="100%" 
-                          height="600" 
-                          frameborder="0" 
-                          scrolling="no">
-                        </iframe>
-                     </div>
+                         <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">My Schedule</h2>
+                            <iframe 
+                                src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FLondon&src=d39539fe8caf1493fe398711479b903c3916b1d258ad8db8200e8cfb27371473%40group.calendar.google.com&src=5898e02f577fb07264972baa9f7e7df72fbb40e419e6f4f83271b86222f4356f%40group.calendar.google.com&src=2cf75c10acdae3f473fd85791ca5ed5974c066754d0a964eb9a9748fdbb8dcb7%40group.calendar.google.com&src=934a7e189d74901c1fd96f1e7f7381bcafd27834b5e84713bf87965e4caa1e42%40group.calendar.google.com&src=90abe9ac507cab74d3df947fdcdd24960d1ce7498cf3a72bbf149ce4914aca47%40group.calendar.google.com&src=08c9a66082c947407e115cf79f6e6661ce664692d86d03d71e4e403515a2eec9%40group.calendar.google.com&src=7fd8003fa22ebcfb8535cf853b002ad987fdbdce8bef9e9afbb752f71ee27e2e%40group.calendar.google.com&src=43002634e7dfbf15e2502db950ff6ea7f201c781d0b1b3536916a1434ef0f232%40group.calendar.google.com&src=8972ab22507aad0719e148a744cdced5dcf2402a68b4db32c4431c701cb45661%40group.calendar.google.com"
+                                style="border:0" 
+                                width="100%" 
+                                height="600" 
+                                frameborder="0" 
+                                scrolling="no">
+                            </iframe>
+                         </div>
                 </div>
 
                 <div id="spotify" class="page-view container mx-auto px-4 sm:px-6 py-8">
-                     <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">Focus Playlist</h2>
-                     </div>
-                     <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/46iQn1DHoYNlHwBIOnfAxi?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                         <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm">
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-4">Focus Playlist</h2>
+                         </div>
+                         <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/46iQn1DHoYNlHwBIOnfAxi?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                 </div>
 
                 <div id="shift-timer" class="page-view h-full relative">
@@ -616,6 +685,48 @@
                         <!-- Items will be generated by JS -->
                     </div>
                 </div>
+                <div id="call-log-generator" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">AI Call Log Generator</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Input Section -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-semibold mb-4">1. Enter Call Details</h2>
+                            <textarea id="call-log-input" class="w-full h-40 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-slate-900 dark:text-white" placeholder="Use the scenarios below or enter custom details..."></textarea>
+                            
+                            <div id="scenario-buttons" class="mt-4">
+                                <h3 class="font-semibold mb-2">Scenarios</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="inbound">Inbound Call</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="outbound">Outbound Call</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="low_battery">Low Battery</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="power_off">Power Off</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="left_home">Left Home</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="past_curfew">Past Curfew</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="other_answered">Other Answered</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="other_called">Other Called</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="not_left">Not Left</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="not_late">Not Late</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="custom">Custom</button>
+                                </div>
+                            </div>
+
+                            <button id="generate-log-btn" class="mt-4 w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700">
+                                <span id="generate-log-btn-text">Generate Log</span>
+                                <div id="generate-log-loader" class="loader hidden ml-3"></div>
+                            </button>
+                        </div>
+                        <!-- Output Section -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold">2. Generated Log</h2>
+                                <button id="copy-log-btn" class="px-4 py-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy</button>
+                            </div>
+                            <div id="call-log-output" class="w-full h-80 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50 whitespace-pre-wrap overflow-y-auto">
+                                Your generated call log will appear here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -729,11 +840,13 @@
                 setupNavigation();
                 setupPrincipleModals();
                 setupPomodoro();
+                setupMindfulness();
                 setupShiftTimer();
                 setupHourCalculator();
                 setupIdeaBoard();
                 setupSettings();
                 setupBreachList();
+                setupCallLogGenerator();
                 dashboardInitialized = true;
             }
             
@@ -771,7 +884,7 @@
                     page.classList.toggle('active', page.id === viewId);
                 });
 
-                if (viewId === 'pomodoro' || viewId === 'shift-timer' || viewId === 'idea-board') {
+                if (['pomodoro', 'shift-timer', 'idea-board', 'mindfulness', 'call-log-generator'].includes(viewId)) {
                     mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                 } else {
                     mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -1033,6 +1146,92 @@
                 
                 setMode('pomodoro'); // Initialize
             }
+
+            function setupMindfulness() {
+                const startBtn = document.getElementById('mindfulness-start-btn');
+                const durationSelect = document.getElementById('mindfulness-duration');
+                const visualizer = document.getElementById('breathing-visualizer');
+                const instruction = document.getElementById('breathing-instruction');
+                const sessionCountEl = document.getElementById('mindfulness-session-count');
+
+                let sessionTimer;
+                let instructionTimer;
+                let isBreathing = false;
+                const BREATHE_IN = 4000;
+                const HOLD = 2000;
+                const BREATHE_OUT = 4000;
+                const CYCLE_TIME = BREATHE_IN + HOLD + BREATHE_OUT;
+
+                function loadSessionCount() {
+                    const count = localStorage.getItem('mindfulnessSessions') || 0;
+                    sessionCountEl.textContent = count;
+                }
+
+                function updateInstruction() {
+                    instruction.style.opacity = 0;
+                    setTimeout(() => {
+                        instruction.textContent = "Breathe In...";
+                        instruction.style.opacity = 1;
+                    }, 500);
+
+                    setTimeout(() => {
+                        instruction.style.opacity = 0;
+                        setTimeout(() => {
+                            instruction.textContent = "Hold";
+                            instruction.style.opacity = 1;
+                        }, 500);
+                    }, BREATHE_IN);
+
+                    setTimeout(() => {
+                        instruction.style.opacity = 0;
+                        setTimeout(() => {
+                            instruction.textContent = "Breathe Out...";
+                            instruction.style.opacity = 1;
+                        }, 500);
+                    }, BREATHE_IN + HOLD);
+                }
+
+                function startSession() {
+                    if (isBreathing) return;
+                    isBreathing = true;
+
+                    const duration = parseInt(durationSelect.value) * 1000;
+                    startBtn.textContent = 'Session in Progress...';
+                    startBtn.disabled = true;
+                    durationSelect.disabled = true;
+
+                    visualizer.classList.add('breathing');
+                    updateInstruction();
+                    instructionTimer = setInterval(updateInstruction, CYCLE_TIME);
+
+                    sessionTimer = setTimeout(() => {
+                        endSession(true);
+                    }, duration);
+                }
+
+                function endSession(completed = false) {
+                    isBreathing = false;
+                    clearInterval(instructionTimer);
+                    clearTimeout(sessionTimer);
+
+                    visualizer.classList.remove('breathing');
+                    instruction.textContent = "Ready?";
+                    startBtn.textContent = 'Start Session';
+                    startBtn.disabled = false;
+                    durationSelect.disabled = false;
+
+                    if (completed) {
+                        let count = parseInt(localStorage.getItem('mindfulnessSessions') || 0);
+                        count++;
+                        localStorage.setItem('mindfulnessSessions', count);
+                        sessionCountEl.textContent = count;
+                        showAlert("Mindfulness session complete. Well done!");
+                    }
+                }
+                
+                startBtn.addEventListener('click', startSession);
+                loadSessionCount();
+            }
             
             function setupShiftTimer() {
                 const shiftTimerPage = document.getElementById('shift-timer');
@@ -1266,11 +1465,11 @@
                                 const mDist = Math.sqrt(mdx*mdx + mdy*mdy);
                                 if (mDist < 150) {
                                      ctx.beginPath();
-                                    ctx.moveTo(p.x, p.y);
-                                    ctx.lineTo(mouse.x, mouse.y);
-                                    ctx.strokeStyle = `rgba(250, 204, 21, ${1 - mDist/150})`;
-                                    ctx.lineWidth = 0.5;
-                                    ctx.stroke();
+                                     ctx.moveTo(p.x, p.y);
+                                     ctx.lineTo(mouse.x, mouse.y);
+                                     ctx.strokeStyle = `rgba(250, 204, 21, ${1 - mDist/150})`;
+                                     ctx.lineWidth = 0.5;
+                                     ctx.stroke();
                                 }
                             }
                         }
@@ -1500,21 +1699,21 @@
                 });
 
                 noteEl.querySelector('.copy-note-btn').addEventListener('click', (e) => {
-                     const button = e.currentTarget;
-                     const originalIcon = button.innerHTML;
-                     const checkIcon = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                     
-                     const tempInput = document.createElement('textarea');
-                     tempInput.value = textarea.value;
-                     document.body.appendChild(tempInput);
-                     tempInput.select();
-                     document.execCommand('copy');
-                     document.body.removeChild(tempInput);
+                       const button = e.currentTarget;
+                       const originalIcon = button.innerHTML;
+                       const checkIcon = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                       
+                       const tempInput = document.createElement('textarea');
+                       tempInput.value = textarea.value;
+                       document.body.appendChild(tempInput);
+                       tempInput.select();
+                       document.execCommand('copy');
+                       document.body.removeChild(tempInput);
 
-                     button.innerHTML = checkIcon;
-                     setTimeout(() => {
-                        button.innerHTML = originalIcon;
-                     }, 1500)
+                       button.innerHTML = checkIcon;
+                       setTimeout(() => {
+                           button.innerHTML = originalIcon;
+                       }, 1500)
                 });
             }
 
@@ -1939,6 +2138,196 @@
             setInterval(updateTime, 1000);
             fetchWeather();
             setInterval(fetchWeather, 900000); // every 15 minutes
+        }
+
+        async function setupCallLogGenerator() {
+            const generateBtn = document.getElementById('generate-log-btn');
+            const btnText = document.getElementById('generate-log-btn-text');
+            const loader = document.getElementById('generate-log-loader');
+            const inputEl = document.getElementById('call-log-input');
+            const outputEl = document.getElementById('call-log-output');
+            const copyBtn = document.getElementById('copy-log-btn');
+            const scenarioBtns = document.querySelectorAll('.scenario-btn');
+
+            const scenarios = {
+                inbound: "Incoming call. DW advised that [REASON FOR CALL]. I advised that the call will be documented. Follow up action: Call logged.",
+                outbound: "Outbound call. I advised DW that [REASON FOR CALL]. DW advised that [RESPONSE]. Follow up action: N/A",
+                low_battery: "Outbound call. I advised DW that the equipment is low and needs to be put on charge. DW advised that the equipment will be put on charge. Follow up action: N/A",
+                power_off: "Outbound call. I advised DW that the equipment has powered off and needs to be put on charge. DW advised that the equipment will be put on charge. Follow up action: N/A",
+                left_home: "Outbound call. I advised DW that they have left home during curfew hours. DW advised that [REASON]. Follow up action: Call logged.",
+                past_curfew: "Outbound call. past curfew [REASON]",
+                other_answered: "Outbound call. Other person answered. Advised them to pass a message to DW. Follow up action: Call logged.",
+                other_called: "Incoming call from [PERSON'S NAME/RELATIONSHIP]. They advised that [REASON FOR CALL]. I advised that the call will be documented. Follow up action: Call logged.",
+                not_left: "Outbound call. Not left.",
+                not_late: "Outbound call. I advised DW that they are not late for their curfew. DW acknowledged. Follow up action: Call logged.",
+                custom: ""
+            };
+
+            scenarioBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const scenarioKey = btn.dataset.scenario;
+                    inputEl.value = scenarios[scenarioKey];
+                    if (scenarioKey !== 'custom') {
+                        generateBtn.click();
+                    }
+                });
+            });
+
+            generateBtn.addEventListener('click', async () => {
+                const userInput = inputEl.value.trim();
+                if (!userInput) {
+                    showAlert("Please enter some details about the call.");
+                    return;
+                }
+
+                btnText.textContent = 'Generating...';
+                loader.classList.remove('hidden');
+                generateBtn.disabled = true;
+                outputEl.textContent = 'Generating your call log, please wait...';
+
+                let prompt;
+                const lowerCaseInput = userInput.toLowerCase();
+
+                if (lowerCaseInput.includes('incoming')) {
+                     prompt = `
+                        Act as a professional assistant generating a call log for an incoming call to a company.
+                        Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
+
+                        Caller details: Device wearer called
+                        Rv's confirmed: Name, DOB, Address, Curfew hours
+                        Caller Statement: Device wearer advised that [content from user notes]
+                        Advise Provided: I advised that [content from user notes]
+                        Follow up action: [content from user notes]
+
+                        **Instructions for filling the template:**
+                        1.  For "Caller Statement", take the main issue from the user's notes and place it after "Device wearer advised that ". For example, if the notes are "incoming DW said not left box keeps ringing", the Caller Statement should be "Device wearer advised that their box keeps ringing."
+                        2.  For "Advise Provided", take the advice given from the user's notes and place it after "I advised that ". For example, if the notes include "I advised that the call will be documented", this section should be "I advised that the call will be documented".
+                        3.  For "Follow up action", if the notes mention "visit requested", this line must be "Follow up action: Visit requested".
+                        4.  If no specific follow-up action is mentioned in the notes, this line must be "Follow up action: Call logged".
+                        5.  "Caller details" and "Rv's confirmed" should always be included exactly as they are in the template.
+
+                        Please generate the log based on these user notes:
+                        "${userInput}"
+                    `;
+                } else if (lowerCaseInput.includes('outbound')) {
+                    if (lowerCaseInput.includes('not left')) {
+                        prompt = `
+                            Act as a professional assistant generating a call log for an outbound call about a potential curfew absence where the user denies leaving.
+                            Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
+
+                            Caller details: Device wearer
+                            Identity verification: DOB, Name, Address
+                            Call details: I asked DW about the absence during the curfew.
+                            DW statement: DW advised not leaving during the curfew and had been in the property.
+                            Follow up action: Call logged.
+
+                            **Instructions:**
+                            1.  Use the exact text provided in the template above. Do not change it. The user's notes are only for context to trigger this specific template. The final output should be exactly as shown.
+
+                            User notes for context:
+                            "${userInput}"
+                        `;
+                    } else if (lowerCaseInput.includes('past curfew')) {
+                         prompt = `
+                            Act as a professional assistant generating a call log for an outbound call about a device wearer being past their curfew.
+                            Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
+
+                            Caller details: Device wearer
+                            Identity verification: DOB, Name, Address
+                            Call details: I advised DW that they are out past their curfew.
+                            DW statement: DW advised coming in late tonight due to [REASON]
+                            Follow up action: Call logged.
+
+                            **Instructions:**
+                            1.  Identify the reason for being late from the user's notes. The reason is the word or phrase that follows "past curfew". For example, if the user's notes are "outbound call. past curfew traffic", the reason is "traffic".
+                            2.  Insert this reason into the "[REASON]" placeholder in the template. The final sentence must be a complete, structured sentence like "DW advised coming in late tonight due to traffic".
+                            3.  The rest of the template should be used exactly as shown.
+
+                            Please generate the log based on these user notes:
+                            "${userInput}"
+                        `;
+                    }
+                    else {
+                        prompt = `
+                            Act as a professional assistant generating a call log for an outbound call from a company.
+                            Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
+
+                            Caller details: Device wearer
+                            Identity verification: DOB, Name, Address
+                            Call details: [Content from user notes, e.g., "I advised DW that the equipment is low and needs to be put on charge"]
+                            DW advised that: [Content from user notes, e.g., "the equipment will be put on charge"]
+                            Follow up action: [Content from user notes, e.g., "N/A"]
+
+                            **Instructions:**
+                            1.  Fill in "Call details" with the advice given by the agent (usually starts with "I advised..." or "I asked...").
+                            2.  Fill in "DW advised that" with the response from the device wearer (usually starts with "DW advised that...").
+                            3.  Fill in "Follow up action" with the specified follow-up action.
+                            4.  "Caller details" and "Identity verification" should be included exactly as they are in the template.
+
+                            Please generate the log based on these user notes:
+                            "${userInput}"
+                        `;
+                    }
+                } else {
+                    prompt = `
+                        Act as a professional assistant. Based on the following notes, generate a structured and professional call log.
+                        The current date and time is: ${new Date().toLocaleString()}.
+                        The log should include the following sections and be in plain text without markdown:
+                        - Call Details: (Date, Time)
+                        - Attendees: (Infer from the notes)
+                        - Summary of Discussion: (Provide a brief, professional summary of the call's purpose and key topics.)
+                        - Key Decisions/Outcomes: (List any decisions that were made.)
+                        - Action Items: (List any action items, who they are assigned to, and any deadlines mentioned.)
+
+                        Here are the notes:
+                        "${userInput}"
+                    `;
+                }
+
+                try {
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        outputEl.textContent = text;
+                    } else {
+                       outputEl.textContent = "Sorry, there was an error generating the log. The response from the AI was empty or malformed.";
+                       console.error("Unexpected API response:", result);
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    outputEl.textContent = "Sorry, there was an error connecting to the AI service. Please check your connection and try again.";
+                } finally {
+                    btnText.textContent = 'Generate Log';
+                    loader.classList.add('hidden');
+                    generateBtn.disabled = false;
+                }
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = outputEl.textContent;
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = textToCopy;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+                showAlert("Log copied to clipboard!");
+            });
         }
 
     </script>
