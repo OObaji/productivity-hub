@@ -122,7 +122,7 @@
             color: #6b7280;
         }
         
-        #pomodoro.page-view, #shift-timer.page-view, #idea-board.page-view, #mindfulness.page-view, #call-log-generator.page-view {
+        #pomodoro.page-view, #shift-timer.page-view, #idea-board.page-view, #mindfulness.page-view, #call-log-generator.page-view, #breach-generator.page-view {
             background-size: cover;
             background-position: center;
             transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
@@ -252,6 +252,11 @@
             60% { transform: scale(1.3); } /* Hold (2s) */
             100% { transform: scale(1); } /* Exhale (4s) */
         }
+        .scenario-btn.selected {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            border-color: #4f46e5;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
@@ -367,6 +372,10 @@
                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="call-log-generator">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                              Call Log Generator
+                         </a>
+                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="breach-generator">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100 4 2 2 0 000-4zm0 0v-.01M12 18v-1m0-8a2 2 0 11-4 0 2 2 0 014 0zm0 0h.01M6 12a2 2 0 11-4 0 2 2 0 014 0zm0 0H5m14 0a2 2 0 11-4 0 2 2 0 014 0zm0 0h-.01M18 12h-1m-4-4a2 2 0 110-4 2 2 0 010 4zm0 0v.01M12 8V7m0 1v.01"></path></svg>
+                             Breach Generator
                          </a>
                     </div>
                 </div>
@@ -695,6 +704,7 @@
                             
                             <div id="scenario-buttons" class="mt-4">
                                 <h3 class="font-semibold mb-2">Scenarios</h3>
+                                <p class="text-xs text-slate-400 mb-2">Select up to two scenarios to combine (one call type + one event).</p>
                                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="inbound">Inbound Call</button>
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="outbound">Outbound Call</button>
@@ -706,6 +716,7 @@
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="other_called">Other Called</button>
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="not_left">Not Left</button>
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="not_late">Not Late</button>
+                                    <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="hospital">Hospital</button>
                                     <button class="scenario-btn p-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md hover:bg-slate-300 dark:hover:bg-gray-600" data-scenario="custom">Custom</button>
                                 </div>
                             </div>
@@ -723,6 +734,42 @@
                             </div>
                             <div id="call-log-output" class="w-full h-80 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50 whitespace-pre-wrap overflow-y-auto">
                                 Your generated call log will appear here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div id="breach-generator" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Breach Generator</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Input Section -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-xl font-semibold mb-4">1. Enter Curfew and Absences</h2>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="curfew-start" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Curfew Start</label>
+                                    <input type="time" id="curfew-start" value="22:00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                </div>
+                                <div>
+                                    <label for="curfew-end" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Curfew End</label>
+                                    <input type="time" id="curfew-end" value="07:00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                </div>
+                            </div>
+                             <div>
+                                <label for="absence-times" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Absence Timestamps</label>
+                                <textarea id="absence-times" rows="8" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Paste timestamps here, one per line. e.g.,&#10;17/07/2025 22:00&#10;17/07/2025 22:53"></textarea>
+                            </div>
+                            <button id="generate-breach-report-btn" class="mt-4 w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700">
+                                Generate Breach Report
+                            </button>
+                        </div>
+                        <!-- Output Section -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold">2. Breach Report</h2>
+                                <button id="copy-breach-report-btn" class="px-4 py-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy Report</button>
+                            </div>
+                            <div id="breach-report-output" class="w-full h-96 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50 whitespace-pre-wrap overflow-y-auto">
+                                Your generated breach report will appear here...
                             </div>
                         </div>
                     </div>
@@ -847,6 +894,7 @@
                 setupSettings();
                 setupBreachList();
                 setupCallLogGenerator();
+                setupBreachGenerator();
                 dashboardInitialized = true;
             }
             
@@ -884,7 +932,7 @@
                     page.classList.toggle('active', page.id === viewId);
                 });
 
-                if (['pomodoro', 'shift-timer', 'idea-board', 'mindfulness', 'call-log-generator'].includes(viewId)) {
+                if (['pomodoro', 'shift-timer', 'idea-board', 'mindfulness', 'call-log-generator', 'breach-generator'].includes(viewId)) {
                     mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                 } else {
                     mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -2148,35 +2196,70 @@
             const outputEl = document.getElementById('call-log-output');
             const copyBtn = document.getElementById('copy-log-btn');
             const scenarioBtns = document.querySelectorAll('.scenario-btn');
+            
+            let selectedScenarios = [];
 
             const scenarios = {
-                inbound: "Incoming call. DW advised that [REASON FOR CALL]. I advised that the call will be documented. Follow up action: Call logged.",
-                outbound: "Outbound call. I advised DW that [REASON FOR CALL]. DW advised that [RESPONSE]. Follow up action: N/A",
-                low_battery: "Outbound call. I advised DW that the equipment is low and needs to be put on charge. DW advised that the equipment will be put on charge. Follow up action: N/A",
-                power_off: "Outbound call. I advised DW that the equipment has powered off and needs to be put on charge. DW advised that the equipment will be put on charge. Follow up action: N/A",
-                left_home: "Outbound call. I advised DW that they have left home during curfew hours. DW advised that [REASON]. Follow up action: Call logged.",
-                past_curfew: "Outbound call. past curfew [REASON]",
-                other_answered: "Outbound call. Other person answered. Advised them to pass a message to DW. Follow up action: Call logged.",
-                other_called: "Incoming call from [PERSON'S NAME/RELATIONSHIP]. They advised that [REASON FOR CALL]. I advised that the call will be documented. Follow up action: Call logged.",
-                not_left: "Outbound call. Not left.",
-                not_late: "Outbound call. I advised DW that they are not late for their curfew. DW acknowledged. Follow up action: Call logged.",
+                inbound: "inbound call",
+                outbound: "outbound call",
+                low_battery: "equipment low battery",
+                power_off: "equipment power off",
+                left_home: "left home during curfew",
+                past_curfew: "out past curfew",
+                other_answered: "other person answered",
+                other_called: "other person called",
+                not_left: "not left",
+                not_late: "not late",
+                hospital: "hospital",
                 custom: ""
             };
+
+            function updateTextarea() {
+                let combinedText = selectedScenarios.map(key => scenarios[key]).join(' ');
+                inputEl.value = combinedText;
+            }
 
             scenarioBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const scenarioKey = btn.dataset.scenario;
-                    inputEl.value = scenarios[scenarioKey];
-                    if (scenarioKey !== 'custom') {
-                        generateBtn.click();
+                    const isSelected = btn.classList.contains('selected');
+
+                    if (scenarioKey === 'custom') {
+                        selectedScenarios = [];
+                        scenarioBtns.forEach(b => b.classList.remove('selected'));
+                        inputEl.value = '';
+                        inputEl.placeholder = "Enter custom call details here...";
+                        return;
                     }
+
+                    if (isSelected) {
+                        btn.classList.remove('selected');
+                        selectedScenarios = selectedScenarios.filter(s => s !== scenarioKey);
+                    } else {
+                        const hasInbound = selectedScenarios.includes('inbound');
+                        const hasOutbound = selectedScenarios.includes('outbound');
+                        
+                        if ( (hasInbound && scenarioKey === 'outbound') || (hasOutbound && scenarioKey === 'inbound') ) {
+                            showAlert("Inbound and Outbound calls cannot be selected together.");
+                            return;
+                        }
+
+                        if (selectedScenarios.length >= 3 || (selectedScenarios.length >= 2 && !(hasInbound && selectedScenarios.includes('other_called') && scenarioKey === 'hospital'))) {
+                           showAlert("You can only combine up to two scenarios, unless it's for the 'Inbound Hospital' case.");
+                           return;
+                        }
+
+                        btn.classList.add('selected');
+                        selectedScenarios.push(scenarioKey);
+                    }
+                    updateTextarea();
                 });
             });
 
             generateBtn.addEventListener('click', async () => {
                 const userInput = inputEl.value.trim();
                 if (!userInput) {
-                    showAlert("Please enter some details about the call.");
+                    showAlert("Please select a scenario or enter some details about the call.");
                     return;
                 }
 
@@ -2188,7 +2271,34 @@
                 let prompt;
                 const lowerCaseInput = userInput.toLowerCase();
 
-                if (lowerCaseInput.includes('incoming')) {
+                if (lowerCaseInput.includes('inbound') && lowerCaseInput.includes('other called') && lowerCaseInput.includes('hospital')) {
+                    prompt = `
+                        Act as a professional assistant generating a call log for an incoming call from a third party about a device wearer being in the hospital.
+                        Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
+
+                        Caller details: Device wearer's [Relationship] called
+                        Caller Statement: Device wearer's [Relationship] called to inform that DW is currently at the hospital and isn't in the property at the moment.
+                        Advise Provided: I advised to obtain a discharge note from the hospital as evidence and this call will be documented
+                        Follow up action: Call logged.
+
+                        **Instructions:**
+                        1. From the user's input, identify the relationship of the caller to the device wearer. The relationship is any word that is not part of the standard keywords ("inbound", "call", "other", "called", "hospital", "dw", "is", "in", "at", "the", "and", "isn't", "property", "moment"). For example, in "Inbound call other called hospital Mother DW is in hospital", the relationship is "Mother".
+                        2. Capitalize the first letter of the relationship.
+                        3. Insert this relationship into the [Relationship] placeholders in the template.
+                        4. The rest of the template must be used exactly as shown. Do NOT include "Rv's confirmed".
+
+                        **Example:**
+                        User Input: "Inbound call other called hospital Mother DW is in hospital"
+                        Correct Output:
+                        Caller details: Device wearer's Mother called
+                        Caller Statement: Device wearer's mother called to inform that DW is currently at the hospital and isn't in the property at the moment.
+                        Advise Provided: I advised to obtain a discharge note from the hospital as evidence and this call will be documented
+                        Follow up action: Call logged.
+
+                        Now, generate the log based on this user input:
+                        "${userInput}"
+                    `;
+                } else if (lowerCaseInput.includes('inbound')) {
                      prompt = `
                         Act as a professional assistant generating a call log for an incoming call to a company.
                         Your output MUST be plain text and follow this EXACT structure, without any extra formatting like bolding or markdown.
@@ -2196,8 +2306,8 @@
                         Caller details: Device wearer called
                         Rv's confirmed: Name, DOB, Address, Curfew hours
                         Caller Statement: Device wearer advised that [content from user notes]
-                        Advise Provided: I advised that [content from user notes]
-                        Follow up action: [content from user notes]
+                        Advise Provided: I advised that the call will be documented
+                        Follow up action: Call logged.
 
                         **Instructions for filling the template:**
                         1.  For "Caller Statement", take the main issue from the user's notes and place it after "Device wearer advised that ". For example, if the notes are "incoming DW said not left box keeps ringing", the Caller Statement should be "Device wearer advised that their box keeps ringing."
@@ -2334,6 +2444,115 @@
                     const successful = document.execCommand('copy');
                     if (successful) {
                         showAlert("Log copied to clipboard!");
+                    } else {
+                        showAlert("Copying failed. Please try again.");
+                    }
+                } catch (err) {
+                    showAlert("Copying failed. Please try again.");
+                }
+                document.body.removeChild(tempTextarea);
+            });
+        }
+        
+        function setupBreachGenerator() {
+            const generateBtn = document.getElementById('generate-breach-report-btn');
+            const copyBtn = document.getElementById('copy-breach-report-btn');
+            const outputEl = document.getElementById('breach-report-output');
+            const absenceTimesEl = document.getElementById('absence-times');
+            const curfewStartEl = document.getElementById('curfew-start');
+            const curfewEndEl = document.getElementById('curfew-end');
+
+            function parseDateTime(dateTimeStr) {
+                const [datePart, timePart] = dateTimeStr.split(' ');
+                const [day, month, year] = datePart.split('/');
+                const [hours, minutes] = timePart.split(':');
+                // Month is 0-indexed in JavaScript Date
+                return new Date(year, month - 1, day, hours, minutes);
+            }
+            
+            function formatDuration(totalMinutes) {
+                if (totalMinutes < 60) {
+                    return `${totalMinutes} Minutes`;
+                } else {
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+                    return `${hours} Hour${hours > 1 ? 's' : ''} ${minutes} Minutes`;
+                }
+            }
+
+            generateBtn.addEventListener('click', () => {
+                const absenceLines = absenceTimesEl.value.trim().split('\n').filter(line => line.trim() !== '');
+                const curfewStartTime = curfewStartEl.value;
+
+                if (absenceLines.length === 0 || absenceLines.length % 2 !== 0) {
+                    showAlert("Please provide an even number of timestamps (pairs of leaving and returning).");
+                    return;
+                }
+
+                let totalBreachMs = 0;
+                let reportLines = [];
+                
+                for (let i = 0; i < absenceLines.length; i += 2) {
+                    const leftTimeStr = absenceLines[i];
+                    const returnedTimeStr = absenceLines[i + 1];
+
+                    if (!leftTimeStr || !returnedTimeStr) {
+                        showAlert(`Missing a timestamp for pair #${(i/2) + 1}. Please check your input.`);
+                        return;
+                    }
+
+                    try {
+                        const leftDate = parseDateTime(leftTimeStr);
+                        const returnedDate = parseDateTime(returnedTimeStr);
+
+                        if (isNaN(leftDate.getTime()) || isNaN(returnedDate.getTime())) {
+                           throw new Error("Invalid date format");
+                        }
+                        
+                        if (returnedDate < leftDate) {
+                            showAlert(`Return time cannot be before the left time for pair #${(i/2) + 1}.`);
+                            return;
+                        }
+
+                        const durationMs = returnedDate - leftDate;
+                        totalBreachMs += durationMs;
+                        
+                        const leftTime = leftTimeStr.split(' ')[1];
+
+                        if(leftTime === curfewStartTime) {
+                             reportLines.push(`Out past curfew ~ ${leftTimeStr} - Returned home late ~ ${returnedTimeStr}`);
+                        } else {
+                             reportLines.push(`Left home during curfew ~ ${leftTimeStr} - Returned home during curfew ~ ${returnedTimeStr}`);
+                        }
+
+                    } catch (e) {
+                        showAlert("Invalid date/time format. Please use DD/MM/YYYY HH:MM format for all timestamps.");
+                        return;
+                    }
+                }
+                
+                const totalMinutes = Math.round(totalBreachMs / 60000);
+                reportLines.push(`\nTotal Breach Time: ${formatDuration(totalMinutes)}`);
+
+                outputEl.innerText = reportLines.join('\n');
+            });
+            
+            copyBtn.addEventListener('click', () => {
+                const reportText = outputEl.innerText;
+                 if (!reportText || reportText === 'Your generated breach report will appear here...') {
+                    showAlert("Nothing to copy!");
+                    return;
+                }
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.style.position = 'absolute';
+                tempTextarea.style.left = '-9999px';
+                tempTextarea.value = reportText;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showAlert("Report copied to clipboard!");
                     } else {
                         showAlert("Copying failed. Please try again.");
                     }
