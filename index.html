@@ -257,6 +257,11 @@
             color: white;
             border-color: #4f46e5;
         }
+        .breach-report-box {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 9pt;
+            line-height: 1.2;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
@@ -763,13 +768,24 @@
                             </button>
                         </div>
                         <!-- Output Section -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
-                            <div class="flex justify-between items-center mb-4">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
+                            <div class="flex justify-between items-center">
                                 <h2 class="text-xl font-semibold">2. Breach Report</h2>
-                                <button id="copy-breach-report-btn" class="px-4 py-2 text-sm bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy Report</button>
                             </div>
-                            <div id="breach-report-output" class="w-full h-96 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50 whitespace-pre-wrap overflow-y-auto">
-                                Your generated breach report will appear here...
+                            <div class="p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-semibold">Absence Time</h3>
+                                    <button id="copy-breach-report-btn" class="px-2 py-1 text-xs bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy</button>
+                                </div>
+                                <div id="breach-report-output" class="breach-report-box whitespace-pre-wrap h-24 overflow-y-auto"></div>
+                            </div>
+                            <div class="flex justify-between items-center p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50">
+                                <span id="breach-report-total-time" class="breach-report-box font-bold">Total Time: 0 Minutes</span>
+                                <button id="copy-total-time-btn" class="px-2 py-1 text-xs bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy</button>
+                            </div>
+                            <div class="flex justify-between items-center p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-900/50">
+                                <span id="breach-report-curfew-hours" class="breach-report-box font-bold">Curfew: 22:00 - 07:00</span>
+                                <button id="copy-curfew-hours-btn" class="px-2 py-1 text-xs bg-slate-200 dark:bg-gray-700 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-gray-600">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -2456,8 +2472,14 @@
         
         function setupBreachGenerator() {
             const generateBtn = document.getElementById('generate-breach-report-btn');
-            const copyBtn = document.getElementById('copy-breach-report-btn');
+            const copyAbsencesBtn = document.getElementById('copy-breach-report-btn');
+            const copyTotalTimeBtn = document.getElementById('copy-total-time-btn');
+            const copyCurfewBtn = document.getElementById('copy-curfew-hours-btn');
+
             const outputEl = document.getElementById('breach-report-output');
+            const totalTimeEl = document.getElementById('breach-report-total-time');
+            const curfewHoursEl = document.getElementById('breach-report-curfew-hours');
+
             const absenceTimesEl = document.getElementById('absence-times');
             const curfewStartEl = document.getElementById('curfew-start');
             const curfewEndEl = document.getElementById('curfew-end');
@@ -2466,7 +2488,6 @@
                 const [datePart, timePart] = dateTimeStr.split(' ');
                 const [day, month, year] = datePart.split('/');
                 const [hours, minutes] = timePart.split(':');
-                // Month is 0-indexed in JavaScript Date
                 return new Date(year, month - 1, day, hours, minutes);
             }
             
@@ -2483,6 +2504,8 @@
             generateBtn.addEventListener('click', () => {
                 const absenceLines = absenceTimesEl.value.trim().split('\n').filter(line => line.trim() !== '');
                 const curfewStartTime = curfewStartEl.value;
+                const curfewEndTime = curfewEndEl.value;
+
 
                 if (absenceLines.length === 0 || absenceLines.length % 2 !== 0) {
                     showAlert("Please provide an even number of timestamps (pairs of leaving and returning).");
@@ -2522,7 +2545,7 @@
                         if(leftTime === curfewStartTime) {
                              reportLines.push(`Out past curfew ~ ${leftTimeStr} - Returned home late ~ ${returnedTimeStr}`);
                         } else {
-                             reportLines.push(`Left home during curfew ~ ${leftTimeStr} - Returned home during curfew ~ ${returnedTimeStr}`);
+                             reportLines.push(`Left home during curfew ~ ${leftTimeStr}\nReturned home during curfew ~ ${returnedTimeStr}`);
                         }
 
                     } catch (e) {
@@ -2532,27 +2555,27 @@
                 }
                 
                 const totalMinutes = Math.round(totalBreachMs / 60000);
-                reportLines.push(`\nTotal Breach Time: ${formatDuration(totalMinutes)}`);
-
-                outputEl.innerText = reportLines.join('\n');
+                
+                outputEl.innerText = reportLines.join('\n\n');
+                totalTimeEl.innerText = `${formatDuration(totalMinutes)}`;
+                curfewHoursEl.innerText = `${curfewStartTime} - ${curfewEndTime}`;
             });
-            
-            copyBtn.addEventListener('click', () => {
-                const reportText = outputEl.innerText;
-                 if (!reportText || reportText === 'Your generated breach report will appear here...') {
+
+            function copyToClipboard(text, successMessage) {
+                 if (!text) {
                     showAlert("Nothing to copy!");
                     return;
                 }
                 const tempTextarea = document.createElement('textarea');
                 tempTextarea.style.position = 'absolute';
                 tempTextarea.style.left = '-9999px';
-                tempTextarea.value = reportText;
+                tempTextarea.value = text;
                 document.body.appendChild(tempTextarea);
                 tempTextarea.select();
                 try {
                     const successful = document.execCommand('copy');
                     if (successful) {
-                        showAlert("Report copied to clipboard!");
+                        showAlert(successMessage);
                     } else {
                         showAlert("Copying failed. Please try again.");
                     }
@@ -2560,6 +2583,28 @@
                     showAlert("Copying failed. Please try again.");
                 }
                 document.body.removeChild(tempTextarea);
+            }
+            
+            copyAbsencesBtn.addEventListener('click', () => {
+                const reportText = outputEl.innerText;
+                 if (!reportText || reportText === 'Your generated breach report will appear here...') {
+                    showAlert("Nothing to copy!");
+                    return;
+                }
+                copyToClipboard(reportText, "Absences copied to clipboard!");
+            });
+            copyTotalTimeBtn.addEventListener('click', () => {
+                const totalTimeText = totalTimeEl.innerText;
+                if(totalTimeText === "Total Time: 0 Minutes") {
+                    showAlert("Nothing to copy!");
+                    return;
+                }
+                copyToClipboard(totalTimeText, "Total time copied to clipboard!");
+            });
+            copyCurfewBtn.addEventListener('click', () => {
+                 const curfewText = curfewHoursEl.innerText;
+                 copyToClipboard(curfewText, "Curfew hours copied to clipboard!");
+
             });
         }
 
