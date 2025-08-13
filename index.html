@@ -287,6 +287,35 @@
         </div>
     </div>
 
+    <!-- Overtime Edit Modal -->
+    <div id="overtime-edit-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md space-y-4">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Overtime Entry</h2>
+            <input type="hidden" id="edit-overtime-id">
+            <div>
+                <label for="edit-overtime-date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
+                <input type="date" id="edit-overtime-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label for="edit-overtime-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (£)</label>
+                <input type="number" id="edit-overtime-amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label for="edit-overtime-allocation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Allocation</label>
+                <select id="edit-overtime-allocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option>Savings</option>
+                    <option>Holiday</option>
+                    <option value="Other">Other (Specify)</option>
+                </select>
+                <input type="text" id="edit-overtime-allocation-custom" class="mt-2 hidden block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Custom allocation name">
+            </div>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-edit-overtime-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-slate-800 dark:text-slate-200 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
+                <button id="save-edit-overtime-btn" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
 
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
         <canvas id="landing-canvas"></canvas>
@@ -369,6 +398,10 @@
                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="salary-calculator">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 4h.01M18 12a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
                              Salary Calculator
+                         </a>
+                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="overtime-tracker">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100 4 2 2 0 000-4zm0 0v-.01M12 18v-1m0-8a2 2 0 11-4 0 2 2 0 014 0zm0 0h.01M6 12a2 2 0 11-4 0 2 2 0 014 0zm0 0H5m14 0a2 2 0 11-4 0 2 2 0 014 0zm0 0h-.01M18 12h-1m-4-4a2 2 0 110-4 2 2 0 010 4zm0 0v.01M12 8V7m0 1v.01"></path></svg>
+                             Overtime Tracker
                          </a>
                     </div>
                 </div>
@@ -759,6 +792,41 @@
                         </div>
                     </div>
                 </div>
+                 <div id="overtime-tracker" class="page-view container mx-auto px-4 sm:px-6 py-8">
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Overtime Tracker</h1>
+                    <div id="overtime-fund-totals" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Totals will be generated here -->
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-8">
+                        <h2 class="text-xl font-semibold mb-4 text-slate-800 dark:text-white">Add New Overtime</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label for="overtime-date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
+                                <input type="date" id="overtime-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div>
+                                <label for="overtime-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (£)</label>
+                                <input type="number" id="overtime-amount" placeholder="e.g., 75.50" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div class="flex-grow">
+                                <label for="overtime-allocation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Allocation</label>
+                                <select id="overtime-allocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                    <option>Savings</option>
+                                    <option>Holiday</option>
+                                    <option value="Other">Other (Specify)</option>
+                                </select>
+                                <input type="text" id="overtime-allocation-custom" class="mt-2 hidden w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Custom allocation name">
+                            </div>
+                            <button id="add-overtime-btn" class="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors">Add Overtime</button>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm">
+                        <h2 class="text-xl font-semibold mb-4 text-slate-800 dark:text-white">Overtime Log</h2>
+                        <div id="overtime-list" class="space-y-4">
+                           <!-- Entries will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -879,6 +947,7 @@
                 setupSettings();
                 setupBreachList();
                 setupSalaryCalculator();
+                setupOvertimeTracker();
                 dashboardInitialized = true;
             }
             
@@ -1056,7 +1125,7 @@
                         name: 'Focus',
                         time: 25,
                         color: '#F97316', // orange-500
-                        icon: '�',
+                        icon: '🍅',
                         next: 'shortBreak',
                         background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
                     },
@@ -2273,7 +2342,238 @@
             });
         }
 
+        function setupOvertimeTracker() {
+            const addBtn = document.getElementById('add-overtime-btn');
+            const listContainer = document.getElementById('overtime-list');
+            const totalsContainer = document.getElementById('overtime-fund-totals');
+            
+            const allocationSelect = document.getElementById('overtime-allocation');
+            const customAllocationInput = document.getElementById('overtime-allocation-custom');
+
+            const editModal = document.getElementById('overtime-edit-modal');
+            const cancelEditBtn = document.getElementById('cancel-edit-overtime-btn');
+            const saveEditBtn = document.getElementById('save-edit-overtime-btn');
+            const editAllocationSelect = document.getElementById('edit-overtime-allocation');
+            const editCustomAllocationInput = document.getElementById('edit-overtime-allocation-custom');
+
+
+            let overtimeEntries = JSON.parse(localStorage.getItem('overtimeEntries')) || [];
+            const formatCurrency = (value) => `£${value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+
+            function saveEntries() {
+                localStorage.setItem('overtimeEntries', JSON.stringify(overtimeEntries));
+            }
+
+            function updateTotals() {
+                totalsContainer.innerHTML = '';
+                const totals = overtimeEntries.reduce((acc, entry) => {
+                    const allocation = entry.allocation;
+                    acc[allocation] = (acc[allocation] || 0) + entry.amount;
+                    return acc;
+                }, {});
+
+                const fundColors = {
+                    'Holiday': 'blue',
+                    'Savings': 'purple',
+                };
+
+                Object.keys(totals).sort().forEach(key => {
+                    const color = fundColors[key] || 'gray';
+                    const totalEl = document.createElement('div');
+                    totalEl.className = `bg-${color}-100 dark:bg-${color}-900/50 p-4 rounded-lg text-center`;
+                    totalEl.innerHTML = `
+                        <p class="text-sm text-${color}-800 dark:text-${color}-300">${key} Fund</p>
+                        <p class="text-2xl font-bold text-${color}-900 dark:text-${color}-200">${formatCurrency(totals[key])}</p>
+                    `;
+                    totalsContainer.appendChild(totalEl);
+                });
+            }
+
+            function renderEntries() {
+                listContainer.innerHTML = '';
+
+                const groupedByMonth = overtimeEntries.reduce((acc, entry) => {
+                    const month = new Date(entry.date).toLocaleString('default', { month: 'long', year: 'numeric' });
+                    if (!acc[month]) {
+                        acc[month] = [];
+                    }
+                    acc[month].push(entry);
+                    return acc;
+                }, {});
+
+                const sortedMonths = Object.keys(groupedByMonth).sort((a, b) => new Date(b) - new Date(a));
+
+                if (sortedMonths.length === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-slate-500 dark:text-slate-400">No overtime logged yet.</p>`;
+                    updateTotals();
+                    return;
+                }
+
+                sortedMonths.forEach(month => {
+                    const monthContainer = document.createElement('div');
+                    monthContainer.innerHTML = `<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">${month}</h3>`;
+                    
+                    const groupedByAllocation = groupedByMonth[month].reduce((acc, entry) => {
+                        if (!acc[entry.allocation]) {
+                            acc[entry.allocation] = [];
+                        }
+                        acc[entry.allocation].push(entry);
+                        return acc;
+                    }, {});
+
+                    Object.keys(groupedByAllocation).sort().forEach(allocation => {
+                        const allocationTotal = groupedByAllocation[allocation].reduce((sum, item) => sum + item.amount, 0);
+                        const allocationContainer = document.createElement('div');
+                        allocationContainer.className = 'mb-4';
+                        allocationContainer.innerHTML = `
+                            <div class="flex justify-between items-center bg-slate-100 dark:bg-gray-700/60 p-2 rounded-t-lg">
+                                <h4 class="font-semibold text-slate-800 dark:text-slate-200">${allocation}</h4>
+                                <span class="font-bold text-slate-800 dark:text-slate-200">${formatCurrency(allocationTotal)}</span>
+                            </div>
+                        `;
+                        
+                        const entriesList = document.createElement('div');
+                        entriesList.className = 'border border-t-0 dark:border-gray-700 rounded-b-lg';
+
+                        groupedByAllocation[allocation].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(entry => {
+                            const entryEl = document.createElement('div');
+                            entryEl.className = 'grid grid-cols-3 gap-4 items-center p-3 border-b dark:border-gray-700 last:border-b-0';
+                            entryEl.dataset.id = entry.id;
+                            entryEl.innerHTML = `
+                                <div class="text-slate-800 dark:text-slate-200">${new Date(entry.date).toLocaleDateString()}</div>
+                                <div class="font-semibold text-slate-900 dark:text-white">${formatCurrency(entry.amount)}</div>
+                                <div class="flex justify-end gap-2">
+                                    <button class="edit-overtime-btn p-1 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <button class="delete-overtime-btn p-1 text-slate-500 hover:text-red-600 dark:hover:text-red-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+                            `;
+                            entriesList.appendChild(entryEl);
+                        });
+                        allocationContainer.appendChild(entriesList);
+                        monthContainer.appendChild(allocationContainer);
+                    });
+
+                    listContainer.appendChild(monthContainer);
+                });
+
+                updateTotals();
+            }
+
+            allocationSelect.addEventListener('change', () => {
+                customAllocationInput.classList.toggle('hidden', allocationSelect.value !== 'Other');
+            });
+            editAllocationSelect.addEventListener('change', () => {
+                editCustomAllocationInput.classList.toggle('hidden', editAllocationSelect.value !== 'Other');
+            });
+
+            addBtn.addEventListener('click', () => {
+                const date = document.getElementById('overtime-date').value;
+                const amount = parseFloat(document.getElementById('overtime-amount').value);
+                let allocation = allocationSelect.value;
+
+                if (allocation === 'Other') {
+                    allocation = customAllocationInput.value.trim();
+                    if (!allocation) {
+                        showAlert("Please enter a name for your custom allocation.");
+                        return;
+                    }
+                }
+                
+                if (!date || isNaN(amount) || amount <= 0) {
+                    showAlert("Please enter a valid date and amount.");
+                    return;
+                }
+
+                overtimeEntries.push({ id: Date.now(), date, amount, allocation });
+                saveEntries();
+                renderEntries();
+                
+                document.getElementById('overtime-date').value = '';
+                document.getElementById('overtime-amount').value = '';
+                customAllocationInput.value = '';
+                allocationSelect.value = 'Savings';
+                customAllocationInput.classList.add('hidden');
+            });
+
+            listContainer.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-overtime-btn');
+                const deleteBtn = e.target.closest('.delete-overtime-btn');
+                
+                if (editBtn) {
+                    const entryEl = editBtn.closest('.grid');
+                    const entryId = parseInt(entryEl.dataset.id);
+                    const entry = overtimeEntries.find(item => item.id === entryId);
+
+                    document.getElementById('edit-overtime-id').value = entry.id;
+                    document.getElementById('edit-overtime-date').value = entry.date;
+                    document.getElementById('edit-overtime-amount').value = entry.amount;
+                    
+                    const standardOptions = ["Savings", "Holiday"];
+                    if (standardOptions.includes(entry.allocation)) {
+                        editAllocationSelect.value = entry.allocation;
+                        editCustomAllocationInput.classList.add('hidden');
+                        editCustomAllocationInput.value = '';
+                    } else {
+                        editAllocationSelect.value = 'Other';
+                        editCustomAllocationInput.classList.remove('hidden');
+                        editCustomAllocationInput.value = entry.allocation;
+                    }
+                    
+                    editModal.classList.remove('hidden');
+                    editModal.classList.add('flex');
+                }
+
+                if (deleteBtn) {
+                    const entryEl = deleteBtn.closest('.grid');
+                    const entryId = parseInt(entryEl.dataset.id);
+                    overtimeEntries = overtimeEntries.filter(item => item.id !== entryId);
+                    saveEntries();
+                    renderEntries();
+                }
+            });
+
+            function closeEditModal() {
+                editModal.classList.add('hidden');
+                editModal.classList.remove('flex');
+            }
+
+            cancelEditBtn.addEventListener('click', closeEditModal);
+
+            saveEditBtn.addEventListener('click', () => {
+                const id = parseInt(document.getElementById('edit-overtime-id').value);
+                const date = document.getElementById('edit-overtime-date').value;
+                const amount = parseFloat(document.getElementById('edit-overtime-amount').value);
+                let allocation = editAllocationSelect.value;
+                
+                if (allocation === 'Other') {
+                    allocation = editCustomAllocationInput.value.trim();
+                    if (!allocation) {
+                        showAlert("Please enter a name for your custom allocation.");
+                        return;
+                    }
+                }
+
+                if (!date || isNaN(amount) || amount <= 0) {
+                    showAlert("Please enter a valid date and amount.");
+                    return;
+                }
+
+                const entryIndex = overtimeEntries.findIndex(item => item.id === id);
+                if (entryIndex > -1) {
+                    overtimeEntries[entryIndex] = { id, date, amount, allocation };
+                    saveEntries();
+                    renderEntries();
+                    closeEditModal();
+                }
+            });
+
+            renderEntries();
+        }
+
     </script>
 </body>
 </html>
-�
