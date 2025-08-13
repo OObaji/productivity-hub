@@ -297,8 +297,12 @@
                 <input type="date" id="edit-overtime-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
             <div>
-                <label for="edit-overtime-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (£)</label>
-                <input type="number" id="edit-overtime-amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <label for="edit-overtime-hours" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Hours Completed</label>
+                <input type="number" id="edit-overtime-hours" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+             <div>
+                <label for="edit-overtime-rate" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Rate per Hour (£)</label>
+                <input type="number" id="edit-overtime-rate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
             <div>
                 <label for="edit-overtime-allocation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Allocation</label>
@@ -799,14 +803,18 @@
                     </div>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-8">
                         <h2 class="text-xl font-semibold mb-4 text-slate-800 dark:text-white">Add New Overtime</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                             <div>
                                 <label for="overtime-date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Date</label>
                                 <input type="date" id="overtime-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div>
-                                <label for="overtime-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (£)</label>
-                                <input type="number" id="overtime-amount" placeholder="e.g., 75.50" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <label for="overtime-hours" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Hours</label>
+                                <input type="number" id="overtime-hours" placeholder="e.g., 5.5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                             <div>
+                                <label for="overtime-rate" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Rate/hr (£)</label>
+                                <input type="number" id="overtime-rate" placeholder="e.g., 15.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="flex-grow">
                                 <label for="overtime-allocation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Allocation</label>
@@ -2437,10 +2445,11 @@
 
                         groupedByAllocation[allocation].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(entry => {
                             const entryEl = document.createElement('div');
-                            entryEl.className = 'grid grid-cols-3 gap-4 items-center p-3 border-b dark:border-gray-700 last:border-b-0';
+                            entryEl.className = 'grid grid-cols-4 gap-4 items-center p-3 border-b dark:border-gray-700 last:border-b-0';
                             entryEl.dataset.id = entry.id;
                             entryEl.innerHTML = `
                                 <div class="text-slate-800 dark:text-slate-200">${new Date(entry.date).toLocaleDateString()}</div>
+                                <div class="text-sm text-slate-600 dark:text-slate-400">${entry.hours} hrs @ ${formatCurrency(entry.rate)}/hr</div>
                                 <div class="font-semibold text-slate-900 dark:text-white">${formatCurrency(entry.amount)}</div>
                                 <div class="flex justify-end gap-2">
                                     <button class="edit-overtime-btn p-1 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400">
@@ -2472,7 +2481,8 @@
 
             addBtn.addEventListener('click', () => {
                 const date = document.getElementById('overtime-date').value;
-                const amount = parseFloat(document.getElementById('overtime-amount').value);
+                const hours = parseFloat(document.getElementById('overtime-hours').value);
+                const rate = parseFloat(document.getElementById('overtime-rate').value);
                 let allocation = allocationSelect.value;
 
                 if (allocation === 'Other') {
@@ -2483,17 +2493,20 @@
                     }
                 }
                 
-                if (!date || isNaN(amount) || amount <= 0) {
-                    showAlert("Please enter a valid date and amount.");
+                if (!date || isNaN(hours) || hours <= 0 || isNaN(rate) || rate <= 0) {
+                    showAlert("Please enter a valid date, hours, and rate.");
                     return;
                 }
+                
+                const amount = hours * rate;
 
-                overtimeEntries.push({ id: Date.now(), date, amount, allocation });
+                overtimeEntries.push({ id: Date.now(), date, hours, rate, amount, allocation });
                 saveEntries();
                 renderEntries();
                 
                 document.getElementById('overtime-date').value = '';
-                document.getElementById('overtime-amount').value = '';
+                document.getElementById('overtime-hours').value = '';
+                document.getElementById('overtime-rate').value = '';
                 customAllocationInput.value = '';
                 allocationSelect.value = 'Savings';
                 customAllocationInput.classList.add('hidden');
@@ -2510,7 +2523,8 @@
 
                     document.getElementById('edit-overtime-id').value = entry.id;
                     document.getElementById('edit-overtime-date').value = entry.date;
-                    document.getElementById('edit-overtime-amount').value = entry.amount;
+                    document.getElementById('edit-overtime-hours').value = entry.hours;
+                    document.getElementById('edit-overtime-rate').value = entry.rate;
                     
                     const standardOptions = ["Savings", "Holiday"];
                     if (standardOptions.includes(entry.allocation)) {
@@ -2546,7 +2560,8 @@
             saveEditBtn.addEventListener('click', () => {
                 const id = parseInt(document.getElementById('edit-overtime-id').value);
                 const date = document.getElementById('edit-overtime-date').value;
-                const amount = parseFloat(document.getElementById('edit-overtime-amount').value);
+                const hours = parseFloat(document.getElementById('edit-overtime-hours').value);
+                const rate = parseFloat(document.getElementById('edit-overtime-rate').value);
                 let allocation = editAllocationSelect.value;
                 
                 if (allocation === 'Other') {
@@ -2557,14 +2572,16 @@
                     }
                 }
 
-                if (!date || isNaN(amount) || amount <= 0) {
-                    showAlert("Please enter a valid date and amount.");
+                if (!date || isNaN(hours) || hours <= 0 || isNaN(rate) || rate <= 0) {
+                    showAlert("Please enter valid details.");
                     return;
                 }
 
+                const amount = hours * rate;
+
                 const entryIndex = overtimeEntries.findIndex(item => item.id === id);
                 if (entryIndex > -1) {
-                    overtimeEntries[entryIndex] = { id, date, amount, allocation };
+                    overtimeEntries[entryIndex] = { id, date, hours, rate, amount, allocation };
                     saveEntries();
                     renderEntries();
                     closeEditModal();
