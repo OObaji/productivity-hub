@@ -262,6 +262,38 @@
             font-size: 9pt;
             line-height: 1.2;
         }
+        /* Ball Game Specific Styles */
+        #ball-game-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+            background-color: #1a1a2e; /* Dark theme for the game */
+        }
+        #game-canvas {
+            background-color: #0d0d1a;
+            border: 2px solid #5d5d81;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #game-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
@@ -413,6 +445,10 @@
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100 4 2 2 0 000-4zm0 0v-.01M12 18v-1m0-8a2 2 0 11-4 0 2 2 0 014 0zm0 0h.01M6 12a2 2 0 11-4 0 2 2 0 014 0zm0 0H5m14 0a2 2 0 11-4 0 2 2 0 014 0zm0 0h-.01M18 12h-1m-4-4a2 2 0 110-4 2 2 0 010 4zm0 0v.01M12 8V7m0 1v.01"></path></svg>
                              Overtime Tracker
                          </a>
+                         <a href="#" class="nav-link flex items-center p-1 rounded-lg hover:bg-gray-700" data-view="ball-game">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.125l-3.376 3.376m0 0l-3.376-3.376m3.376 3.376v-7.25m6.876 7.25c.571 0 1.034-.463 1.034-1.034v-1.258c0-.571-.463-1.034-1.034-1.034s-1.034.463-1.034 1.034v1.258c0 .571.463 1.034 1.034 1.034zM12 21a9 9 0 100-18 9 9 0 000 18z"></path></svg>
+                            Ball Game
+                        </a>
                     </div>
                 </div>
             </div>
@@ -860,6 +896,21 @@
                         </div>
                     </div>
                 </div>
+                <div id="ball-game" class="page-view h-full">
+                    <div id="ball-game-container">
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Ball Game</h1>
+                        <div id="game-info">
+                            <span id="game-score">Score: 0</span>
+                            <span id="game-lives">Lives: 3</span>
+                            <span id="game-high-score">High Score: 0</span>
+                        </div>
+                        <canvas id="game-canvas" width="500" height="400"></canvas>
+                        <div id="game-controls">
+                            <button id="start-game-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">Start</button>
+                            <button id="reset-game-btn" class="px-6 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700">Reset</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -870,7 +921,7 @@
                 module: "Ikigai (生き甲斐)",
                 themeColor: "rose",
                 icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
-                description: "Discover your 'reason for being' by finding the intersection of what you love, what you're good at, what the world needs, and what you can be paid for.",
+                description: "DDiscover your 'reason for being' by finding the intersection of what you love, what you're good at, what the world needs, and what you can be paid for.",
                 topics: [
                     { title: "Passion", items: ["What do you love?", "What are you good at?"] },
                     { title: "Mission", items: ["What does the world need?", "What can you contribute?"] },
@@ -981,6 +1032,7 @@
                 setupBreachList();
                 setupSalaryCalculator();
                 setupOvertimeTracker();
+                setupBallGame(); // New game setup function
                 dashboardInitialized = true;
             }
             
@@ -1018,7 +1070,7 @@
                     page.classList.toggle('active', page.id === viewId);
                 });
 
-                if (['pomodoro', 'shift-timer', 'idea-board', 'mindfulness'].includes(viewId)) {
+                if (['pomodoro', 'shift-timer', 'idea-board', 'mindfulness', 'ball-game'].includes(viewId)) {
                     mainContentWrapper.classList.remove('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
                 } else {
                     mainContentWrapper.classList.add('container', 'mx-auto', 'px-4', 'sm:px-6', 'py-8');
@@ -1400,9 +1452,10 @@
                 const mouse = { x: null, y: null, radius: 150 };
 
                 function formatTime(ms) {
-                    const h = Math.floor(ms / 3600000);
-                    const m = Math.floor((ms % 3600000) / 60000);
-                    const s = Math.floor((ms % 60000) / 1000);
+                    const totalSeconds = Math.floor(ms / 1000);
+                    const h = Math.floor(totalSeconds / 3600);
+                    const m = Math.floor((totalSeconds % 3600) / 60);
+                    const s = totalSeconds % 60;
                     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 }
 
@@ -1418,9 +1471,9 @@
                         const breakEl = document.createElement('div');
                         breakEl.className = 'flex items-center space-x-2 text-sm text-gray-300';
                         breakEl.innerHTML = `
-                            <input type="time" value="${breakItem.startTime}" class="break-start-time w-1/2 p-1 rounded bg-gray-600 text-white border-gray-500">
-                            <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-1/2 p-1 rounded bg-gray-600 text-white border-gray-500">
-                            <span>mins</span>
+                            <input type="time" value="${breakItem.startTime}" class="break-start-time w-1/3 p-1 rounded bg-gray-600 text-white border-gray-500">
+                            <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-1/3 p-1 rounded bg-gray-600 text-white border-gray-500">
+                            <span class="text-xs">mins</span>
                             <button class="remove-break-btn text-red-400 p-1 rounded hover:bg-gray-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -2560,7 +2613,7 @@
 
                     Object.keys(groupedByAllocation).sort().forEach(allocation => {
                         const allocationTotal = groupedByAllocation[allocation].reduce((sum, item) => sum + item.amount, 0);
-                        const allocationContaainer = document.createElement('div');
+                        const allocationContainer = document.createElement('div');
                         allocationContainer.className = 'mb-4';
                         allocationContainer.innerHTML = `
                             <div class="flex justify-between items-center bg-slate-100 dark:bg-gray-700/60 p-2 rounded-t-lg">
@@ -2718,6 +2771,195 @@
             });
 
             renderEntries();
+        }
+
+        function setupBallGame() {
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            const startGameBtn = document.getElementById('start-game-btn');
+            const resetGameBtn = document.getElementById('reset-game-btn');
+            const scoreDisplay = document.getElementById('game-score');
+            const livesDisplay = document.getElementById('game-lives');
+            const highScoreDisplay = document.getElementById('game-high-score');
+
+            // Game variables
+            let gameInterval;
+            let gameRunning = false;
+            let score = 0;
+            let lives = 3;
+            let highScore = localStorage.getItem('ballGameHighScore') || 0;
+
+            // Ball properties
+            let ballRadius = 10;
+            let x = canvas.width / 2;
+            let y = canvas.height - 30;
+            let dx = 2;
+            let dy = -2;
+
+            // Paddle properties
+            let paddleHeight = 10;
+            let paddleWidth = 75;
+            let paddleX = (canvas.width - paddleWidth) / 2;
+            let rightPressed = false;
+            let leftPressed = false;
+
+            // Event listeners for paddle control
+            document.addEventListener("keydown", keyDownHandler, false);
+            document.addEventListener("keyup", keyUpHandler, false);
+            canvas.addEventListener("mousemove", mouseMoveHandler, false);
+
+            function keyDownHandler(e) {
+                if(e.key === "Right" || e.key === "ArrowRight") {
+                    rightPressed = true;
+                }
+                else if(e.key === "Left" || e.key === "ArrowLeft") {
+                    leftPressed = true;
+                }
+            }
+
+            function keyUpHandler(e) {
+                if(e.key === "Right" || e.key === "ArrowRight") {
+                    rightPressed = false;
+                }
+                else if(e.key === "Left" || e.key === "ArrowLeft") {
+                    leftPressed = false;
+                }
+            }
+
+            function mouseMoveHandler(e) {
+                let relativeX = e.clientX - canvas.offsetLeft;
+                if(relativeX > 0 && relativeX < canvas.width) {
+                    paddleX = relativeX - paddleWidth / 2;
+                }
+            }
+
+            // Drawing functions
+            function drawBall() {
+                ctx.beginPath();
+                ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffcc00"; // Yellow ball
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function drawPaddle() {
+                ctx.beginPath();
+                ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+                ctx.fillStyle = "#8d8dff"; // Blue paddle
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function draw() {
+                if (!gameRunning) return;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBall();
+                drawPaddle();
+
+                // Ball collision detection with walls
+                if(x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                    dx = -dx;
+                }
+                if(y + dy < ballRadius) {
+                    dy = -dy;
+                } else if(y + dy > canvas.height - ballRadius) {
+                    // Check for paddle collision
+                    if(x > paddleX && x < paddleX + paddleWidth) {
+                        dy = -dy;
+                    } else {
+                        lives--;
+                        if(!lives) {
+                            endGame();
+                        } else {
+                            // Reset ball position
+                            x = canvas.width / 2;
+                            y = canvas.height - 30;
+                            dx = 2;
+                            dy = -2;
+                            paddleX = (canvas.width - paddleWidth) / 2;
+                        }
+                    }
+                }
+
+                // Paddle movement
+                if(rightPressed && paddleX < canvas.width - paddleWidth) {
+                    paddleX += 7;
+                }
+                else if(leftPressed && paddleX > 0) {
+                    paddleX -= 7;
+                }
+
+                // Update ball position
+                x += dx;
+                y += dy;
+
+                // Update score
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+
+                requestAnimationFrame(draw);
+            }
+
+            function startGame() {
+                if (gameRunning) return;
+                gameRunning = true;
+                score = 0;
+                lives = 3;
+                scoreDisplay.textContent = `Score: ${score}`;
+                livesDisplay.textContent = `Lives: ${lives}`;
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
+                gameInterval = requestAnimationFrame(draw);
+                startGameBtn.textContent = "Pause";
+            }
+
+            function pauseGame() {
+                if (!gameRunning) return;
+                gameRunning = false;
+                cancelAnimationFrame(gameInterval);
+                startGameBtn.textContent = "Resume";
+            }
+
+            function resetGame() {
+                pauseGame();
+                x = canvas.width / 2;
+                y = canvas.height - 30;
+                dx = 2;
+                dy = -2;
+                paddleX = (canvas.width - paddleWidth) / 2;
+                score = 0;
+                lives = 3;
+                scoreDisplay.textContent = `Score: ${score}`;
+                livesDisplay.textContent = `Lives: ${lives}`;
+                startGameBtn.textContent = "Start";
+                drawBall();
+                drawPaddle();
+            }
+
+            function endGame() {
+                pauseGame();
+                showAlert(`Game Over! Your score was ${score}.`);
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('ballGameHighScore', highScore);
+                    highScoreDisplay.textContent = `High Score: ${highScore}`;
+                }
+                resetGame();
+            }
+
+            startGameBtn.addEventListener('click', () => {
+                if (gameRunning) {
+                    pauseGame();
+                } else {
+                    startGame();
+                }
+            });
+
+            resetGameBtn.addEventListener('click', resetGame);
+            
+            // Initial draw to show the starting state
+            drawBall();
+            drawPaddle();
         }
 
     </script>
