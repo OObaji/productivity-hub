@@ -228,19 +228,26 @@
         .log-container details[open] .summary-arrow {
             transform: rotate(90deg);
         }
-        /* New rules for collapsible sections */
+        /* General collapsible <details> styling */
         details > summary {
-            list-style: none;
+            list-style: none; /* Remove default marker */
+            cursor: pointer;
         }
         details > summary::-webkit-details-marker {
+            display: none; /* Remove default marker for Safari */
+        }
+
+        /* Toggle lock icons for the completed tasks dropdown */
+        #breach-list-completed-section details > summary .lock-open {
             display: none;
         }
-        details .summary-arrow {
-            transition: transform 0.2s;
+        #breach-list-completed-section details[open] > summary .lock-closed {
+            display: none;
         }
-        details[open] > summary .summary-arrow {
-            transform: rotate(90deg);
+        #breach-list-completed-section details[open] > summary .lock-open {
+            display: inline;
         }
+
         /* Mindfulness styles */
         #mindfulness {
             background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
@@ -781,7 +788,10 @@
                         <details class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
                             <summary class="p-4 cursor-pointer flex justify-between items-center font-semibold text-slate-800 dark:text-white">
                                 <div class="flex items-center">
-                                    <svg class="w-5 h-5 summary-arrow text-slate-500 mr-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    <span class="lock-icon-container mr-2">
+                                        <svg class="w-5 h-5 text-slate-500 lock-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                        <svg class="w-5 h-5 text-slate-500 lock-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                    </span>
                                     <span>Completed Items</span>
                                 </div>
                                 <span id="completed-tasks-count" class="text-sm px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded-full font-medium">0</span>
@@ -3019,3 +3029,4 @@
     </script>
 </body>
 </html>
+
