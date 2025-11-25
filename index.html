@@ -620,70 +620,120 @@
 
                 <div id="shift-timer" class="page-view h-full relative">
                     <canvas id="shift-timer-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
-                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white">
-                        <div id="shift-setup" class="w-full max-w-md bg-black/30 backdrop-blur-md p-8 rounded-2xl text-center">
-                            <h2 class="text-2xl font-bold mb-4">Set Shift</h2>
-                             <div class="space-y-4">
-                                <input type="text" id="shift-title-input" placeholder="Shift Title" value="Let's get this bread!" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
-                                <div>
-                                    <label for="shift-end-time-input" class="block text-sm text-gray-300 text-left mb-1">Shift End Time</label>
-                                    <input type="datetime-local" id="shift-end-time-input" class="w-full p-2 rounded-lg bg-gray-700 text-white border-gray-600">
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-white overflow-y-auto">
+                        <div id="shift-setup" class="w-full max-w-md bg-black/40 backdrop-blur-md p-8 rounded-2xl text-center my-8 shadow-2xl border border-white/10">
+                            <h2 class="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">Shift Setup</h2>
+                             <div class="space-y-5">
+                                <div class="text-left">
+                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Shift Name</label>
+                                    <input type="text" id="shift-title-input" placeholder="e.g., Night Shift Grind" value="Let's get this bread!" class="w-full p-3 rounded-xl bg-gray-800/50 text-white border border-gray-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <button id="preset-normal-btn" class="p-2 bg-indigo-500/50 rounded-lg">Normal Shift (7AM)</button>
-                                    <button id="preset-overtime-btn" class="p-2 bg-indigo-500/50 rounded-lg">Overtime (5AM)</button>
+                                <div class="text-left">
+                                    <label for="shift-end-time-input" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">End Time</label>
+                                    <input type="datetime-local" id="shift-end-time-input" class="w-full p-3 rounded-xl bg-gray-800/50 text-white border border-gray-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
                                 </div>
-                                <div class="bg-gray-700 p-4 rounded-lg">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h3 class="font-semibold text-lg">Breaks</h3>
-                                        <button id="add-break-btn" class="text-sm text-indigo-400 hover:underline">+ Add Break</button>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <button id="preset-normal-btn" class="p-3 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl transition-all">Normal (7AM)</button>
+                                    <button id="preset-overtime-btn" class="p-3 bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/30 rounded-xl transition-all">Overtime (5AM)</button>
+                                </div>
+                                
+                                <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="font-bold text-gray-200">Breaks</h3>
+                                        <div class="flex gap-2">
+                                            <button id="load-my-breaks-btn" class="text-xs px-2 py-1 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 rounded border border-blue-500/30 transition-all">Load My Defaults</button>
+                                            <button id="add-break-btn" class="text-xs px-2 py-1 bg-green-600/30 hover:bg-green-600/50 text-green-200 rounded border border-green-500/30 transition-all">+ Add</button>
+                                        </div>
                                     </div>
-                                    <div id="break-times-container" class="space-y-2">
+                                    <div id="break-times-container" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
                                         <!-- Break times will be added here -->
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between">
+                                        <div class="text-left">
+                                            <label for="health-breaks-toggle" class="text-sm font-medium text-gray-300 cursor-pointer select-none">Auto-schedule Health Breaks</label>
+                                            <p class="text-[10px] text-gray-500">Adds a 5m walk break every hour if no break exists.</p>
+                                        </div>
+                                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                            <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-5 checked:border-green-400"/>
+                                            <label for="health-breaks-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer"></label>
+                                        </div>
                                     </div>
                                 </div>
                              </div>
-                            <button id="start-shift-btn" class="mt-8 w-full px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start Shift</button>
+                            <button id="start-shift-btn" class="mt-8 w-full px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-bold text-lg rounded-xl shadow-lg hover:shadow-orange-500/20 hover:scale-[1.02] transition-all transform">Start Shift</button>
                         </div>
 
-                        <div id="shift-countdown-display" class="hidden text-center">
-                            <h2 id="shift-motivation-quote" class="text-2xl font-semibold tracking-wider mb-4">Let's get this bread!</h2>
-                            <div class="flex items-center justify-center my-4 text-yellow-400" style="text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);">
-                                <div class="mx-2">
-                                    <div id="shift-hours-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
-                                    <div class="text-sm uppercase tracking-widest">Hours</div>
-                                </div>
-                                <div class="text-6xl sm:text-8xl md:text-9xl font-bold">:</div>
-                                <div class="mx-2">
-                                    <div id="shift-minutes-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
-                                    <div class="text-sm uppercase tracking-widest">Minutes</div>
-                                </div>
-                                <div class="text-6xl sm:text-8xl md:text-9xl font-bold">:</div>
-                                <div class="mx-2">
-                                    <div id="shift-seconds-display" class="text-6xl sm:text-8xl md:text-9xl font-bold">00</div>
-                                    <div class="text-sm uppercase tracking-widest">Seconds</div>
+                        <div id="shift-countdown-display" class="hidden text-center w-full max-w-6xl px-4 flex flex-col h-full py-8">
+                            <!-- Header / Quote -->
+                            <div class="flex-none mb-4">
+                                <h2 id="shift-motivation-quote" class="text-2xl md:text-3xl font-semibold tracking-wide text-gray-100">Let's get this bread!</h2>
+                                <div id="break-alert-banner" class="hidden mt-2 py-2 px-6 bg-green-500/20 border border-green-500 text-green-300 rounded-full inline-block animate-pulse">
+                                    🌱 Time to step away from the desk!
                                 </div>
                             </div>
-                            <div id="break-countdown-display" class="mt-4 text-center hidden">
-                                <h3 id="break-title" class="text-xl font-semibold">Break Time!</h3>
-                                <div class="text-4xl font-bold" id="break-time-remaining"></div>
-                            </div>
-                            <div class="w-full max-w-2xl mx-auto mt-4 px-4">
-                                <div class="w-full bg-white/20 rounded-full h-2.5">
-                                    <div id="shift-progress-bar" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
+
+                            <!-- Main Timer -->
+                            <div class="flex-grow flex flex-col justify-center">
+                                <div class="flex items-center justify-center my-4 text-white drop-shadow-[0_0_15px_rgba(220,38,38,0.5)] scale-90 md:scale-100">
+                                    <div class="mx-2 text-center">
+                                        <div id="shift-hours-display" class="text-6xl sm:text-8xl md:text-9xl font-bold font-mono">00</div>
+                                        <div class="text-xs sm:text-sm uppercase tracking-[0.3em] text-red-400 font-bold mt-2">Hours</div>
+                                    </div>
+                                    <div class="text-6xl sm:text-8xl md:text-9xl font-bold text-gray-600 pb-8">:</div>
+                                    <div class="mx-2 text-center">
+                                        <div id="shift-minutes-display" class="text-6xl sm:text-8xl md:text-9xl font-bold font-mono">00</div>
+                                        <div class="text-xs sm:text-sm uppercase tracking-[0.3em] text-red-400 font-bold mt-2">Minutes</div>
+                                    </div>
+                                    <div class="text-6xl sm:text-8xl md:text-9xl font-bold text-gray-600 pb-8">:</div>
+                                    <div class="mx-2 text-center">
+                                        <div id="shift-seconds-display" class="text-6xl sm:text-8xl md:text-9xl font-bold font-mono">00</div>
+                                        <div class="text-xs sm:text-sm uppercase tracking-[0.3em] text-red-400 font-bold mt-2">Seconds</div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between text-xs mt-1">
-                                    <span>Shift Started</span>
-                                    <span id="shift-end-time-label"></span>
+                                
+                                <!-- Next Break Info -->
+                                <div id="next-break-container" class="mt-8 text-center transition-opacity duration-500">
+                                    <div class="inline-flex flex-col items-center bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-2xl px-8 py-4">
+                                        <span class="text-gray-400 text-xs uppercase tracking-widest mb-1">Next Break In</span>
+                                        <span id="time-to-next-break" class="text-3xl font-bold text-white font-mono">00:00:00</span>
+                                        <span id="next-break-time-label" class="text-indigo-300 text-sm mt-1 font-medium">at 22:00</span>
+                                    </div>
+                                </div>
+
+                                <!-- Break Active Mode (Replaces Timer when active) -->
+                                <div id="break-active-display" class="hidden absolute inset-0 z-50 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center p-8">
+                                    <div class="w-32 h-32 bg-green-500/20 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                                        <span class="text-6xl">☕</span>
+                                    </div>
+                                    <h2 class="text-5xl font-bold text-white mb-2">Break Time!</h2>
+                                    <p class="text-xl text-green-300 mb-8">Go for a walk. Get some water. Step away.</p>
+                                    <div class="text-8xl font-bold font-mono text-white mb-4" id="break-timer-large">10:00</div>
+                                    <p class="text-gray-400">Time remaining until work resumes</p>
                                 </div>
                             </div>
-                            <button id="reset-shift-btn" class="mt-8 px-8 py-3 bg-white/20 backdrop-blur-md rounded-full font-semibold uppercase tracking-wider">Reset Shift</button>
+                            
+                            <!-- Visual Progress Blocks -->
+                            <div class="flex-none mt-auto mb-8 w-full">
+                                <div class="flex justify-between text-xs text-gray-400 font-mono tracking-tight px-1 uppercase mb-2">
+                                    <span id="shift-start-time-label">Start</span>
+                                    <span class="flex-grow text-center text-gray-500 text-[10px]">Shift Progress</span>
+                                    <span id="shift-end-time-label">End</span>
+                                </div>
+                                
+                                <div id="shift-blocks-container" class="relative w-full h-20 bg-gray-900 rounded-xl border-2 border-gray-700 shadow-xl overflow-hidden flex">
+                                    <!-- Blocks generated by JS -->
+                                </div>
+                                
+                                <button id="reset-shift-btn" class="mt-8 text-xs text-red-400 hover:text-white hover:underline transition-all opacity-50 hover:opacity-100">Reset / End Shift Early</button>
+                            </div>
                         </div>
                         
-                        <div id="shift-end-message" class="hidden text-center max-w-lg">
-                            <h2 class="text-4xl font-bold">Congratulations!</h2>
-                            <p class="text-xl mt-4">Your shift has now ended. It's time to rest.</p>
-                            <button id="new-shift-btn" class="mt-8 px-8 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-lg hover:bg-yellow-400">Start New Shift</button>
+                        <div id="shift-end-message" class="hidden text-center max-w-lg z-50 bg-black/60 p-12 rounded-3xl backdrop-blur-xl border border-white/10 shadow-2xl">
+                            <h2 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 mb-6">Shift Complete!</h2>
+                            <p class="text-xl text-gray-300 mb-8 leading-relaxed">You've crushed it. Time to rest and recharge.</p>
+                            <div class="flex justify-center gap-4">
+                                <button id="new-shift-btn" class="px-8 py-3 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-colors">New Shift</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1070,7 +1120,7 @@
                 setupBreachList();
                 setupSalaryCalculator();
                 setupOvertimeTracker();
-                setupBallGame(); // New game setup function
+                setupBallGame(); 
                 dashboardInitialized = true;
             }
             
@@ -1467,27 +1517,51 @@
                 const newShiftBtn = document.getElementById('new-shift-btn');
                 const endTimeInput = document.getElementById('shift-end-time-input');
                 const endTimeLabel = document.getElementById('shift-end-time-label');
-                const shiftProgressBar = document.getElementById('shift-progress-bar');
+                const startTimeLabel = document.getElementById('shift-start-time-label');
+                const shiftBlocksContainer = document.getElementById('shift-blocks-container');
                 const presetNormalBtn = document.getElementById('preset-normal-btn');
                 const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
                 const shiftTitleInput = document.getElementById('shift-title-input');
                 const motivationQuote = document.getElementById('shift-motivation-quote');
+                
+                // Break Elements
                 const addBreakBtn = document.getElementById('add-break-btn');
+                const loadMyBreaksBtn = document.getElementById('load-my-breaks-btn');
                 const breakTimesContainer = document.getElementById('break-times-container');
-                const breakCountdownDisplay = document.getElementById('break-countdown-display');
-                const breakTimeRemaining = document.getElementById('break-time-remaining');
+                const healthBreaksToggle = document.getElementById('health-breaks-toggle');
+                
+                // Active Break Display
+                const breakActiveDisplay = document.getElementById('break-active-display');
+                const breakTimerLarge = document.getElementById('break-timer-large');
+                const breakAlertBanner = document.getElementById('break-alert-banner');
+                
+                // Next Break Display
+                const nextBreakContainer = document.getElementById('next-break-container');
+                const timeToNextBreakEl = document.getElementById('time-to-next-break');
+                const nextBreakTimeLabel = document.getElementById('next-break-time-label');
 
                 let shiftTimer;
                 let shiftStartTime;
                 let shiftEndTime;
                 let totalShiftDuration;
                 let activeAnimationId;
-                let breakTimes = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
-                let isBreak = false;
                 
+                // User defined break strings (HH:MM) and durations
+                let userBreakConfigs = JSON.parse(localStorage.getItem('shiftUserBreakConfigs')) || [];
+                // Calculated Break Date Objects for the current shift
+                let activeBreakObjects = []; 
+                let autoScheduleHealthBreaks = localStorage.getItem('shiftAutoHealthBreaks') === 'true';
+
                 const canvas = document.getElementById('shift-timer-canvas');
                 const ctx = canvas.getContext('2d');
                 const mouse = { x: null, y: null, radius: 150 };
+
+                // Initialize Toggle State
+                healthBreaksToggle.checked = autoScheduleHealthBreaks;
+                healthBreaksToggle.addEventListener('change', (e) => {
+                    autoScheduleHealthBreaks = e.target.checked;
+                    localStorage.setItem('shiftAutoHealthBreaks', autoScheduleHealthBreaks);
+                });
 
                 function formatTime(ms) {
                     const totalSeconds = Math.floor(ms / 1000);
@@ -1496,48 +1570,80 @@
                     const s = totalSeconds % 60;
                     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 }
+                
+                function formatTimeShort(ms) {
+                     const totalSeconds = Math.floor(ms / 1000);
+                    const h = Math.floor(totalSeconds / 3600);
+                    const m = Math.floor((totalSeconds % 3600) / 60);
+                    const s = totalSeconds % 60;
+                    if (h > 0) return `${h}h ${m}m ${s}s`;
+                    return `${m}m ${s}s`;
+                }
 
                 function formatDateTimeForInput(date) {
                     const pad = (num) => num.toString().padStart(2, '0');
                     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
                 }
 
-                function renderBreaks() {
+                // Render Setup List
+                function renderSetupBreaks() {
                     breakTimesContainer.innerHTML = '';
-                    breakTimes.sort((a, b) => a.startTime.localeCompare(b.startTime));
-                    breakTimes.forEach((breakItem, index) => {
+                    userBreakConfigs.sort((a, b) => a.startTime.localeCompare(b.startTime));
+                    
+                    if (userBreakConfigs.length === 0) {
+                        breakTimesContainer.innerHTML = '<p class="text-gray-500 text-xs italic text-center py-2">No specific breaks set.</p>';
+                    }
+
+                    userBreakConfigs.forEach((breakItem, index) => {
                         const breakEl = document.createElement('div');
-                        breakEl.className = 'flex items-center space-x-2 text-sm text-gray-300';
+                        breakEl.className = 'flex items-center space-x-2 text-sm text-gray-300 bg-gray-800/50 p-2 rounded-lg';
                         breakEl.innerHTML = `
-                            <input type="time" value="${breakItem.startTime}" class="break-start-time w-1/3 p-1 rounded bg-gray-600 text-white border-gray-500">
-                            <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-1/3 p-1 rounded bg-gray-600 text-white border-gray-500">
-                            <span class="text-xs">mins</span>
-                            <button class="remove-break-btn text-red-400 p-1 rounded hover:bg-gray-500">
+                            <input type="time" value="${breakItem.startTime}" class="break-start-time w-1/3 p-1 rounded bg-gray-700 text-white border-transparent focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-xs">
+                            <div class="flex items-center w-1/3">
+                                <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-full p-1 rounded-l bg-gray-700 text-white border-transparent focus:border-indigo-500 text-xs text-center">
+                                <span class="bg-gray-600 px-2 py-1 rounded-r text-xs">m</span>
+                            </div>
+                            <button class="remove-break-btn ml-auto text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1 rounded transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         `;
                         breakTimesContainer.appendChild(breakEl);
 
                         breakEl.querySelector('.remove-break-btn').addEventListener('click', () => {
-                            breakTimes.splice(index, 1);
-                            localStorage.setItem('shiftBreakTimes', JSON.stringify(breakTimes));
-                            renderBreaks();
+                            userBreakConfigs.splice(index, 1);
+                            saveUserBreaks();
+                            renderSetupBreaks();
                         });
                         breakEl.querySelector('.break-start-time').addEventListener('change', (e) => {
-                            breakTimes[index].startTime = e.target.value;
-                            localStorage.setItem('shiftBreakTimes', JSON.stringify(breakTimes));
+                            userBreakConfigs[index].startTime = e.target.value;
+                            saveUserBreaks();
                         });
                         breakEl.querySelector('.break-duration').addEventListener('change', (e) => {
-                            breakTimes[index].duration = parseInt(e.target.value);
-                            localStorage.setItem('shiftBreakTimes', JSON.stringify(breakTimes));
+                            userBreakConfigs[index].duration = parseInt(e.target.value);
+                            saveUserBreaks();
                         });
                     });
                 }
+
+                function saveUserBreaks() {
+                    localStorage.setItem('shiftUserBreakConfigs', JSON.stringify(userBreakConfigs));
+                }
                 
                 addBreakBtn.addEventListener('click', () => {
-                    breakTimes.push({ startTime: '12:00', duration: 30 });
-                    localStorage.setItem('shiftBreakTimes', JSON.stringify(breakTimes));
-                    renderBreaks();
+                    userBreakConfigs.push({ startTime: '00:00', duration: 15, type: 'manual' });
+                    saveUserBreaks();
+                    renderSetupBreaks();
+                });
+
+                loadMyBreaksBtn.addEventListener('click', () => {
+                    userBreakConfigs = [
+                        { startTime: '22:00', duration: 10, type: 'manual' },
+                        { startTime: '00:00', duration: 10, type: 'manual' },
+                        { startTime: '03:15', duration: 30, type: 'manual' },
+                        { startTime: '05:00', duration: 10, type: 'manual' }
+                    ];
+                    saveUserBreaks();
+                    renderSetupBreaks();
                 });
 
                 presetNormalBtn.addEventListener('click', () => {
@@ -1566,64 +1672,233 @@
                     document.getElementById('shift-seconds-display').textContent = s.toString().padStart(2, '0');
                 }
 
+                function generateShiftBlocks() {
+                    shiftBlocksContainer.innerHTML = '';
+                    
+                    // Add Global Indicator Line
+                    const indicator = document.createElement('div');
+                    indicator.id = 'shift-global-indicator';
+                    indicator.className = "absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_15px_white] z-20 transition-all duration-1000 ease-linear pointer-events-none";
+                    indicator.style.left = '0%';
+                    
+                    const indicatorTag = document.createElement('div');
+                    indicatorTag.className = "absolute -top-2 left-1/2 -translate-x-1/2 bg-white text-indigo-900 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-tighter transform -translate-y-full";
+                    indicatorTag.textContent = "You Are Here";
+                    
+                    // Arrow down
+                    const arrow = document.createElement('div');
+                    arrow.className = "absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-white";
+                    indicatorTag.appendChild(arrow);
+                    
+                    indicator.appendChild(indicatorTag);
+                    shiftBlocksContainer.appendChild(indicator);
+
+                    const totalHours = Math.ceil(totalShiftDuration / (1000 * 60 * 60));
+                    
+                    for (let i = 0; i < totalHours; i++) {
+                        const block = document.createElement('div');
+                        // Flex-1 ensures they share the full width equally (Visualizing the Whole)
+                        block.className = "flex-1 border-r border-gray-800 last:border-r-0 relative group bg-gray-900/50";
+                        
+                        // Fill element
+                        const fill = document.createElement('div');
+                        fill.id = `shift-block-fill-${i}`;
+                        fill.className = "absolute top-0 left-0 h-full w-0 bg-gradient-to-r from-red-700 to-red-600 transition-all duration-300";
+                        
+                        // Hour Label
+                        const label = document.createElement('div');
+                        label.className = "absolute bottom-1 right-1.5 text-[10px] text-gray-600 font-mono font-bold z-10 select-none";
+                        label.textContent = `${i + 1}h`;
+
+                        block.appendChild(fill);
+                        block.appendChild(label);
+                        shiftBlocksContainer.appendChild(block);
+                    }
+                }
+
                 function updateShiftVisuals() {
                     const now = new Date();
                     const elapsedMs = now - shiftStartTime;
-                    const percentage = (elapsedMs / totalShiftDuration) * 100;
-                    shiftProgressBar.style.width = `${Math.min(percentage, 100)}%`;
-                }
+                    const totalMs = totalShiftDuration;
+                    const hourMs = 1000 * 60 * 60;
+                    const totalHours = Math.ceil(totalMs / hourMs);
 
-                function checkActiveBreak(now) {
-                    const nowTime = now.getHours() * 60 + now.getMinutes();
-                    for (const breakItem of breakTimes) {
-                        const [startHour, startMinute] = breakItem.startTime.split(':').map(Number);
-                        const breakStart = startHour * 60 + startMinute;
-                        const breakEnd = breakStart + breakItem.duration;
+                    // Update Global Indicator Position
+                    const percentage = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+                    const indicator = document.getElementById('shift-global-indicator');
+                    if (indicator) {
+                        indicator.style.left = `${percentage}%`;
+                    }
 
-                        if (nowTime >= breakStart && nowTime < breakEnd) {
-                            const breakEndMinutes = (startHour * 60 + startMinute) + breakItem.duration;
-                            const endHour = Math.floor(breakEndMinutes / 60);
-                            const endMinute = breakEndMinutes % 60;
-                            const breakEndDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHour, endMinute, 0);
-                            return breakEndDateTime;
+                    // Update Block Fills
+                    for (let i = 0; i < totalHours; i++) {
+                        const fill = document.getElementById(`shift-block-fill-${i}`);
+                        if (!fill) continue;
+                        
+                        const blockStartMs = i * hourMs;
+                        const blockEndMs = (i + 1) * hourMs;
+
+                        if (elapsedMs >= blockEndMs) {
+                            // Fully completed
+                            fill.style.width = '100%';
+                        } else if (elapsedMs > blockStartMs) {
+                            // Currently active
+                            const progress = (elapsedMs - blockStartMs) / hourMs;
+                            fill.style.width = `${progress * 100}%`;
+                        } else {
+                            // Future
+                            fill.style.width = '0%';
                         }
                     }
-                    return null;
+                }
+
+                function calculateActiveBreaks() {
+                    activeBreakObjects = [];
+                    // 1. Convert user configs (HH:MM) to Date objects relative to shift start
+                    userBreakConfigs.forEach(config => {
+                        const [hours, minutes] = config.startTime.split(':').map(Number);
+                        
+                        // Create a date for this break
+                        let breakStart = new Date(shiftStartTime);
+                        breakStart.setHours(hours, minutes, 0, 0);
+
+                        // Adjust date if shift crosses midnight
+                        if (breakStart < shiftStartTime) {
+                            breakStart.setDate(breakStart.getDate() + 1);
+                        }
+                        
+                        const breakEnd = new Date(breakStart.getTime() + config.duration * 60000);
+                        
+                        // Only add if it falls within the shift
+                        if (breakStart >= shiftStartTime && breakStart < shiftEndTime) {
+                            activeBreakObjects.push({
+                                start: breakStart,
+                                end: breakEnd,
+                                type: 'Standard Break',
+                                duration: config.duration
+                            });
+                        }
+                    });
+
+                    // 2. Auto-schedule Health Breaks (5 mins every 60 mins gap)
+                    if (autoScheduleHealthBreaks) {
+                        // Sort existing breaks
+                        activeBreakObjects.sort((a, b) => a.start - b.start);
+                        
+                        let pointer = new Date(shiftStartTime);
+                        const healthIntervalMs = 60 * 60 * 1000; // 1 hour
+                        const healthDurationMs = 5 * 60 * 1000; // 5 mins
+                        
+                        // We iterate until end of shift
+                        while (pointer.getTime() + healthIntervalMs < shiftEndTime.getTime()) {
+                            const potentialHealthStart = new Date(pointer.getTime() + healthIntervalMs);
+                            const potentialHealthEnd = new Date(potentialHealthStart.getTime() + healthDurationMs);
+                            
+                            // Check for collision with existing breaks or end of shift
+                            let collision = false;
+                            
+                            // Don't schedule if it pushes past end time
+                            if (potentialHealthEnd > shiftEndTime) break;
+
+                            // Check collision with existing breaks (allow a buffer of ~15 mins)
+                            for (let b of activeBreakObjects) {
+                                // If potential break overlaps or is too close (within 15 mins) to a standard break
+                                const buffer = 15 * 60 * 1000;
+                                if (
+                                    (potentialHealthStart >= new Date(b.start.getTime() - buffer) && potentialHealthStart < new Date(b.end.getTime() + buffer)) ||
+                                    (potentialHealthEnd > new Date(b.start.getTime() - buffer) && potentialHealthEnd <= new Date(b.end.getTime() + buffer))
+                                ) {
+                                    collision = true;
+                                    // Move pointer to end of this colliding break
+                                    pointer = new Date(b.end);
+                                    break;
+                                }
+                            }
+
+                            if (!collision) {
+                                activeBreakObjects.push({
+                                    start: potentialHealthStart,
+                                    end: potentialHealthEnd,
+                                    type: 'Health Break',
+                                    duration: 5
+                                });
+                                pointer = potentialHealthEnd; // Next check starts after this break
+                            }
+                        }
+                        
+                        // Re-sort after adding health breaks
+                        activeBreakObjects.sort((a, b) => a.start - b.start);
+                    }
+                    
+                    localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
                 }
 
                 function shiftCountdown() {
                     const now = new Date();
-                    const activeBreakEnd = checkActiveBreak(now);
                     
-                    if (activeBreakEnd) {
-                        breakCountdownDisplay.classList.remove('hidden');
-                        const remainingBreakMs = activeBreakEnd - now;
-                        if (remainingBreakMs > 0) {
-                            breakTimeRemaining.textContent = formatTime(remainingBreakMs);
-                        } else {
-                            breakCountdownDisplay.classList.add('hidden');
-                        }
-                        motivationQuote.textContent = "Break Time!";
-                    } else {
-                        breakCountdownDisplay.classList.add('hidden');
-                        motivationQuote.textContent = shiftTitleInput.value || "Let's get this bread!";
-                    }
-
-                    const remainingMs = shiftEndTime - now;
-
-                    if (remainingMs > 0) {
-                        updateShiftDisplay(remainingMs);
-                        updateShiftVisuals();
-                    } else {
+                    // 1. Check if shift ended
+                    if (now >= shiftEndTime) {
                         clearInterval(shiftTimer);
                         updateShiftDisplay(0);
+                        updateShiftVisuals();
                         countdownView.classList.add('hidden');
                         endView.classList.remove('hidden');
                         stopActiveAnimation();
                         localStorage.removeItem('shiftEndTime');
-                        localStorage.removeItem('shiftStartTime');
-                        localStorage.removeItem('shiftBreakTimes');
-                        localStorage.removeItem('shiftTitle');
+                        return;
+                    }
+
+                    const remainingMs = shiftEndTime - now;
+                    updateShiftDisplay(remainingMs);
+                    updateShiftVisuals();
+
+                    // 2. Check Break Status
+                    let currentBreak = null;
+                    let nextBreak = null;
+
+                    for (const b of activeBreakObjects) {
+                        const start = new Date(b.start);
+                        const end = new Date(b.end);
+                        
+                        if (now >= start && now < end) {
+                            currentBreak = b;
+                            break; // Found active
+                        }
+                        if (now < start && !nextBreak) {
+                            nextBreak = b;
+                        }
+                    }
+
+                    if (currentBreak) {
+                        // ON BREAK
+                        breakActiveDisplay.classList.remove('hidden');
+                        breakAlertBanner.classList.remove('hidden');
+                        nextBreakContainer.classList.add('opacity-0'); // Hide next break info
+                        
+                        const breakRemaining = new Date(currentBreak.end) - now;
+                        breakTimerLarge.textContent = formatTimeShort(breakRemaining);
+                        motivationQuote.textContent = "Recharge Mode On";
+                    } else {
+                        // WORKING
+                        breakActiveDisplay.classList.add('hidden');
+                        breakAlertBanner.classList.add('hidden');
+                        nextBreakContainer.classList.remove('opacity-0');
+                        motivationQuote.textContent = shiftTitleInput.value || "Let's get this bread!";
+                        
+                        if (nextBreak) {
+                            const timeToNext = new Date(nextBreak.start) - now;
+                            timeToNextBreakEl.textContent = formatTime(timeToNext);
+                            const nextBreakTimeStr = new Date(nextBreak.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            nextBreakTimeLabel.textContent = `at ${nextBreakTimeStr} (${nextBreak.type})`;
+                            
+                            // Alert if break is soon (e.g. < 1 min)
+                            if (timeToNext < 60000 && timeToNext > 59000) {
+                                // optional beep or visual flash could go here
+                            }
+                        } else {
+                            timeToNextBreakEl.textContent = "--:--:--";
+                            nextBreakTimeLabel.textContent = "No more breaks scheduled";
+                        }
                     }
                 }
 
@@ -1632,44 +1907,44 @@
                     stopActiveAnimation();
                     localStorage.removeItem('shiftEndTime');
                     localStorage.removeItem('shiftStartTime');
-                    localStorage.removeItem('shiftBreakTimes');
+                    localStorage.removeItem('shiftActiveBreakObjects');
                     localStorage.removeItem('shiftTitle');
+                    
                     setupView.classList.remove('hidden');
                     countdownView.classList.add('hidden');
                     endView.classList.add('hidden');
+                    breakActiveDisplay.classList.add('hidden');
                 }
 
                 function checkStoredShift() {
                     const storedEndTime = localStorage.getItem('shiftEndTime');
                     const storedStartTime = localStorage.getItem('shiftStartTime');
+                    const storedBreaks = localStorage.getItem('shiftActiveBreakObjects');
                     const storedTitle = localStorage.getItem('shiftTitle');
-                    const storedBreaks = localStorage.getItem('shiftBreakTimes');
                     
-                    if (storedBreaks) {
-                        breakTimes = JSON.parse(storedBreaks);
-                        renderBreaks();
-                    }
-                    if (storedTitle) {
-                        shiftTitleInput.value = storedTitle;
-                    }
+                    renderSetupBreaks();
 
                     if (storedEndTime && storedStartTime) {
                         shiftEndTime = new Date(storedEndTime);
                         shiftStartTime = new Date(storedStartTime);
+                        if (storedBreaks) activeBreakObjects = JSON.parse(storedBreaks);
+                        if (storedTitle) shiftTitleInput.value = storedTitle;
                         
                         if (shiftEndTime > new Date()) {
                             totalShiftDuration = shiftEndTime - shiftStartTime;
                             setupView.classList.add('hidden');
                             countdownView.classList.remove('hidden');
-                            endTimeLabel.textContent = `Ends at ${shiftEndTime.toLocaleTimeString()}`;
+                            
+                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            
+                            generateShiftBlocks();
                             shiftCountdown();
                             shiftTimer = setInterval(shiftCountdown, 1000);
                             startRandomAnimation();
                         } else {
                             resetShiftTimer();
                         }
-                    } else {
-                        resetShiftTimer();
                     }
                 }
 
@@ -1680,11 +1955,22 @@
                         return;
                     }
                     
-                    shiftStartTime = new Date();
                     shiftEndTime = new Date(endTimeValue);
+                    
+                    // FIX: Always calculate Start Time as 7:00 PM (19:00) relative to End Time
+                    shiftStartTime = new Date(shiftEndTime);
+                    shiftStartTime.setHours(19, 0, 0, 0); // Set to 19:00
+                    
+                    // If the calculated start time (19:00 on the same day as end time) is after the end time,
+                    // it means the shift started the previous day.
+                    // Example: End is 07:00 (Day 2). Candidate Start is 19:00 (Day 2). 19 > 07, so Start is 19:00 (Day 1).
+                    if (shiftStartTime >= shiftEndTime) {
+                        shiftStartTime.setDate(shiftStartTime.getDate() - 1);
+                    }
 
-                    if (shiftEndTime <= shiftStartTime) {
-                        showAlert("End time must be in the future.");
+                    // Check if shift has effectively ended already relative to now
+                    if (shiftEndTime <= new Date()) {
+                        showAlert("The selected shift end time is in the past.");
                         return;
                     }
 
@@ -1694,11 +1980,16 @@
                     
                     totalShiftDuration = (shiftEndTime - shiftStartTime);
                     
+                    // Calculate breaks specifically for this shift instance
+                    calculateActiveBreaks();
+                    
                     setupView.classList.add('hidden');
                     countdownView.classList.remove('hidden');
                     
-                    endTimeLabel.textContent = `Ends at ${shiftEndTime.toLocaleTimeString()}`;
+                    endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                     
+                    generateShiftBlocks();
                     shiftCountdown(); // Initial call
                     shiftTimer = setInterval(shiftCountdown, 1000);
                     startRandomAnimation();
@@ -1810,9 +2101,9 @@
                     }
                     animate();
                 }
-
+                
+                // Initialize setup view
                 checkStoredShift();
-                renderBreaks();
             }
             
             function initLandingPageAnimation() {
@@ -3029,4 +3320,3 @@
     </script>
 </body>
 </html>
-
