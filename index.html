@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyndArc - Your Productivity Hub</title>
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MyndArc - Your Productivity Hub">
+    <meta property="og:description" content="Master your time with the Pomodoro Timer, Shift Tracker, and Productivity Tools. Organize your life and achieve more with MyndArc.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1200&auto=format&fit=crop">
+    <meta property="og:url" content=""> <!-- URL will be auto-filled by the platform -->
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="MyndArc - Your Productivity Hub">
+    <meta property="twitter:description" content="Master your time with the Pomodoro Timer, Shift Tracker, and Productivity Tools. Organize your life and achieve more with MyndArc.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1200&auto=format&fit=crop">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/96/brain.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2075,22 +2092,54 @@
                         return;
                     }
                     
-                    const shareData = {
-                        start: shiftStartTime.toISOString(),
-                        end: shiftEndTime.toISOString(),
-                        title: shiftTitleInput.value,
-                        breaks: activeBreakObjects // Send the calculated break objects
-                    };
+                    // V6 DOT-COMPRESSED FORMAT (Absolute Max Shortness)
+                    // Structure: DataString~Title
+                    // DataString: Start.Duration[.Off.Comp.Off.Comp...]
+                    // Separator: . (Dot)
+                    // Breaks: "Comp" = (Duration * 2) + (Type ? 1 : 0) -> Base36
                     
-                    // Encode data to Base64 to keep URL cleaner
-                    const encodedData = btoa(encodeURIComponent(JSON.stringify(shareData)));
-                    const shareUrl = `${window.location.href.split('?')[0]}?shared_shift=${encodedData}`;
+                    // 1. Start Time (Minutes since epoch, Base36)
+                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36);
                     
-                    // Use execCommand fallback for iframes/strict environments where navigator.clipboard fails
+                    // 2. Duration (Minutes, Base36)
+                    const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36);
+                    
+                    // 3. Build Data Array
+                    const dataParts = [s, d];
+                    
+                    // 4. Breaks
+                    activeBreakObjects.forEach(brk => {
+                        // Offset from start (mins, Base36)
+                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000);
+                        const offset = offsetVal.toString(36);
+                        
+                        // Compound Value: (Duration * 2) + TypeBit
+                        // TypeBit: 1 for Health, 0 for Standard
+                        const typeBit = brk.type === 'Health Break' ? 1 : 0;
+                        const compoundVal = (parseInt(brk.duration) * 2) + typeBit;
+                        const compound = compoundVal.toString(36);
+                        
+                        dataParts.push(offset, compound);
+                    });
+                    
+                    // Join Data with Dot
+                    const dataString = dataParts.join('.');
+                    
+                    // 5. Title (Custom encode: spaces to +)
+                    let t = shiftTitleInput.value;
+                    t = encodeURIComponent(t).replace(/%20/g, '+');
+                    
+                    // Final String: Data~Title
+                    const rawString = `${dataString}~${t}`;
+                    
+                    // Construct URL directly
+                    let baseUrl = window.location.href.split('?')[0];
+                    const shareUrl = `${baseUrl}?shared_shift=${rawString}`;
+                    
+                    // Use execCommand fallback
                     const textArea = document.createElement("textarea");
                     textArea.value = shareUrl;
                     
-                    // Ensure it's not visible but part of DOM
                     textArea.style.position = "fixed";
                     textArea.style.left = "-9999px";
                     textArea.style.top = "0";
@@ -2102,7 +2151,7 @@
                     try {
                         const successful = document.execCommand('copy');
                         if (successful) {
-                            showAlert("Shift link copied to clipboard! Anyone with this link can view your active timer.");
+                            showAlert("Link minimized to max limit!");
                         } else {
                             showAlert("Failed to copy link. Please manually copy the URL.");
                         }
@@ -2367,13 +2416,137 @@
             
             if (sharedShiftData) {
                 try {
-                    const decoded = JSON.parse(decodeURIComponent(atob(sharedShiftData)));
+                    let startStr, endStr, title, breaks = [];
+
+                    // DETECT FORMAT VERSION
+                    
+                    // V6 Check: Contains '~' AND the first part contains '.' (e.g. "start.dur.brk~title")
+                    // V5 Check: Contains '~' but first part is just StartTime (no dot) (e.g. "start~dur~brk~title")
+                    // Legacy Check: Base64/JSON chars
+                    
+                    const tildeSplit = sharedShiftData.split('~');
+                    const isV6 = sharedShiftData.includes('~') && tildeSplit[0].includes('.');
+                    const isV5 = sharedShiftData.includes('~') && !isV6;
+
+                    if (isV6) {
+                        // V6: DOT-COMPRESSED
+                        // Part 0: DataString (s.d.off.comp...)
+                        // Part 1: Title
+                        
+                        const dataString = tildeSplit[0];
+                        title = tildeSplit.slice(1).join('~').replace(/\+/g, ' '); // Decode title
+                        
+                        const dParts = dataString.split('.');
+                        
+                        // Basic Data
+                        const s = parseInt(dParts[0], 36);
+                        const d = parseInt(dParts[1], 36);
+                        
+                        const startTimeMs = s * 60000;
+                        startStr = new Date(startTimeMs).toISOString();
+                        endStr = new Date(startTimeMs + d * 60000).toISOString();
+                        
+                        // Breaks (Pairs starting at index 2)
+                        for (let i = 2; i < dParts.length; i += 2) {
+                            const offStr = dParts[i];
+                            const compStr = dParts[i+1];
+                            
+                            if (offStr && compStr) {
+                                const offsetMins = parseInt(offStr, 36);
+                                const compVal = parseInt(compStr, 36);
+                                
+                                // Unpack Compound: Val = Dur * 2 + Type
+                                const duration = Math.floor(compVal / 2);
+                                const typeBit = compVal % 2;
+                                
+                                const bStart = new Date(startTimeMs + offsetMins * 60000);
+                                const bEnd = new Date(bStart.getTime() + duration * 60000);
+                                
+                                breaks.push({
+                                    start: bStart.toISOString(),
+                                    end: bEnd.toISOString(),
+                                    duration: duration,
+                                    type: typeBit === 1 ? 'Health Break' : 'Standard Break'
+                                });
+                            }
+                        }
+
+                    } else if (isV5) {
+                        // V5: RAW STRING FORMAT (s~d~b~Title)
+                        const parts = tildeSplit;
+                        const s = parseInt(parts[0], 36);
+                        const d = parseInt(parts[1], 36);
+                        const bStr = parts[2];
+                        title = parts.slice(3).join('~').replace(/\+/g, ' '); 
+
+                        const startTimeMs = s * 60000;
+                        startStr = new Date(startTimeMs).toISOString();
+                        endStr = new Date(startTimeMs + d * 60000).toISOString();
+
+                        if (bStr && bStr.length > 0) {
+                             breaks = bStr.split('_').map(part => {
+                                const [off, dur, type] = part.split('.');
+                                const offsetMins = parseInt(off, 36);
+                                const duration = parseInt(dur, 36);
+                                const bStart = new Date(startTimeMs + offsetMins * 60000);
+                                const bEnd = new Date(bStart.getTime() + duration * 60000);
+                                return {
+                                    start: bStart.toISOString(),
+                                    end: bEnd.toISOString(),
+                                    duration: duration,
+                                    type: type == 1 ? 'Health Break' : 'Standard Break'
+                                };
+                            });
+                        }
+                    } else {
+                        // LEGACY JSON (V1-V4)
+                        const cleanBase64 = sharedShiftData.replace(/ /g, '+');
+                        const decodedStr = decodeURIComponent(atob(cleanBase64));
+                        // ... (Legacy parsing logic remains same as backup)
+                        const decoded = JSON.parse(decodedStr);
+                         if (Array.isArray(decoded)) {
+                                // V3
+                                const [s, d, t, bStr] = decoded;
+                                const startTime = parseInt(s, 36); 
+                                startStr = new Date(startTime).toISOString();
+                                const durationMins = parseInt(d, 36);
+                                endStr = new Date(startTime + durationMins * 60000).toISOString();
+                                title = t;
+                                if (bStr) {
+                                    breaks = bStr.split('!').map(part => {
+                                        const [off, dur, type] = part.split('.');
+                                        const offsetMins = parseInt(off, 36);
+                                        const duration = parseInt(dur, 36);
+                                        const bStart = new Date(startTime + offsetMins * 60000);
+                                        const bEnd = new Date(bStart.getTime() + duration * 60000);
+                                        return { start: bStart.toISOString(), end: bEnd.toISOString(), duration, type: type == 1 ? 'Health Break' : 'Standard Break' };
+                                    });
+                                }
+                            } else {
+                                if (decoded.s) { // V2
+                                    startStr = new Date(parseInt(decoded.s, 36)).toISOString();
+                                    endStr = new Date(parseInt(decoded.e, 36)).toISOString();
+                                    title = decoded.t;
+                                    breaks = decoded.b.map(b => ({
+                                        start: new Date(parseInt(b[0], 36)).toISOString(),
+                                        end: new Date(parseInt(b[0], 36) + b[1] * 60000).toISOString(),
+                                        duration: b[1],
+                                        type: b[2] === 1 ? 'Health Break' : 'Standard Break'
+                                    }));
+                                } else { // V1
+                                    startStr = decoded.start;
+                                    endStr = decoded.end;
+                                    title = decoded.title;
+                                    breaks = decoded.breaks;
+                                }
+                            }
+                    }
                     
                     // Import shared shift into localStorage
-                    localStorage.setItem('shiftStartTime', decoded.start);
-                    localStorage.setItem('shiftEndTime', decoded.end);
-                    localStorage.setItem('shiftTitle', decoded.title);
-                    localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(decoded.breaks));
+                    localStorage.setItem('shiftStartTime', startStr);
+                    localStorage.setItem('shiftEndTime', endStr);
+                    localStorage.setItem('shiftTitle', title);
+                    localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(breaks));
                     
                     // Clean URL without reloading
                     window.history.replaceState({}, document.title, window.location.pathname);
