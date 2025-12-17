@@ -716,7 +716,20 @@
                         
                         <!-- SETUP VIEW (Centered) -->
                         <div id="shift-setup" class="w-full max-w-lg glass-panel p-10 rounded-3xl shadow-2xl mx-auto my-auto border border-white/10 backdrop-blur-xl">
-                            <h2 class="text-4xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300 neon-text tracking-tight">Shift Setup</h2>
+                            <h2 class="text-4xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300 neon-text tracking-tight">Shift Setup</h2>
+                            
+                            <!-- Location Toggle -->
+                            <div class="flex justify-center mb-8">
+                                <div class="bg-black/40 p-1.5 rounded-xl flex border border-white/10">
+                                    <button id="loc-home-btn" class="px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]">
+                                        <span>🏠</span> Home
+                                    </button>
+                                    <button id="loc-office-btn" class="px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent">
+                                        <span>🏢</span> Office
+                                    </button>
+                                </div>
+                            </div>
+
                              <div class="space-y-6">
                                 <div class="text-left">
                                     <label class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">Shift Name</label>
@@ -1807,9 +1820,14 @@
                 const guideBadge = document.getElementById('current-hour-badge');
                 const guideIcon = document.getElementById('current-hour-icon');
                 const guideTheme = document.getElementById('current-hour-theme');
+                
+                // Location Controls
+                const locHomeBtn = document.getElementById('loc-home-btn');
+                const locOfficeBtn = document.getElementById('loc-office-btn');
+                let shiftLocation = localStorage.getItem('shiftLocation') || 'home';
 
                 // --- SHIFT PLAN DATA ---
-                const shiftPlan = [
+                const shiftPlanHome = [
                     { hour: 1, title: "Hour 1 — The Launchpad", theme: "Calm Initiation", icon: "🚀", tasks: ["Set lighting (LEDs/Soft)", "Queue low-fidelity beats", "Breathing exercise (5 reps)", "Goal: Zero friction start"] },
                     { hour: 2, title: "Hour 2 — Deep Dive", theme: "High Focus", icon: "🌊", tasks: ["Switch to brown noise/driving beats", "Clear desk surface", "Tackle high-priority calls", "Hydration break at 30m"] },
                     { hour: 3, title: "Hour 3 — The Warm Up", theme: "Caffeinated Flow", icon: "☕", tasks: ["Brew tea/coffee", "Slow the tempo", "Neck stretches", "Intention: 'Smooth execution'"] },
@@ -1822,6 +1840,21 @@
                     { hour: 10, title: "Hour 10 — Gamification", theme: "Challenge Mode", icon: "🎮", tasks: ["+1 point per smooth task", "+2 points for patience", "Reward: Sweet treat or favorite track"] },
                     { hour: 11, title: "Hour 11 — Deceleration", theme: "Cool Down", icon: "🌙", tasks: ["Lo-fi music", "Lower lights", "Steady breathing", "Visualize the finish line"] },
                     { hour: 12, title: "Hour 12 — The Victory Lap", theme: "Completion", icon: "🏁", tasks: ["Clear workspace", "Gentle tunes", "Final stretch", "Gratitude: 'Mission accomplished'"] }
+                ];
+
+                const shiftPlanOffice = [
+                    { hour: 1, title: "Hour 1 — Armor Up", theme: "Defensive Setup", icon: "🛡️", tasks: ["Headphones ON immediately", "Fill water bottle (large)", "Check calendar for ambush meetings", "Goal: Establish perimeter"] },
+                    { hour: 2, title: "Hour 2 — The Bunker", theme: "Noise Cancellation", icon: "🎧", tasks: ["Brown noise max volume", "Ignore open-plan chatter", "Do NOT make eye contact", "Focus on one big task"] },
+                    { hour: 3, title: "Hour 3 — Social Battery Check", theme: "Interaction Mgmt", icon: "🔋", tasks: ["Brief coffee run (look busy)", " polite nods only", "Avoid the 'weekend plans' trap", "Back to desk ASAP"] },
+                    { hour: 4, title: "Hour 4 — Tactical Pause", theme: "Find Silence", icon: "🤫", tasks: ["Find an empty meeting room", "Or take a long bathroom break", "Deep breathing (4-7-8)", "Reset sensory overload"] },
+                    { hour: 5, title: "Hour 5 — The Escape", theme: "Physical Exit", icon: "🏃", tasks: ["Leave the building for lunch", "Do NOT eat at desk", "Get fresh air/sunlight", "Disconnect from office wifi"] },
+                    { hour: 6, title: "Hour 6 — Re-Entry", theme: "Shields Up", icon: "🧱", tasks: ["Slow transition back", "Low-energy admin tasks", "Put headphones back on", "Accept the afternoon slump"] },
+                    { hour: 7, title: "Hour 7 — Invisible Mode", theme: "Under the Radar", icon: "👻", tasks: ["Look intensely busy", "Organize files/emails", "Avoid new requests", "Keep head down"] },
+                    { hour: 8, title: "Hour 8 — Hydration & Stretch", theme: "Body Maintenance", icon: "🚰", tasks: ["Walk to water cooler", "Stretch in a stairwell", "Reset posture", "Ignore the fluorescent hum"] },
+                    { hour: 9, title: "Hour 9 — Power Sprint", theme: "The Final Push", icon: "🔥", tasks: ["High BPM playlist", "Blast through remaining list", "Ignore distractions", "Tunnel vision enabled"] },
+                    { hour: 10, title: "Hour 10 — Inbox Zero", theme: "Documentation", icon: "📨", tasks: ["Clear emails", "Update tickets", "Document today's wins", "Prepare for tomorrow"] },
+                    { hour: 11, title: "Hour 11 — Exit Strategy", theme: "Pack Up", icon: "🎒", tasks: ["Clean desk surface", "Pack bag quietly", "Check commute traffic", "Visualize the door"] },
+                    { hour: 12, title: "Hour 12 — Freedom Run", theme: "Extraction", icon: "🏁", tasks: ["Log off", "Say quick goodbyes", "Walk fast", "Survive the commute"] }
                 ];
 
                 let shiftTimer;
@@ -1845,6 +1878,31 @@
                 healthBreaksToggle.addEventListener('change', (e) => {
                     autoScheduleHealthBreaks = e.target.checked;
                     localStorage.setItem('shiftAutoHealthBreaks', autoScheduleHealthBreaks);
+                });
+                
+                // Initialize Location State
+                updateLocButtons();
+                
+                function updateLocButtons() {
+                    if (shiftLocation === 'home') {
+                        locHomeBtn.className = "px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]";
+                        locOfficeBtn.className = "px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
+                    } else {
+                        locHomeBtn.className = "px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
+                        locOfficeBtn.className = "px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]";
+                    }
+                }
+
+                locHomeBtn.addEventListener('click', () => {
+                    shiftLocation = 'home';
+                    localStorage.setItem('shiftLocation', 'home');
+                    updateLocButtons();
+                });
+
+                locOfficeBtn.addEventListener('click', () => {
+                    shiftLocation = 'office';
+                    localStorage.setItem('shiftLocation', 'office');
+                    updateLocButtons();
                 });
 
                 function formatTime(ms) {
@@ -2037,8 +2095,12 @@
 
                     // --- UPDATE HOUR GUIDE ---
                     const currentHourIndex = Math.floor(elapsedMs / hourMs); // 0-indexed (0 = Hour 1)
-                    if (currentHourIndex >= 0 && currentHourIndex < shiftPlan.length) {
-                        const plan = shiftPlan[currentHourIndex];
+                    
+                    // Select Plan based on Location Preference
+                    const activePlan = shiftLocation === 'office' ? shiftPlanOffice : shiftPlanHome;
+                    
+                    if (currentHourIndex >= 0 && currentHourIndex < activePlan.length) {
+                        const plan = activePlan[currentHourIndex];
                         guideTitle.textContent = plan.title;
                         guideTheme.textContent = `// ${plan.theme}`;
                         guideIcon.textContent = plan.icon;
@@ -2049,7 +2111,7 @@
                             html += `<div class="flex items-start gap-2"><span class="text-teal-400 mt-1">›</span><span>${task}</span></div>`;
                         });
                         guideContent.innerHTML = html;
-                    } else if (currentHourIndex >= shiftPlan.length) {
+                    } else if (currentHourIndex >= activePlan.length) {
                         // After last hour defined
                         guideTitle.textContent = "Shift Complete";
                         guideTheme.textContent = "// Overtime";
