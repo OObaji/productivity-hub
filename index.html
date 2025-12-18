@@ -286,8 +286,28 @@
                             <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">💨</span>
                             <span class="font-medium">White</span>
                         </button>
-                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-purple-500/50 group col-span-2" data-type="gamma" title="40Hz Isochronic Tone for deep cognition">
-                            <div class="flex items-center gap-2">
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-blue-500/50 group" data-type="rain" title="Soft steady rain">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">☔</span>
+                            <span class="font-medium">Rain</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-cyan-500/50 group" data-type="waves" title="Ocean waves">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🏖️</span>
+                            <span class="font-medium">Waves</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-orange-500/50 group" data-type="city" title="Urban ambience & traffic">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🏙️</span>
+                            <span class="font-medium">City</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-amber-700/50 group" data-type="cafe" title="Coffee shop chatter">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">☕</span>
+                            <span class="font-medium">Cafe</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-indigo-400/50 group" data-type="lofi" title="Chill beat & vinyl crackle">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🎧</span>
+                            <span class="font-medium">Lofi</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-purple-500/50 group col-span-3" data-type="gamma" title="40Hz Isochronic Tone for deep cognition">
+                            <div class="flex items-center justify-center gap-2">
                                 <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🧠</span>
                                 <span class="font-medium">Gamma (40Hz)</span>
                             </div>
@@ -939,11 +959,17 @@
                 // Nodes for Noise
                 this.noiseSource = null;
                 this.filterNode = null;
+                this.secondarySource = null; // For texture layers
+                this.secondaryFilter = null;
                 
-                // Nodes for Oscillators (Gamma)
+                // Nodes for Oscillators (Gamma/Waves/Lofi)
                 this.carrierOsc = null;
                 this.lfoOsc = null;
                 this.lfoGain = null;
+                
+                // Lofi Specifics
+                this.lofiInterval = null;
+                this.beatStep = 0;
                 
                 this.gainNode = null;
                 this.isPlaying = false;
@@ -1016,39 +1042,152 @@
                     this.ctx.resume();
                 }
                 
-                // Stop any existing nodes to ensure clean state
                 this.stopNodes();
 
                 if (this.type === 'gamma') {
-                    // 40Hz Gamma Isochronic Tone Logic
-                    // Carrier: 200Hz Sine (Pleasant low tone)
+                    // 40Hz Gamma Logic
                     this.carrierOsc = this.ctx.createOscillator();
                     this.carrierOsc.type = 'sine';
                     this.carrierOsc.frequency.value = 200; 
 
-                    // Amplitude Modulation Gain
                     this.lfoGain = this.ctx.createGain();
-                    this.lfoGain.gain.value = 0.5; // Base gain center
+                    this.lfoGain.gain.value = 0.5; 
 
-                    // LFO: 40Hz
                     this.lfoOsc = this.ctx.createOscillator();
                     this.lfoOsc.type = 'sine';
                     this.lfoOsc.frequency.value = 40;
 
-                    // Connect LFO to Gain's gain param to modulate volume
-                    // This creates the rapid "pulsing" effect
                     this.lfoOsc.connect(this.lfoGain.gain);
-                    
-                    // Connect Carrier -> AM Gain -> Main Gain -> Dest
                     this.carrierOsc.connect(this.lfoGain);
                     this.lfoGain.connect(this.gainNode);
 
                     this.carrierOsc.start();
                     this.lfoOsc.start();
-                } else {
-                    // Noise Logic
+                } 
+                else if (this.type === 'waves') {
+                    // Ocean Logic
+                    const buffer = this.createNoiseBuffer('brown');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    this.lfoOsc = this.ctx.createOscillator();
+                    this.lfoOsc.type = 'sine';
+                    this.lfoOsc.frequency.value = 0.15; 
+
+                    this.lfoGain = this.ctx.createGain();
+                    this.lfoGain.gain.value = 0.5; 
+
+                    this.lfoOsc.connect(this.lfoGain.gain);
+                    this.noiseSource.connect(this.lfoGain);
+                    this.lfoGain.connect(this.gainNode);
+
+                    this.noiseSource.start();
+                    this.lfoOsc.start();
+                }
+                else if (this.type === 'city') {
+                    // City: Brown noise rumble + Filtered traffic swells
+                    // 1. Background Rumble (Brown)
+                    const bgBuffer = this.createNoiseBuffer('brown');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = bgBuffer;
+                    this.noiseSource.loop = true;
+                    
+                    const bgGain = this.ctx.createGain();
+                    bgGain.gain.value = 0.4;
+                    
+                    this.noiseSource.connect(bgGain);
+                    bgGain.connect(this.gainNode);
+                    this.noiseSource.start();
+
+                    // 2. Traffic Swells (Filtered Pink Noise)
+                    const trafficBuffer = this.createNoiseBuffer('pink');
+                    this.secondarySource = this.ctx.createBufferSource();
+                    this.secondarySource.buffer = trafficBuffer;
+                    this.secondarySource.loop = true;
+
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 400;
+
+                    // LFO to modulate traffic filter (simulating cars passing)
+                    this.lfoOsc = this.ctx.createOscillator();
+                    this.lfoOsc.type = 'sine';
+                    this.lfoOsc.frequency.value = 0.1; // Slow swell
+
+                    const filterModGain = this.ctx.createGain();
+                    filterModGain.gain.value = 300; // Modulate frequency by +/- 300Hz
+
+                    this.lfoOsc.connect(filterModGain);
+                    filterModGain.connect(this.filterNode.frequency);
+                    
+                    this.secondarySource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+                    
+                    this.secondarySource.start();
+                    this.lfoOsc.start();
+                }
+                else if (this.type === 'cafe') {
+                    // Cafe: Pink noise filtered for "chatter" + random clinks
+                    // 1. Chatter (Filtered Pink)
+                    const chatterBuffer = this.createNoiseBuffer('pink');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = chatterBuffer;
+                    this.noiseSource.loop = true;
+
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'bandpass';
+                    this.filterNode.frequency.value = 800; // Speech range
+                    this.filterNode.Q.value = 1;
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+                    this.noiseSource.start();
+
+                    // 2. Random "Clink" generator (Dishes/Cups)
+                    // We use an interval to create random high-pitched pings
+                    this.lofiInterval = setInterval(() => {
+                        if (Math.random() > 0.7) { // 30% chance per second
+                            this.playClink();
+                        }
+                    }, 1000);
+                }
+                else if (this.type === 'lofi') {
+                    // Lofi: Vinyl Crackle + Beat Loop
+                    // 1. Vinyl Crackle (Highpass Pink Noise)
+                    const crackleBuffer = this.createNoiseBuffer('pink');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = crackleBuffer;
+                    this.noiseSource.loop = true;
+
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'highpass';
+                    this.filterNode.frequency.value = 2000;
+                    
+                    const crackleGain = this.ctx.createGain();
+                    crackleGain.gain.value = 0.15; // Quiet
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(crackleGain);
+                    crackleGain.connect(this.gainNode);
+                    this.noiseSource.start();
+
+                    // 2. Beat Sequencer
+                    this.beatStep = 0;
+                    const bpm = 70;
+                    const stepTime = (60 / bpm) * 1000 / 2; // 8th notes
+                    
+                    this.playLofiStep(); // Play immediately
+                    this.lofiInterval = setInterval(() => this.playLofiStep(), stepTime);
+                    
+                    // 3. Drone Chord (Pad)
+                    this.playLofiPad();
+                }
+                else {
+                    // Standard Noise Logic (White, Pink, Brown, Green, Rain)
                     let bufferType = this.type;
-                    if (this.type === 'green') bufferType = 'white'; // Green is filtered white
+                    if (this.type === 'green') bufferType = 'white'; 
+                    if (this.type === 'rain') bufferType = 'pink';
 
                     const buffer = this.createNoiseBuffer(bufferType);
                     this.noiseSource = this.ctx.createBufferSource();
@@ -1056,21 +1195,137 @@
                     this.noiseSource.loop = true;
 
                     if (this.type === 'green') {
-                        // Green Noise: White noise + Lowpass Filter @ 500Hz
                         this.filterNode = this.ctx.createBiquadFilter();
                         this.filterNode.type = 'lowpass';
                         this.filterNode.frequency.value = 500;
                         this.filterNode.Q.value = 1;
-                        
+                        this.noiseSource.connect(this.filterNode);
+                        this.filterNode.connect(this.gainNode);
+                    } else if (this.type === 'rain') {
+                        this.filterNode = this.ctx.createBiquadFilter();
+                        this.filterNode.type = 'lowpass';
+                        this.filterNode.frequency.value = 800;
                         this.noiseSource.connect(this.filterNode);
                         this.filterNode.connect(this.gainNode);
                     } else {
                         this.noiseSource.connect(this.gainNode);
                     }
-                    
                     this.noiseSource.start();
                 }
                 this.isPlaying = true;
+            }
+
+            // Helper for Cafe Sound
+            playClink() {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                // Random freq between 2000 and 4000
+                osc.frequency.value = 2000 + Math.random() * 2000;
+                
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(this.gainNode);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            // Helpers for Lofi
+            playLofiPad() {
+                // Cm9 Chord Pad: C3, Eb3, G3, Bb3, D4
+                const freqs = [130.81, 155.56, 196.00, 233.08, 293.66];
+                freqs.forEach(f => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = 'triangle'; // Softer than square, richer than sine
+                    osc.frequency.value = f;
+                    
+                    // Detune slightly for "wobbly" lofi feel
+                    osc.detune.value = Math.random() * 10 - 5;
+
+                    // Filter to make it mellow
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 800;
+
+                    gain.gain.value = 0.03; // Very quiet background
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.gainNode);
+                    
+                    osc.start();
+                    // Store in secondarySource array if we wanted to stop individually, 
+                    // but stopNodes() cleans up generally.
+                    this.secondarySource = osc; // Just tracking one for non-null check
+                });
+            }
+
+            playLofiStep() {
+                const t = this.ctx.currentTime;
+                // Beat Pattern (8 steps)
+                // K - - - S - - - (Kick on 0, Snare on 4)
+                // Hats on 0, 2, 4, 6
+                
+                // Kick
+                if (this.beatStep === 0 || this.beatStep === 5) { // Syncopated kick
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.frequency.setValueAtTime(150, t);
+                    osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5);
+                    gain.gain.setValueAtTime(0.5, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+                    osc.connect(gain);
+                    gain.connect(this.gainNode);
+                    osc.start(t);
+                    osc.stop(t + 0.5);
+                }
+
+                // Snare
+                if (this.beatStep === 4) {
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = this.createNoiseBuffer('white');
+                    const gain = this.ctx.createGain();
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'highpass';
+                    filter.frequency.value = 1000;
+                    
+                    gain.gain.setValueAtTime(0.3, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+                    
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.gainNode);
+                    noise.start(t);
+                    noise.stop(t + 0.2);
+                }
+
+                // Hi-hat (Closed)
+                if (this.beatStep % 2 === 0) {
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = this.createNoiseBuffer('white');
+                    const gain = this.ctx.createGain();
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'highpass';
+                    filter.frequency.value = 5000;
+                    
+                    // Vary volume slightly for "human" feel
+                    const vol = 0.05 + Math.random() * 0.02;
+                    gain.gain.setValueAtTime(vol, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                    
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.gainNode);
+                    noise.start(t);
+                    noise.stop(t + 0.05);
+                }
+
+                this.beatStep = (this.beatStep + 1) % 8;
             }
 
             stop() {
@@ -1079,7 +1334,7 @@
             }
 
             stopNodes() {
-                // Stop Noise Nodes
+                // Stop basic noises
                 if (this.noiseSource) {
                     try { this.noiseSource.stop(); } catch(e){}
                     this.noiseSource.disconnect();
@@ -1089,8 +1344,15 @@
                     this.filterNode.disconnect();
                     this.filterNode = null;
                 }
+                
+                // Stop secondary sources (used in City/Lofi)
+                if (this.secondarySource) {
+                    try { this.secondarySource.stop(); } catch(e){}
+                    this.secondarySource.disconnect();
+                    this.secondarySource = null;
+                }
 
-                // Stop Oscillator Nodes
+                // Stop Oscillators
                 if (this.carrierOsc) {
                     try { this.carrierOsc.stop(); } catch(e){}
                     this.carrierOsc.disconnect();
@@ -1104,6 +1366,12 @@
                 if (this.lfoGain) {
                     this.lfoGain.disconnect();
                     this.lfoGain = null;
+                }
+                
+                // Clear Intervals (Cafe/Lofi)
+                if (this.lofiInterval) {
+                    clearInterval(this.lofiInterval);
+                    this.lofiInterval = null;
                 }
             }
 
