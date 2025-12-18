@@ -1789,226 +1789,226 @@
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
                 let shiftLocation = localStorage.getItem('shiftLocation') || 'home';
-
+                // --- SHIFT PLAN DATA (Updated with Effects) ---
                 const shiftPlanHome = [
                     { 
                         hour: 1, 
-                        title: "Hour 1 — The Launchpad", 
-                        theme: "Calm Initiation", 
-                        icon: "🚀", 
+                        title: "Hour 1 — Night Owl Launch", 
+                        theme: "Evening Initiation", 
+                        icon: "🦉", 
                         effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Set lighting (LEDs/Soft)", "Queue low-fidelity beats", "Breathing exercise (5 reps)", "Goal: Zero friction start"] 
+                        visual: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Set warm lighting (amber/red)", "Brew first coffee/tea", "Review night's objectives", "Say goodnight to the day walkers"] 
                     },
                     { 
                         hour: 2, 
-                        title: "Hour 2 — Deep Dive", 
-                        theme: "High Focus", 
-                        icon: "🌊", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1510519138101-570d1dca3d66?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Switch to brown noise/driving beats", "Clear desk surface", "Tackle high-priority calls", "Hydration break at 30m"] 
+                        title: "Hour 2 — The Quiet Begins", 
+                        theme: "Distraction Free", 
+                        icon: "🌑", 
+                        effect: "rain",
+                        visual: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["World is quieting down", "Deep work session 1", "Phone on DND", "Enjoy the solitude"] 
                     },
                     { 
                         hour: 3, 
-                        title: "Hour 3 — The Warm Up", 
-                        theme: "Caffeinated Flow", 
-                        icon: "☕", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Brew tea/coffee", "Slow the tempo", "Neck stretches", "Intention: 'Smooth execution'"] 
+                        title: "Hour 3 — Momentum", 
+                        theme: "Steady Flow", 
+                        icon: "🌊", 
+                        effect: "bubbles",
+                        visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Hydrate (Large water)", "Check emails before midnight lull", "Steady pace", "Comfort check (temp/chair)"] 
                     },
                     { 
                         hour: 4, 
-                        title: "Hour 4 — Dopamine Hit", 
-                        theme: "Mental Reset", 
-                        icon: "⚡", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Watch comedy/motivational clip (3-5m)", "Posture check", "Arm stretches", "Combat monotony"] 
+                        title: "Hour 4 — First Refuel", 
+                        theme: "Energy Maintenance", 
+                        icon: "🥪", 
+                        effect: "embers",
+                        visual: "https://images.unsplash.com/photo-1567306301408-9b74779a11af?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Light snack (protein)", "Stretch legs", "Avoid heavy carbs", "Reset eyes (20-20-20 rule)"] 
                     },
                     { 
                         hour: 5, 
-                        title: "Hour 5 — Kinetic Energy", 
-                        theme: "Physical Awakening", 
-                        icon: "🏃", 
+                        title: "Hour 5 — Midnight Oil", 
+                        theme: "Peak Focus", 
+                        icon: "🕯️", 
                         effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Room walk (2 mins)", "Fresh air intake", "Hydrate", "Wake up the body"] 
+                        visual: "https://images.unsplash.com/photo-1532983330958-4b32a24a4271?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Zero distractions remain", "Tackle the hardest task", "High-fidelity playlist", "Total immersion"] 
                     },
                     { 
                         hour: 6, 
-                        title: "Hour 6 — Fuel Station", 
-                        theme: "Sustained Energy", 
-                        icon: "🥗", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Light protein/fruit snack", "Ambient background music", "Posture correction", "Avoid heavy food crash"] 
+                        title: "Hour 6 — The Crossing", 
+                        theme: "Midnight Lunch", 
+                        icon: "🕛", 
+                        effect: "snow",
+                        visual: "https://images.unsplash.com/photo-1495573767597-28020b6af738?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Halfway point!", "Eat 'Lunch'", "Step outside if safe/possible", "Mental reset"] 
                     },
                     { 
                         hour: 7, 
-                        title: "Hour 7 — Audio Stimulus", 
-                        theme: "Passive Learning", 
-                        icon: "🎧", 
+                        title: "Hour 7 — Ghost Mode", 
+                        theme: "Silent Runner", 
+                        icon: "👻", 
                         effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Engage a podcast (Crime/Comedy/Tech)", "Keep brain active but low-stress"] 
+                        visual: "https://images.unsplash.com/photo-1515266591878-5a14080e615e?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["World is asleep", "Cyberpunk vibes", "Creative work / Coding", "Stay warm"] 
                     },
                     { 
                         hour: 8, 
-                        title: "Hour 8 — Cozy Mode", 
-                        theme: "Comfort & Stability", 
-                        icon: "🧸", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Dim lights further", "Softer playlist", "Hoodie/blanket on", "Maximize physical comfort"] 
+                        title: "Hour 8 — The Dip Defense", 
+                        theme: "Alertness Check", 
+                        icon: "🛡️", 
+                        effect: "embers",
+                        visual: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Splash face with cold water", "Stand up / Pacing", "Upbeat music switch", "Fight the drowsiness"] 
                     },
                     { 
                         hour: 9, 
-                        title: "Hour 9 — System Reboot", 
-                        theme: "Physical Reset", 
-                        icon: "🔄", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Stand up", "Shoulder rotations", "Deep breathing (1 min)", "Water refill", "'Home stretch begins'"] 
+                        title: "Hour 9 — Second Wind", 
+                        theme: "Power Through", 
+                        icon: "💨", 
+                        effect: "constellation",
+                        visual: "https://images.unsplash.com/photo-1500491460312-c32fc2dbc751?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Caffeine cutoff check", "Finish major deliverables", "Keep lights bright", "You're over the hump"] 
                     },
                     { 
                         hour: 10, 
-                        title: "Hour 10 — Gamification", 
-                        theme: "Challenge Mode", 
-                        icon: "🎮", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["+1 point per smooth task", "+2 points for patience", "Reward: Sweet treat or favorite track"] 
+                        title: "Hour 10 — Pre-Dawn", 
+                        theme: "Admin & Prep", 
+                        icon: "☕", 
+                        effect: "rain",
+                        visual: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Clear inbox", "Organize files", "Low energy tasks", "Listen to a podcast"] 
                     },
                     { 
                         hour: 11, 
-                        title: "Hour 11 — Deceleration", 
-                        theme: "Cool Down", 
-                        icon: "🌙", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Lo-fi music", "Lower lights", "Steady breathing", "Visualize the finish line"] 
+                        title: "Hour 11 — Blue Hour", 
+                        theme: "Sunrise Approach", 
+                        icon: "🌅", 
+                        effect: "bubbles",
+                        visual: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Birds start chirping", "Finalize reports", "Plan tomorrow's sleep", "Prepare handover notes"] 
                     },
                     { 
                         hour: 12, 
-                        title: "Hour 12 — The Victory Lap", 
-                        theme: "Completion", 
-                        icon: "🏁", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1461988320302-91b5b4c6c034?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Clear workspace", "Gentle tunes", "Final stretch", "Gratitude: 'Mission accomplished'"] 
+                        title: "Hour 12 — Landing Gear", 
+                        theme: "Deceleration", 
+                        icon: "🛬", 
+                        effect: "snow",
+                        visual: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Sunglasses ready", "Blue light blockers on", "Pack up", "Commute home & Sleep"] 
                     }
                 ];
 
                 const shiftPlanOffice = [
                     { 
                         hour: 1, 
-                        title: "Hour 1 — Armor Up", 
-                        theme: "Defensive Setup", 
-                        icon: "🛡️", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Headphones ON immediately", "Fill water bottle (large)", "Check calendar for ambush meetings", "Goal: Establish perimeter"] 
+                        title: "Hour 1 — The Handover", 
+                        theme: "Shift Change", 
+                        icon: "🤝", 
+                        effect: "bubbles",
+                        visual: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Get updates from day crew", "Set up desk ergonomics", "Fill water bottle", "Log in to all systems"] 
                     },
                     { 
                         hour: 2, 
-                        title: "Hour 2 — The Bunker", 
-                        theme: "Noise Cancellation", 
-                        icon: "🎧", 
+                        title: "Hour 2 — Silence Falls", 
+                        theme: "Empty Building", 
+                        icon: "🔇", 
                         effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1590212151175-e58edd96185b?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Brown noise max volume", "Ignore open-plan chatter", "Do NOT make eye contact", "Focus on one big task"] 
+                        visual: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Day staff gone", "Claim the best chair?", "Enjoy the quiet", "Start core tasks"] 
                     },
                     { 
                         hour: 3, 
-                        title: "Hour 3 — Social Battery Check", 
-                        theme: "Interaction Mgmt", 
-                        icon: "🔋", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Brief coffee run (look busy)", " polite nods only", "Avoid the 'weekend plans' trap", "Back to desk ASAP"] 
+                        title: "Hour 3 — Ops Mode", 
+                        theme: "Tactical Focus", 
+                        icon: "💻", 
+                        effect: "constellation",
+                        visual: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Headphones on", "Monitor dashboards", "Clear backlog", "Efficient processing"] 
                     },
                     { 
                         hour: 4, 
-                        title: "Hour 4 — Tactical Pause", 
-                        theme: "Find Silence", 
-                        icon: "🤫", 
+                        title: "Hour 4 — Perimeter Check", 
+                        theme: "Movement", 
+                        icon: "🚶", 
                         effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Find an empty meeting room", "Or take a long bathroom break", "Deep breathing (4-7-8)", "Reset sensory overload"] 
+                        visual: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Walk the floor", "Stretch in the hallway", "Vending machine run", "Check in with night team"] 
                     },
                     { 
                         hour: 5, 
-                        title: "Hour 5 — The Escape", 
-                        theme: "Physical Exit", 
-                        icon: "🏃", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1517789711843-157973bb2226?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Leave the building for lunch", "Do NOT eat at desk", "Get fresh air/sunlight", "Disconnect from office wifi"] 
+                        title: "Hour 5 — Cruising Speed", 
+                        theme: "Steady State", 
+                        icon: "🚄", 
+                        effect: "embers",
+                        visual: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Workflow optimized", "Batch processing", "Update logs", "Stay hydrated"] 
                     },
                     { 
                         hour: 6, 
-                        title: "Hour 6 — Re-Entry", 
-                        theme: "Shields Up", 
-                        icon: "🧱", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Slow transition back", "Low-energy admin tasks", "Put headphones back on", "Accept the afternoon slump"] 
+                        title: "Hour 6 — Midnight Lunch", 
+                        theme: "The Break", 
+                        icon: "🍱", 
+                        effect: "bubbles",
+                        visual: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Eat away from desk", "Socialize with night crew", "Read a book", "Do not talk about work"] 
                     },
                     { 
                         hour: 7, 
-                        title: "Hour 7 — Invisible Mode", 
-                        theme: "Under the Radar", 
-                        icon: "👻", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Look intensely busy", "Organize files/emails", "Avoid new requests", "Keep head down"] 
+                        title: "Hour 7 — Graveyard Grit", 
+                        theme: "Deep Night", 
+                        icon: "🪦", 
+                        effect: "rain",
+                        visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Last coffee opportunity", "Upbeat playlist", "Keep lights bright", "Focus on detail work"] 
                     },
                     { 
                         hour: 8, 
-                        title: "Hour 8 — Hydration & Stretch", 
-                        theme: "Body Maintenance", 
-                        icon: "🚰", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1523362628408-3c26bed06636?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Walk to water cooler", "Stretch in a stairwell", "Reset posture", "Ignore the fluorescent hum"] 
+                        title: "Hour 8 — Zombie Defense", 
+                        theme: "Stay Alert", 
+                        icon: "🧟", 
+                        effect: "embers",
+                        visual: "https://images.unsplash.com/photo-1563911302283-d2bc129e7c1f?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Walk around the building", "Splash cold water on face", "Talk to a colleague", "Shake off the fatigue"] 
                     },
                     { 
                         hour: 9, 
-                        title: "Hour 9 — Power Sprint", 
-                        theme: "The Final Push", 
-                        icon: "🔥", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["High BPM playlist", "Blast through remaining list", "Ignore distractions", "Tunnel vision enabled"] 
+                        title: "Hour 9 — The 3AM Wall", 
+                        theme: "Resistance", 
+                        icon: "🧱", 
+                        effect: "snow",
+                        visual: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Hydrate aggressively", "Stand while working", "Switch task types", "Don't stare at the clock"] 
                     },
                     { 
                         hour: 10, 
-                        title: "Hour 10 — Inbox Zero", 
-                        theme: "Documentation", 
-                        icon: "📨", 
+                        title: "Hour 10 — Solo Pilot", 
+                        theme: "Quiet Focus", 
+                        icon: "✈️", 
                         effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1555421689-d68471e189f2?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Clear emails", "Update tickets", "Document today's wins", "Prepare for tomorrow"] 
+                        visual: "https://images.unsplash.com/photo-1520034475321-cbe63696469a?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Report writing", "Documentation", "Maintenance tasks", "Prepare for day shift arrival"] 
                     },
                     { 
                         hour: 11, 
-                        title: "Hour 11 — Exit Strategy", 
-                        theme: "Pack Up", 
-                        icon: "🎒", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Clean desk surface", "Pack bag quietly", "Check commute traffic", "Visualize the door"] 
+                        title: "Hour 11 — Early Birds", 
+                        theme: "World Waking Up", 
+                        icon: "🐦", 
+                        effect: "rain",
+                        visual: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Cleaners arriving", "Tidy desk area", "Final emails", "Watch the sunrise"] 
                     },
                     { 
                         hour: 12, 
-                        title: "Hour 12 — Freedom Run", 
-                        theme: "Extraction", 
-                        icon: "🏁", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1496360938681-9a9189cb2cc3?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Log off", "Say quick goodbyes", "Walk fast", "Survive the commute"] 
+                        title: "Hour 12 — Extraction Prep", 
+                        theme: "Go Home", 
+                        icon: "🕶️", 
+                        effect: "bubbles",
+                        visual: "https://images.unsplash.com/photo-1533561797500-4fad4750814e?q=80&w=1200&auto=format&fit=crop",
+                        tasks: ["Sunglasses ON", "Handover to day team", "Log off", "Survive the commute & Sleep"] 
                     }
                 ];
 
