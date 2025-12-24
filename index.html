@@ -23,6 +23,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Added QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
@@ -124,6 +127,28 @@
             <p id="principle-modal-description" class="text-slate-600 dark:text-slate-400 mb-6"></p>
             <div id="principle-modal-tasks" class="max-h-60 overflow-y-auto pr-2"></div>
             <button id="principle-modal-ok-btn" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">Got it!</button>
+        </div>
+    </div>
+
+    <!-- QR Code Modal (NEW) -->
+    <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all scale-100 flex flex-col items-center border border-white/10">
+            <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Scan to Sync</h3>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm">Point your phone camera here to open this shift.</p>
+            
+            <div class="bg-white p-4 rounded-xl shadow-inner mb-6">
+                <div id="qrcode-container"></div>
+            </div>
+            
+            <div class="flex w-full gap-3">
+                <button id="copy-link-fallback-btn" class="flex-1 py-3 px-4 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold rounded-xl hover:bg-indigo-500/20 transition-colors flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                    Copy Link
+                </button>
+                <button id="close-qr-btn" class="flex-1 py-3 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2364,6 +2389,13 @@
                 const motivationQuote = document.getElementById('shift-motivation-quote');
                 
                 const shareShiftBtn = document.getElementById('share-shift-btn');
+                // QR Elements
+                const qrModal = document.getElementById('qr-modal');
+                const qrContainer = document.getElementById('qrcode-container');
+                const closeQrBtn = document.getElementById('close-qr-btn');
+                const copyLinkFallbackBtn = document.getElementById('copy-link-fallback-btn');
+                let currentShareUrl = '';
+
                 const addBreakBtn = document.getElementById('add-break-btn');
                 const loadMyBreaksBtn = document.getElementById('load-my-breaks-btn');
                 const breakTimesContainer = document.getElementById('break-times-container');
@@ -2701,16 +2733,155 @@
                     setupView.classList.remove('hidden'); countdownView.classList.add('hidden'); endView.classList.add('hidden'); breakActiveDisplay.classList.add('hidden');
                 }
                 
+                // --- NEW: Shared Shift Logic ---
+                function checkSharedShift() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sharedData = urlParams.get('shared_shift');
+                    
+                    if (sharedData) {
+                        try {
+                            const [dataString, encodedTitle] = sharedData.split('~');
+                            const parts = dataString.split('.');
+                            
+                            if (parts.length < 2) return;
+
+                            const startMin = parseInt(parts[0], 36);
+                            const durationMin = parseInt(parts[1], 36);
+                            
+                            const startMs = startMin * 60000;
+                            const endMs = startMs + (durationMin * 60000);
+                            
+                            const newStartTime = new Date(startMs);
+                            const newEndTime = new Date(endMs);
+                            
+                            const newTitle = decodeURIComponent((encodedTitle || '').replace(/\+/g, '%20'));
+                            
+                            const newBreaks = [];
+                            for (let i = 2; i < parts.length; i += 2) {
+                                if (i + 1 >= parts.length) break;
+                                const offsetMin = parseInt(parts[i], 36);
+                                const compoundVal = parseInt(parts[i+1], 36);
+                                
+                                const typeBit = compoundVal % 2;
+                                const duration = Math.floor(compoundVal / 2);
+                                
+                                const breakStart = new Date(startMs + (offsetMin * 60000));
+                                const breakEnd = new Date(breakStart.getTime() + (duration * 60000));
+                                
+                                newBreaks.push({
+                                    start: breakStart,
+                                    end: breakEnd,
+                                    type: typeBit === 1 ? 'Health Break' : 'Standard Break',
+                                    duration: duration
+                                });
+                            }
+
+                            // Apply to state
+                            shiftStartTime = newStartTime;
+                            shiftEndTime = newEndTime;
+                            shiftTitleInput.value = newTitle;
+                            activeBreakObjects = newBreaks;
+                            totalShiftDuration = shiftEndTime - shiftStartTime;
+
+                            // Save to local storage
+                            localStorage.setItem('shiftStartTime', shiftStartTime.toISOString());
+                            localStorage.setItem('shiftEndTime', shiftEndTime.toISOString());
+                            localStorage.setItem('shiftTitle', newTitle);
+                            localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
+                            
+                            // Clean URL
+                            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path:newUrl},'',newUrl);
+                            
+                            // Switch UI
+                            navigateToView('shift-timer');
+                            setupView.classList.add('hidden');
+                            countdownView.classList.remove('hidden');
+                            endView.classList.add('hidden');
+                            
+                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            
+                            generateShiftBlocks();
+                            shiftCountdown();
+                            if (shiftTimer) clearInterval(shiftTimer);
+                            shiftTimer = setInterval(shiftCountdown, 1000);
+                            startEffect('constellation');
+                            
+                            showAlert("Sync successful! Viewing shared shift.");
+
+                        } catch (e) {
+                            console.error("Error parsing shared shift:", e);
+                            showAlert("Invalid shared shift link.");
+                        }
+                    }
+                }
+
+                // QR Code & Share Logic
                 shareShiftBtn.addEventListener('click', () => {
                     if (!shiftStartTime || !shiftEndTime) { showAlert("Cannot share an inactive shift."); return; }
-                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36); const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36); const dataParts = [s, d];
+                    
+                    // 1. Generate Data String
+                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36); 
+                    const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36); 
+                    const dataParts = [s, d];
+                    
                     activeBreakObjects.forEach(brk => {
-                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000); const offset = offsetVal.toString(36); const typeBit = brk.type === 'Health Break' ? 1 : 0; const compoundVal = (parseInt(brk.duration) * 2) + typeBit; const compound = compoundVal.toString(36);
+                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000); 
+                        const offset = offsetVal.toString(36); 
+                        const typeBit = brk.type === 'Health Break' ? 1 : 0; 
+                        const compoundVal = (parseInt(brk.duration) * 2) + typeBit; 
+                        const compound = compoundVal.toString(36);
                         dataParts.push(offset, compound);
                     });
-                    const dataString = dataParts.join('.'); let t = shiftTitleInput.value; t = encodeURIComponent(t).replace(/%20/g, '+'); const rawString = `${dataString}~${t}`; let baseUrl = window.location.href.split('?')[0]; const shareUrl = `${baseUrl}?shared_shift=${rawString}`;
-                    const textArea = document.createElement("textarea"); textArea.value = shareUrl; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
-                    try { const successful = document.execCommand('copy'); if (successful) { showAlert("Link minimized to max limit!"); } else { showAlert("Failed to copy link. Please manually copy the URL."); } } catch (err) { console.error("Failed to copy link: ", err); showAlert("Failed to copy link. Please check permissions."); } document.body.removeChild(textArea);
+                    
+                    const dataString = dataParts.join('.'); 
+                    let t = shiftTitleInput.value; 
+                    t = encodeURIComponent(t).replace(/%20/g, '+'); 
+                    const rawString = `${dataString}~${t}`; 
+                    let baseUrl = window.location.href.split('?')[0]; 
+                    
+                    // 2. Set URL
+                    currentShareUrl = `${baseUrl}?shared_shift=${rawString}`;
+                    
+                    // 3. Generate QR
+                    qrContainer.innerHTML = ''; // Clear previous
+                    new QRCode(qrContainer, {
+                        text: currentShareUrl,
+                        width: 180,
+                        height: 180,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+
+                    // 4. Show Modal
+                    qrModal.classList.remove('hidden');
+                    qrModal.classList.add('flex');
+                });
+
+                closeQrBtn.addEventListener('click', () => {
+                    qrModal.classList.add('hidden');
+                    qrModal.classList.remove('flex');
+                });
+
+                copyLinkFallbackBtn.addEventListener('click', () => {
+                    if (!currentShareUrl) return;
+                    const textArea = document.createElement("textarea"); 
+                    textArea.value = currentShareUrl; 
+                    textArea.style.position = "fixed"; 
+                    textArea.style.left = "-9999px"; 
+                    document.body.appendChild(textArea); 
+                    textArea.focus(); 
+                    textArea.select();
+                    try { 
+                        document.execCommand('copy'); 
+                        showAlert("Link copied to clipboard!"); 
+                    } catch (err) { 
+                        console.error("Failed to copy", err); 
+                        showAlert("Failed to copy link."); 
+                    } 
+                    document.body.removeChild(textArea);
                 });
 
                 function checkStoredShift() {
@@ -2740,7 +2911,10 @@
                 });
 
                 resetBtn.addEventListener('click', resetShiftTimer); newShiftBtn.addEventListener('click', resetShiftTimer);
+                
+                // Initialize logic
                 checkStoredShift();
+                checkSharedShift(); // Check URL last to override stored shift
             }
             
             function setupSettings() {
@@ -2941,6 +3115,25 @@
                 });
 
                 notes.forEach(createNoteElement);
+            }
+
+            // ... (setupBreachList, setupDailyQuote, etc. - keep existing) ...
+
+            // --- Updated Initialization Logic ---
+            // Auto-enter if returning user or if shared link is present
+            if (localStorage.getItem('appEntered') === 'true' || new URLSearchParams(window.location.search).has('shared_shift')) {
+                initializeDashboard();
+                landingPage.style.display = 'none';
+                appLayout.classList.remove('hidden-fade');
+                appLayout.classList.add('visible-fade');
+                
+                // Navigate to view logic
+                if (new URLSearchParams(window.location.search).has('shared_shift')) {
+                    // checkSharedShift in setupShiftTimer will handle navigation to 'shift-timer'
+                } else {
+                    const lastView = localStorage.getItem('lastActiveView') || 'dashboard-home';
+                    navigateToView(lastView);
+                }
             }
 
             function setupBreachList() {
