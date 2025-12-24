@@ -306,6 +306,26 @@
                             <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🎧</span>
                             <span class="font-medium">Lofi</span>
                         </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-slate-500/50 group" data-type="train" title="Rhythmic track noise">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🚂</span>
+                            <span class="font-medium">Train</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-sky-500/50 group" data-type="airplane" title="Cabin white noise drone">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">✈️</span>
+                            <span class="font-medium">Airplane</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-teal-400/50 group" data-type="beach" title="Waves & Seagulls">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🏖️</span>
+                            <span class="font-medium">Beach</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-red-500/50 group" data-type="fire" title="Cozy fireplace crackle">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🔥</span>
+                            <span class="font-medium">Fire</span>
+                        </button>
+                        <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-green-600/50 group" data-type="forest" title="Wind & Birds">
+                            <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🌲</span>
+                            <span class="font-medium">Forest</span>
+                        </button>
                         <button class="sound-btn p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all text-xs flex flex-col items-center gap-1 border border-transparent hover:border-purple-500/50 group col-span-3" data-type="gamma" title="40Hz Isochronic Tone for deep cognition">
                             <div class="flex items-center justify-center gap-2">
                                 <span class="text-lg opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">🧠</span>
@@ -523,13 +543,19 @@
                                     <label class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">Shift Name</label>
                                     <input type="text" id="shift-title-input" placeholder="e.g., Night Shift Grind" value="Let's get this bread!" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg placeholder-gray-500">
                                 </div>
-                                <div class="text-left">
-                                    <label for="shift-end-time-input" class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">End Time</label>
-                                    <input type="datetime-local" id="shift-end-time-input" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg appearance-none">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="text-left">
+                                        <label for="shift-start-time-input" class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">Start Time</label>
+                                        <input type="datetime-local" id="shift-start-time-input" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg appearance-none">
+                                    </div>
+                                    <div class="text-left">
+                                        <label for="shift-end-time-input" class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">End Time</label>
+                                        <input type="datetime-local" id="shift-end-time-input" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg appearance-none">
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <button id="preset-normal-btn" class="p-4 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-2xl transition-all font-medium hover:scale-[1.02]">Normal (7AM)</button>
-                                    <button id="preset-overtime-btn" class="p-4 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-100 rounded-2xl transition-all font-medium hover:scale-[1.02]">Overtime (5AM)</button>
+                                    <button id="preset-normal-btn" class="p-4 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-2xl transition-all font-medium hover:scale-[1.02]">Normal (19:00 - 07:00)</button>
+                                    <button id="preset-overtime-btn" class="p-4 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-100 rounded-2xl transition-all font-medium hover:scale-[1.02]">Early (17:00 - 05:00)</button>
                                 </div>
                                 
                                 <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
@@ -967,8 +993,8 @@
                 this.lfoOsc = null;
                 this.lfoGain = null;
                 
-                // Lofi Specifics
-                this.lofiInterval = null;
+                // Lofi/Texture Specifics
+                this.textureInterval = null; // Replaced lofiInterval to be generic
                 this.beatStep = 0;
                 
                 this.gainNode = null;
@@ -1064,8 +1090,8 @@
                     this.carrierOsc.start();
                     this.lfoOsc.start();
                 } 
-                else if (this.type === 'waves') {
-                    // Ocean Logic
+                else if (this.type === 'waves' || this.type === 'beach') {
+                    // Ocean Logic (Waves) + Seagulls for Beach
                     const buffer = this.createNoiseBuffer('brown');
                     this.noiseSource = this.ctx.createBufferSource();
                     this.noiseSource.buffer = buffer;
@@ -1073,7 +1099,7 @@
 
                     this.lfoOsc = this.ctx.createOscillator();
                     this.lfoOsc.type = 'sine';
-                    this.lfoOsc.frequency.value = 0.15; 
+                    this.lfoOsc.frequency.value = 0.15; // Slow swell
 
                     this.lfoGain = this.ctx.createGain();
                     this.lfoGain.gain.value = 0.5; 
@@ -1084,6 +1110,148 @@
 
                     this.noiseSource.start();
                     this.lfoOsc.start();
+
+                    if (this.type === 'beach') {
+                        // Add intermittent seagulls
+                         this.textureInterval = setInterval(() => {
+                            if (Math.random() > 0.8) { // Occasional chirp
+                                this.playSeagull();
+                            }
+                        }, 2000);
+                    }
+                }
+                else if (this.type === 'train') {
+                    // Train: Rhythmic Brown Noise
+                    // Base rumble
+                    const buffer = this.createNoiseBuffer('pink'); // Pink noise for "hiss" of wheels
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    // Lowpass to muffle it
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 400;
+
+                    // Rhythmic Gain (The "Chug")
+                    this.lfoOsc = this.ctx.createOscillator();
+                    this.lfoOsc.type = 'square'; // Harsh on/off
+                    this.lfoOsc.frequency.value = 4; // 4 chugs per second
+
+                    // Smooth the square wave slightly
+                    const lfoFilter = this.ctx.createBiquadFilter();
+                    lfoFilter.type = 'lowpass';
+                    lfoFilter.frequency.value = 10;
+
+                    this.lfoGain = this.ctx.createGain();
+                    this.lfoGain.gain.value = 0.2; // Base volume
+
+                    // Connect LFO to Gain
+                    const rhythmGain = this.ctx.createGain();
+                    rhythmGain.gain.value = 0.3; // Modulation depth
+
+                    this.lfoOsc.connect(lfoFilter);
+                    lfoFilter.connect(rhythmGain);
+                    rhythmGain.connect(this.lfoGain.gain);
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.lfoGain);
+                    this.lfoGain.connect(this.gainNode);
+
+                    this.noiseSource.start();
+                    this.lfoOsc.start();
+                }
+                else if (this.type === 'airplane') {
+                    // Airplane: Deep Brown Noise Drone
+                    const buffer = this.createNoiseBuffer('brown');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    // Lowpass filter for the cabin "hum"
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 150; 
+                    
+                    // Add a secondary Pink noise for high-end "air" hiss
+                    const windBuffer = this.createNoiseBuffer('pink');
+                    this.secondarySource = this.ctx.createBufferSource();
+                    this.secondarySource.buffer = windBuffer;
+                    this.secondarySource.loop = true;
+
+                    const windFilter = this.ctx.createBiquadFilter();
+                    windFilter.type = 'bandpass';
+                    windFilter.frequency.value = 500;
+                    
+                    const windGain = this.ctx.createGain();
+                    windGain.gain.value = 0.1;
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+
+                    this.secondarySource.connect(windFilter);
+                    windFilter.connect(windGain);
+                    windGain.connect(this.gainNode);
+
+                    this.noiseSource.start();
+                    this.secondarySource.start();
+                }
+                else if (this.type === 'fire') {
+                    // Fire: Brown noise rumble + Crackle
+                    const buffer = this.createNoiseBuffer('brown');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    // Filter rumble
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 120;
+                    
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+                    this.noiseSource.start();
+
+                    // Crackle generator
+                    this.textureInterval = setInterval(() => {
+                        if (Math.random() > 0.6) { 
+                            this.playCrackle();
+                        }
+                    }, 100);
+                }
+                else if (this.type === 'forest') {
+                    // Forest: Filtered Pink (Wind) + Birds
+                    const buffer = this.createNoiseBuffer('pink');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    // Dynamic wind filter (slowly changing)
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 400;
+
+                    this.lfoOsc = this.ctx.createOscillator();
+                    this.lfoOsc.type = 'sine';
+                    this.lfoOsc.frequency.value = 0.1; // Slow wind shifts
+                    
+                    const lfoAmp = this.ctx.createGain();
+                    lfoAmp.gain.value = 200; // Shift freq by +/- 200
+
+                    this.lfoOsc.connect(lfoAmp);
+                    lfoAmp.connect(this.filterNode.frequency);
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+                    this.noiseSource.start();
+                    this.lfoOsc.start();
+
+                    // Birds
+                    this.textureInterval = setInterval(() => {
+                        if (Math.random() > 0.85) { 
+                            this.playBird();
+                        }
+                    }, 1500);
                 }
                 else if (this.type === 'city') {
                     // City: Brown noise rumble + Filtered traffic swells
@@ -1128,7 +1296,7 @@
                     this.lfoOsc.start();
                 }
                 else if (this.type === 'cafe') {
-                    // Cafe: Pink noise filtered for "chatter" + random clinks
+                    // ... existing cafe setup ...
                     // 1. Chatter (Filtered Pink)
                     const chatterBuffer = this.createNoiseBuffer('pink');
                     this.noiseSource = this.ctx.createBufferSource();
@@ -1144,9 +1312,8 @@
                     this.filterNode.connect(this.gainNode);
                     this.noiseSource.start();
 
-                    // 2. Random "Clink" generator (Dishes/Cups)
-                    // We use an interval to create random high-pitched pings
-                    this.lofiInterval = setInterval(() => {
+                    // 2. Random "Clink" generator
+                    this.textureInterval = setInterval(() => {
                         if (Math.random() > 0.7) { // 30% chance per second
                             this.playClink();
                         }
@@ -1178,7 +1345,7 @@
                     const stepTime = (60 / bpm) * 1000 / 2; // 8th notes
                     
                     this.playLofiStep(); // Play immediately
-                    this.lofiInterval = setInterval(() => this.playLofiStep(), stepTime);
+                    this.textureInterval = setInterval(() => this.playLofiStep(), stepTime);
                     
                     // 3. Drone Chord (Pad)
                     this.playLofiPad();
@@ -1213,6 +1380,80 @@
                     this.noiseSource.start();
                 }
                 this.isPlaying = true;
+            }
+
+            // Helper for Seagulls (Beach)
+            playSeagull() {
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1500, t);
+                osc.frequency.exponentialRampToValueAtTime(1000, t + 0.4);
+                
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.05, t + 0.1);
+                gain.gain.linearRampToValueAtTime(0, t + 0.4);
+
+                osc.connect(gain);
+                gain.connect(this.gainNode);
+                
+                osc.start(t);
+                osc.stop(t + 0.5);
+            }
+
+            // Helper for Fire Crackle
+            playCrackle() {
+                const t = this.ctx.currentTime;
+                const buffer = this.createNoiseBuffer('white');
+                const source = this.ctx.createBufferSource();
+                source.buffer = buffer;
+                
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 1000;
+
+                const gain = this.ctx.createGain();
+                // Short, sharp bursts
+                gain.gain.setValueAtTime(0.1 + Math.random() * 0.1, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
+                source.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.gainNode);
+                
+                source.start(t);
+                source.stop(t + 0.06);
+            }
+
+            // Helper for Birds (Forest)
+            playBird() {
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                // Randomize pitch high
+                const startFreq = 2000 + Math.random() * 1000;
+                osc.frequency.setValueAtTime(startFreq, t);
+                
+                // Simple chirp pattern (up-down or down)
+                if (Math.random() > 0.5) {
+                    osc.frequency.linearRampToValueAtTime(startFreq + 500, t + 0.1);
+                } else {
+                    osc.frequency.linearRampToValueAtTime(startFreq - 500, t + 0.1);
+                }
+                
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.05, t + 0.02);
+                gain.gain.linearRampToValueAtTime(0, t + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.gainNode);
+                
+                osc.start(t);
+                osc.stop(t + 0.2);
             }
 
             // Helper for Cafe Sound
@@ -1368,10 +1609,10 @@
                     this.lfoGain = null;
                 }
                 
-                // Clear Intervals (Cafe/Lofi)
-                if (this.lofiInterval) {
-                    clearInterval(this.lofiInterval);
-                    this.lofiInterval = null;
+                // Clear Intervals (Cafe/Lofi/Beach/Fire/Forest)
+                if (this.textureInterval) {
+                    clearInterval(this.textureInterval);
+                    this.textureInterval = null;
                 }
             }
 
@@ -2102,6 +2343,9 @@
             }
             
             function setupShiftTimer() {
+                // ... (Existing Shift Timer setup logic omitted for brevity as it remains largely unchanged)
+                // However, due to user request in previous prompt, ensure start/end logic is intact.
+                // Re-inserting the full block to guarantee consistency.
                 const shiftTimerPage = document.getElementById('shift-timer');
                 const setupView = document.getElementById('shift-setup');
                 const countdownView = document.getElementById('shift-countdown-display');
@@ -2109,6 +2353,7 @@
                 const startBtn = document.getElementById('start-shift-btn');
                 const resetBtn = document.getElementById('reset-shift-btn');
                 const newShiftBtn = document.getElementById('new-shift-btn');
+                const startTimeInput = document.getElementById('shift-start-time-input');
                 const endTimeInput = document.getElementById('shift-end-time-input');
                 const endTimeLabel = document.getElementById('shift-end-time-label');
                 const startTimeLabel = document.getElementById('shift-start-time-label');
@@ -2118,26 +2363,19 @@
                 const shiftTitleInput = document.getElementById('shift-title-input');
                 const motivationQuote = document.getElementById('shift-motivation-quote');
                 
-                // Share button
                 const shareShiftBtn = document.getElementById('share-shift-btn');
-
-                // Break Elements
                 const addBreakBtn = document.getElementById('add-break-btn');
                 const loadMyBreaksBtn = document.getElementById('load-my-breaks-btn');
                 const breakTimesContainer = document.getElementById('break-times-container');
                 const healthBreaksToggle = document.getElementById('health-breaks-toggle');
                 
-                // Active Break Display
                 const breakActiveDisplay = document.getElementById('break-active-display');
                 const breakTimerLarge = document.getElementById('break-timer-large');
                 const breakAlertBanner = document.getElementById('break-alert-banner');
-                
-                // Next Break Display
                 const nextBreakContainer = document.getElementById('next-break-container');
                 const timeToNextBreakEl = document.getElementById('time-to-next-break');
                 const nextBreakTimeLabel = document.getElementById('next-break-time-label');
 
-                // Shift Plan Guide Elements
                 const guideContainer = document.getElementById('current-hour-guide');
                 const guideTitle = document.getElementById('current-hour-title');
                 const guideContent = document.getElementById('current-hour-content');
@@ -2145,231 +2383,37 @@
                 const guideIcon = document.getElementById('current-hour-icon');
                 const guideTheme = document.getElementById('current-hour-theme');
                 
-                // Location Controls
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
                 let shiftLocation = localStorage.getItem('shiftLocation') || 'home';
-                // --- SHIFT PLAN DATA (Updated with Effects) ---
-                const shiftPlanHome = [
-                    { 
-                        hour: 1, 
-                        title: "Hour 1 — Night Owl Launch", 
-                        theme: "Evening Initiation", 
-                        icon: "🦉", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Set warm lighting (amber/red)", "Brew first coffee/tea", "Review night's objectives", "Say goodnight to the day walkers"] 
-                    },
-                    { 
-                        hour: 2, 
-                        title: "Hour 2 — The Quiet Begins", 
-                        theme: "Distraction Free", 
-                        icon: "🌑", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["World is quieting down", "Deep work session 1", "Phone on DND", "Enjoy the solitude"] 
-                    },
-                    { 
-                        hour: 3, 
-                        title: "Hour 3 — Momentum", 
-                        theme: "Steady Flow", 
-                        icon: "🌊", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Hydrate (Large water)", "Check emails before midnight lull", "Steady pace", "Comfort check (temp/chair)"] 
-                    },
-                    { 
-                        hour: 4, 
-                        title: "Hour 4 — First Refuel", 
-                        theme: "Energy Maintenance", 
-                        icon: "🥪", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1567306301408-9b74779a11af?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Light snack (protein)", "Stretch legs", "Avoid heavy carbs", "Reset eyes (20-20-20 rule)"] 
-                    },
-                    { 
-                        hour: 5, 
-                        title: "Hour 5 — Midnight Oil", 
-                        theme: "Peak Focus", 
-                        icon: "🕯️", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1532983330958-4b32a24a4271?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Zero distractions remain", "Tackle the hardest task", "High-fidelity playlist", "Total immersion"] 
-                    },
-                    { 
-                        hour: 6, 
-                        title: "Hour 6 — The Crossing", 
-                        theme: "Midnight Lunch", 
-                        icon: "🕛", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1495573767597-28020b6af738?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Halfway point!", "Eat 'Lunch'", "Step outside if safe/possible", "Mental reset"] 
-                    },
-                    { 
-                        hour: 7, 
-                        title: "Hour 7 — Ghost Mode", 
-                        theme: "Silent Runner", 
-                        icon: "👻", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1515266591878-5a14080e615e?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["World is asleep", "Cyberpunk vibes", "Creative work / Coding", "Stay warm"] 
-                    },
-                    { 
-                        hour: 8, 
-                        title: "Hour 8 — The Dip Defense", 
-                        theme: "Alertness Check", 
-                        icon: "🛡️", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Splash face with cold water", "Stand up / Pacing", "Upbeat music switch", "Fight the drowsiness"] 
-                    },
-                    { 
-                        hour: 9, 
-                        title: "Hour 9 — Second Wind", 
-                        theme: "Power Through", 
-                        icon: "💨", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1500491460312-c32fc2dbc751?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Caffeine cutoff check", "Finish major deliverables", "Keep lights bright", "You're over the hump"] 
-                    },
-                    { 
-                        hour: 10, 
-                        title: "Hour 10 — Pre-Dawn", 
-                        theme: "Admin & Prep", 
-                        icon: "☕", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Clear inbox", "Organize files", "Low energy tasks", "Listen to a podcast"] 
-                    },
-                    { 
-                        hour: 11, 
-                        title: "Hour 11 — Blue Hour", 
-                        theme: "Sunrise Approach", 
-                        icon: "🌅", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Birds start chirping", "Finalize reports", "Plan tomorrow's sleep", "Prepare handover notes"] 
-                    },
-                    { 
-                        hour: 12, 
-                        title: "Hour 12 — Landing Gear", 
-                        theme: "Deceleration", 
-                        icon: "🛬", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Sunglasses ready", "Blue light blockers on", "Pack up", "Commute home & Sleep"] 
-                    }
-                ];
 
+                const shiftPlanHome = [
+                    { hour: 1, title: "Hour 1 — Night Owl Launch", theme: "Evening Initiation", icon: "🦉", effect: "constellation", visual: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=1200&auto=format&fit=crop", tasks: ["Set warm lighting (amber/red)", "Brew first coffee/tea", "Review night's objectives", "Say goodnight to the day walkers"] },
+                    { hour: 2, title: "Hour 2 — The Quiet Begins", theme: "Distraction Free", icon: "🌑", effect: "rain", visual: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1200&auto=format&fit=crop", tasks: ["World is quieting down", "Deep work session 1", "Phone on DND", "Enjoy the solitude"] },
+                    { hour: 3, title: "Hour 3 — Momentum", theme: "Steady Flow", icon: "🌊", effect: "bubbles", visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop", tasks: ["Hydrate (Large water)", "Check emails before midnight lull", "Steady pace", "Comfort check (temp/chair)"] },
+                    { hour: 4, title: "Hour 4 — First Refuel", theme: "Energy Maintenance", icon: "🥪", effect: "embers", visual: "https://images.unsplash.com/photo-1567306301408-9b74779a11af?q=80&w=1200&auto=format&fit=crop", tasks: ["Light snack (protein)", "Stretch legs", "Avoid heavy carbs", "Reset eyes (20-20-20 rule)"] },
+                    { hour: 5, title: "Hour 5 — Midnight Oil", theme: "Peak Focus", icon: "🕯️", effect: "constellation", visual: "https://images.unsplash.com/photo-1532983330958-4b32a24a4271?q=80&w=1200&auto=format&fit=crop", tasks: ["Zero distractions remain", "Tackle the hardest task", "High-fidelity playlist", "Total immersion"] },
+                    { hour: 6, title: "Hour 6 — The Crossing", theme: "Midnight Lunch", icon: "🕛", effect: "snow", visual: "https://images.unsplash.com/photo-1495573767597-28020b6af738?q=80&w=1200&auto=format&fit=crop", tasks: ["Halfway point!", "Eat 'Lunch'", "Step outside if safe/possible", "Mental reset"] },
+                    { hour: 7, title: "Hour 7 — Ghost Mode", theme: "Silent Runner", icon: "👻", effect: "rain", visual: "https://images.unsplash.com/photo-1515266591878-5a14080e615e?q=80&w=1200&auto=format&fit=crop", tasks: ["World is asleep", "Cyberpunk vibes", "Creative work / Coding", "Stay warm"] },
+                    { hour: 8, title: "Hour 8 — The Dip Defense", theme: "Alertness Check", icon: "🛡️", effect: "embers", visual: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=1200&auto=format&fit=crop", tasks: ["Splash face with cold water", "Stand up / Pacing", "Upbeat music switch", "Fight the drowsiness"] },
+                    { hour: 9, title: "Hour 9 — Second Wind", theme: "Power Through", icon: "💨", effect: "constellation", visual: "https://images.unsplash.com/photo-1500491460312-c32fc2dbc751?q=80&w=1200&auto=format&fit=crop", tasks: ["Caffeine cutoff check", "Finish major deliverables", "Keep lights bright", "You're over the hump"] },
+                    { hour: 10, title: "Hour 10 — Pre-Dawn", theme: "Admin & Prep", icon: "☕", effect: "rain", visual: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop", tasks: ["Clear inbox", "Organize files", "Low energy tasks", "Listen to a podcast"] },
+                    { hour: 11, title: "Hour 11 — Blue Hour", theme: "Sunrise Approach", icon: "🌅", effect: "bubbles", visual: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1200&auto=format&fit=crop", tasks: ["Birds start chirping", "Finalize reports", "Plan tomorrow's sleep", "Prepare handover notes"] },
+                    { hour: 12, title: "Hour 12 — Landing Gear", theme: "Deceleration", icon: "🛬", effect: "snow", visual: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=1200&auto=format&fit=crop", tasks: ["Sunglasses ready", "Blue light blockers on", "Pack up", "Commute home & Sleep"] }
+                ];
                 const shiftPlanOffice = [
-                    { 
-                        hour: 1, 
-                        title: "Hour 1 — The Handover", 
-                        theme: "Shift Change", 
-                        icon: "🤝", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Get updates from day crew", "Set up desk ergonomics", "Fill water bottle", "Log in to all systems"] 
-                    },
-                    { 
-                        hour: 2, 
-                        title: "Hour 2 — Silence Falls", 
-                        theme: "Empty Building", 
-                        icon: "🔇", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Day staff gone", "Claim the best chair?", "Enjoy the quiet", "Start core tasks"] 
-                    },
-                    { 
-                        hour: 3, 
-                        title: "Hour 3 — Ops Mode", 
-                        theme: "Tactical Focus", 
-                        icon: "💻", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Headphones on", "Monitor dashboards", "Clear backlog", "Efficient processing"] 
-                    },
-                    { 
-                        hour: 4, 
-                        title: "Hour 4 — Perimeter Check", 
-                        theme: "Movement", 
-                        icon: "🚶", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Walk the floor", "Stretch in the hallway", "Vending machine run", "Check in with night team"] 
-                    },
-                    { 
-                        hour: 5, 
-                        title: "Hour 5 — Cruising Speed", 
-                        theme: "Steady State", 
-                        icon: "🚄", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Workflow optimized", "Batch processing", "Update logs", "Stay hydrated"] 
-                    },
-                    { 
-                        hour: 6, 
-                        title: "Hour 6 — Midnight Lunch", 
-                        theme: "The Break", 
-                        icon: "🍱", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Eat away from desk", "Socialize with night crew", "Read a book", "Do not talk about work"] 
-                    },
-                    { 
-                        hour: 7, 
-                        title: "Hour 7 — Graveyard Grit", 
-                        theme: "Deep Night", 
-                        icon: "🪦", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Last coffee opportunity", "Upbeat playlist", "Keep lights bright", "Focus on detail work"] 
-                    },
-                    { 
-                        hour: 8, 
-                        title: "Hour 8 — Zombie Defense", 
-                        theme: "Stay Alert", 
-                        icon: "🧟", 
-                        effect: "embers",
-                        visual: "https://images.unsplash.com/photo-1563911302283-d2bc129e7c1f?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Walk around the building", "Splash cold water on face", "Talk to a colleague", "Shake off the fatigue"] 
-                    },
-                    { 
-                        hour: 9, 
-                        title: "Hour 9 — The 3AM Wall", 
-                        theme: "Resistance", 
-                        icon: "🧱", 
-                        effect: "snow",
-                        visual: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Hydrate aggressively", "Stand while working", "Switch task types", "Don't stare at the clock"] 
-                    },
-                    { 
-                        hour: 10, 
-                        title: "Hour 10 — Solo Pilot", 
-                        theme: "Quiet Focus", 
-                        icon: "✈️", 
-                        effect: "constellation",
-                        visual: "https://images.unsplash.com/photo-1520034475321-cbe63696469a?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Report writing", "Documentation", "Maintenance tasks", "Prepare for day shift arrival"] 
-                    },
-                    { 
-                        hour: 11, 
-                        title: "Hour 11 — Early Birds", 
-                        theme: "World Waking Up", 
-                        icon: "🐦", 
-                        effect: "rain",
-                        visual: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Cleaners arriving", "Tidy desk area", "Final emails", "Watch the sunrise"] 
-                    },
-                    { 
-                        hour: 12, 
-                        title: "Hour 12 — Extraction Prep", 
-                        theme: "Go Home", 
-                        icon: "🕶️", 
-                        effect: "bubbles",
-                        visual: "https://images.unsplash.com/photo-1533561797500-4fad4750814e?q=80&w=1200&auto=format&fit=crop",
-                        tasks: ["Sunglasses ON", "Handover to day team", "Log off", "Survive the commute & Sleep"] 
-                    }
+                    { hour: 1, title: "Hour 1 — The Handover", theme: "Shift Change", icon: "🤝", effect: "bubbles", visual: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop", tasks: ["Get updates from day crew", "Set up desk ergonomics", "Fill water bottle", "Log in to all systems"] },
+                    { hour: 2, title: "Hour 2 — Silence Falls", theme: "Empty Building", icon: "🔇", effect: "rain", visual: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=1200&auto=format&fit=crop", tasks: ["Day staff gone", "Claim the best chair?", "Enjoy the quiet", "Start core tasks"] },
+                    { hour: 3, title: "Hour 3 — Ops Mode", theme: "Tactical Focus", icon: "💻", effect: "constellation", visual: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop", tasks: ["Headphones on", "Monitor dashboards", "Clear backlog", "Efficient processing"] },
+                    { hour: 4, title: "Hour 4 — Perimeter Check", theme: "Movement", icon: "🚶", effect: "snow", visual: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop", tasks: ["Walk the floor", "Stretch in the hallway", "Vending machine run", "Check in with night team"] },
+                    { hour: 5, title: "Hour 5 — Cruising Speed", theme: "Steady State", icon: "🚄", effect: "embers", visual: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop", tasks: ["Workflow optimized", "Batch processing", "Update logs", "Stay hydrated"] },
+                    { hour: 6, title: "Hour 6 — Midnight Lunch", theme: "The Break", icon: "🍱", effect: "bubbles", visual: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1200&auto=format&fit=crop", tasks: ["Eat away from desk", "Socialize with night crew", "Read a book", "Do not talk about work"] },
+                    { hour: 7, title: "Hour 7 — Graveyard Grit", theme: "Deep Night", icon: "🪦", effect: "rain", visual: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop", tasks: ["Last coffee opportunity", "Upbeat playlist", "Keep lights bright", "Focus on detail work"] },
+                    { hour: 8, title: "Hour 8 — Zombie Defense", theme: "Stay Alert", icon: "🧟", effect: "embers", visual: "https://images.unsplash.com/photo-1563911302283-d2bc129e7c1f?q=80&w=1200&auto=format&fit=crop", tasks: ["Walk around the building", "Splash cold water on face", "Talk to a colleague", "Shake off the fatigue"] },
+                    { hour: 9, title: "Hour 9 — The 3AM Wall", theme: "Resistance", icon: "🧱", effect: "snow", visual: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop", tasks: ["Hydrate aggressively", "Stand while working", "Switch task types", "Don't stare at the clock"] },
+                    { hour: 10, title: "Hour 10 — Solo Pilot", theme: "Quiet Focus", icon: "✈️", effect: "constellation", visual: "https://images.unsplash.com/photo-1520034475321-cbe63696469a?q=80&w=1200&auto=format&fit=crop", tasks: ["Report writing", "Documentation", "Maintenance tasks", "Prepare for day shift arrival"] },
+                    { hour: 11, title: "Hour 11 — Early Birds", theme: "World Waking Up", icon: "🐦", effect: "rain", visual: "https://images.unsplash.com/photo-1465447142348-e9952c393450?q=80&w=1200&auto=format&fit=crop", tasks: ["Cleaners arriving", "Tidy desk area", "Final emails", "Watch the sunrise"] },
+                    { hour: 12, title: "Hour 12 — Extraction Prep", theme: "Go Home", icon: "🕶️", effect: "bubbles", visual: "https://images.unsplash.com/photo-1533561797500-4fad4750814e?q=80&w=1200&auto=format&fit=crop", tasks: ["Sunglasses ON", "Handover to day team", "Log off", "Survive the commute & Sleep"] }
                 ];
 
                 let shiftTimer;
@@ -2379,28 +2423,21 @@
                 let animationFrameId; 
                 let currentEffect = 'constellation';
                 let particles = [];
-                
                 let userBreakConfigs = JSON.parse(localStorage.getItem('shiftUserBreakConfigs')) || [];
                 let activeBreakObjects = []; 
                 let autoScheduleHealthBreaks = localStorage.getItem('shiftAutoHealthBreaks') === 'true';
-                
-                // Track break state for notifications
                 let wasOnBreak = false;
 
                 const canvas = document.getElementById('shift-timer-canvas');
                 const ctx = canvas.getContext('2d');
-                const mouse = { x: null, y: null, radius: 150 };
 
-                // Initialize Toggle State (Existing)
                 healthBreaksToggle.checked = autoScheduleHealthBreaks;
                 healthBreaksToggle.addEventListener('change', (e) => {
                     autoScheduleHealthBreaks = e.target.checked;
                     localStorage.setItem('shiftAutoHealthBreaks', autoScheduleHealthBreaks);
                 });
                 
-                // Initialize Location State (Existing)
                 updateLocButtons();
-                
                 function updateLocButtons() {
                     if (shiftLocation === 'home') {
                         locHomeBtn.className = "px-8 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]";
@@ -2411,23 +2448,10 @@
                     }
                 }
 
-                locHomeBtn.addEventListener('click', () => {
-                    shiftLocation = 'home';
-                    localStorage.setItem('shiftLocation', 'home');
-                    updateLocButtons();
-                });
+                locHomeBtn.addEventListener('click', () => { shiftLocation = 'home'; localStorage.setItem('shiftLocation', 'home'); updateLocButtons(); });
+                locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
 
-                locOfficeBtn.addEventListener('click', () => {
-                    shiftLocation = 'office';
-                    localStorage.setItem('shiftLocation', 'office');
-                    updateLocButtons();
-                });
-
-                function resizeCanvas() {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                }
-                
+                function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
                 window.addEventListener('resize', resizeCanvas);
                 resizeCanvas(); 
 
@@ -2436,50 +2460,28 @@
                     currentEffect = type;
                     const w = canvas.width;
                     const h = canvas.height;
-                    
-                    let count = 100;
-                    if (window.innerWidth < 768) count = 50;
-
+                    let count = window.innerWidth < 768 ? 50 : 100;
                     for (let i = 0; i < count; i++) {
                         particles.push(createParticle(type, w, h));
                     }
                 }
 
                 function createParticle(type, w, h) {
-                    const p = {
-                        x: Math.random() * w,
-                        y: Math.random() * h,
-                        type: type
-                    };
-
+                    const p = { x: Math.random() * w, y: Math.random() * h, type: type };
                     if (type === 'rain') {
-                        p.vy = Math.random() * 15 + 10; // Fast falling
-                        p.vx = 0;
-                        p.len = Math.random() * 20 + 10;
-                        p.color = `rgba(174, 194, 224, ${Math.random() * 0.4 + 0.1})`;
-                        p.y = Math.random() * -h; // Start above
+                        p.vy = Math.random() * 15 + 10; p.vx = 0; p.len = Math.random() * 20 + 10;
+                        p.color = `rgba(174, 194, 224, ${Math.random() * 0.4 + 0.1})`; p.y = Math.random() * -h;
                     } else if (type === 'snow') {
-                        p.vy = Math.random() * 2 + 0.5; // Slow falling
-                        p.vx = Math.random() * 1 - 0.5;
-                        p.radius = Math.random() * 2 + 1;
+                        p.vy = Math.random() * 2 + 0.5; p.vx = Math.random() * 1 - 0.5; p.radius = Math.random() * 2 + 1;
                         p.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
                     } else if (type === 'embers') {
-                        p.vy = (Math.random() * 2 + 0.5) * -1; // Rising
-                        p.vx = Math.random() * 1 - 0.5;
-                        p.radius = Math.random() * 3 + 1;
-                        p.color = `rgba(255, ${Math.floor(Math.random() * 100 + 50)}, 0, ${Math.random() * 0.6 + 0.1})`;
-                        p.y = h + Math.random() * 100; // Start below
+                        p.vy = (Math.random() * 2 + 0.5) * -1; p.vx = Math.random() * 1 - 0.5; p.radius = Math.random() * 3 + 1;
+                        p.color = `rgba(255, ${Math.floor(Math.random() * 100 + 50)}, 0, ${Math.random() * 0.6 + 0.1})`; p.y = h + Math.random() * 100;
                     } else if (type === 'bubbles') {
-                        p.vy = (Math.random() * 1 + 0.2) * -1; // Slow Rising
-                        p.vx = Math.random() * 0.5 - 0.25;
-                        p.radius = Math.random() * 10 + 2;
-                        p.color = `rgba(100, 200, 255, ${Math.random() * 0.2 + 0.05})`;
-                        p.y = h + Math.random() * 100;
+                        p.vy = (Math.random() * 1 + 0.2) * -1; p.vx = Math.random() * 0.5 - 0.25; p.radius = Math.random() * 10 + 2;
+                        p.color = `rgba(100, 200, 255, ${Math.random() * 0.2 + 0.05})`; p.y = h + Math.random() * 100;
                     } else {
-                        // Constellation / Default
-                        p.vx = Math.random() * 0.5 - 0.25;
-                        p.vy = Math.random() * 0.5 - 0.25;
-                        p.radius = Math.random() * 2;
+                        p.vx = Math.random() * 0.5 - 0.25; p.vy = Math.random() * 0.5 - 0.25; p.radius = Math.random() * 2;
                         p.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
                     }
                     return p;
@@ -2487,135 +2489,62 @@
 
                 function drawParticles() {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    const w = canvas.width;
-                    const h = canvas.height;
-
+                    const w = canvas.width; const h = canvas.height;
                     for (let i = 0; i < particles.length; i++) {
                         const p = particles[i];
-                        
-                        p.x += p.vx;
-                        p.y += p.vy;
-
-                        ctx.fillStyle = p.color;
-                        ctx.strokeStyle = p.color;
+                        p.x += p.vx; p.y += p.vy;
+                        ctx.fillStyle = p.color; ctx.strokeStyle = p.color;
 
                         if (currentEffect === 'rain') {
-                            ctx.beginPath();
-                            ctx.moveTo(p.x, p.y);
-                            ctx.lineTo(p.x, p.y + p.len);
-                            ctx.lineWidth = 1;
-                            ctx.stroke();
-                            
-                            if (p.y > h) {
-                                p.y = -p.len;
-                                p.x = Math.random() * w;
-                            }
+                            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.len); ctx.lineWidth = 1; ctx.stroke();
+                            if (p.y > h) { p.y = -p.len; p.x = Math.random() * w; }
                         } else if (currentEffect === 'snow') {
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                            ctx.fill();
-                            
+                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
                             p.x += Math.sin(p.y * 0.01) * 0.5;
-
-                            if (p.y > h) {
-                                p.y = -10;
-                                p.x = Math.random() * w;
-                            }
+                            if (p.y > h) { p.y = -10; p.x = Math.random() * w; }
                         } else if (currentEffect === 'embers' || currentEffect === 'bubbles') {
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                            ctx.fill();
-                            
-                            if (p.y < -20) {
-                                p.y = h + 20;
-                                p.x = Math.random() * w;
-                            }
+                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+                            if (p.y < -20) { p.y = h + 20; p.x = Math.random() * w; }
                         } else {
-                            // Constellation
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                            ctx.fill();
-                            
+                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
                             if (p.x < 0 || p.x > w) p.vx *= -1;
                             if (p.y < 0 || p.y > h) p.vy *= -1;
-                            
                             for (let j = i + 1; j < particles.length; j++) {
                                 const p2 = particles[j];
-                                const dx = p.x - p2.x;
-                                const dy = p.y - p2.y;
+                                const dx = p.x - p2.x; const dy = p.y - p2.y;
                                 const dist = Math.sqrt(dx*dx + dy*dy);
                                 if (dist < 100) {
-                                    ctx.beginPath();
-                                    ctx.moveTo(p.x, p.y);
-                                    ctx.lineTo(p2.x, p2.y);
-                                    ctx.lineWidth = 0.5;
-                                    ctx.strokeStyle = `rgba(255,255,255, ${0.1 - dist/1000})`;
-                                    ctx.stroke();
+                                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.lineWidth = 0.5;
+                                    ctx.strokeStyle = `rgba(255,255,255, ${0.1 - dist/1000})`; ctx.stroke();
                                 }
                             }
                         }
                     }
-                    
                     animationFrameId = requestAnimationFrame(drawParticles);
                 }
 
-                function startEffect(type) {
-                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                    initEffect(type);
-                    drawParticles();
-                }
+                function startEffect(type) { if (animationFrameId) cancelAnimationFrame(animationFrameId); initEffect(type); drawParticles(); }
+                function stopEffect() { if (animationFrameId) cancelAnimationFrame(animationFrameId); ctx.clearRect(0, 0, canvas.width, canvas.height); }
                 
-                function stopEffect() {
-                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-
-                // --- Audio Notification ---
                 function playBreakSound() {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     if (!AudioContext) return;
-
-                    const ctx = new AudioContext();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-
+                    const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
                     const now = ctx.currentTime;
-                    
-                    // Gentle Chime (E5 -> G#5)
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(659.25, now); 
-                    osc.frequency.exponentialRampToValueAtTime(830.61, now + 0.1);
-                    
-                    // Envelope
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.15, now + 0.05); // Fade in
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5); // Fade out
-
-                    osc.start(now);
-                    osc.stop(now + 1.5);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(659.25, now); osc.frequency.exponentialRampToValueAtTime(830.61, now + 0.1);
+                    gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.15, now + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                    osc.start(now); osc.stop(now + 1.5);
                 }
 
                 function formatTime(ms) {
-                    const totalSeconds = Math.floor(ms / 1000);
-                    const h = Math.floor(totalSeconds / 3600);
-                    const m = Math.floor((totalSeconds % 3600) / 60);
-                    const s = totalSeconds % 60;
+                    const totalSeconds = Math.floor(ms / 1000); const h = Math.floor(totalSeconds / 3600); const m = Math.floor((totalSeconds % 3600) / 60); const s = totalSeconds % 60;
                     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 }
-                
                 function formatTimeShort(ms) {
-                     const totalSeconds = Math.floor(ms / 1000);
-                    const h = Math.floor(totalSeconds / 3600);
-                    const m = Math.floor((totalSeconds % 3600) / 60);
-                    const s = totalSeconds % 60;
-                    if (h > 0) return `${h}h ${m}m ${s}s`;
-                    return `${m}m ${s}s`;
+                     const totalSeconds = Math.floor(ms / 1000); const h = Math.floor(totalSeconds / 3600); const m = Math.floor((totalSeconds % 3600) / 60); const s = totalSeconds % 60;
+                    if (h > 0) return `${h}h ${m}m ${s}s`; return `${m}m ${s}s`;
                 }
-
                 function formatDateTimeForInput(date) {
                     const pad = (num) => num.toString().padStart(2, '0');
                     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -2624,11 +2553,7 @@
                 function renderSetupBreaks() {
                     breakTimesContainer.innerHTML = '';
                     userBreakConfigs.sort((a, b) => a.startTime.localeCompare(b.startTime));
-                    
-                    if (userBreakConfigs.length === 0) {
-                        breakTimesContainer.innerHTML = '<p class="text-gray-500 text-xs italic text-center py-2">No specific breaks set.</p>';
-                    }
-
+                    if (userBreakConfigs.length === 0) breakTimesContainer.innerHTML = '<p class="text-gray-500 text-xs italic text-center py-2">No specific breaks set.</p>';
                     userBreakConfigs.forEach((breakItem, index) => {
                         const breakEl = document.createElement('div');
                         breakEl.className = 'flex items-center space-x-2 text-sm text-gray-300 bg-gray-800/50 p-2 rounded-lg';
@@ -2638,70 +2563,42 @@
                                 <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-full p-1 rounded-l bg-gray-700 text-white border-transparent focus:border-indigo-500 text-xs text-center">
                                 <span class="bg-gray-600 px-2 py-1 rounded-r text-xs">m</span>
                             </div>
-                            <button class="remove-break-btn ml-auto text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1 rounded transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
+                            <button class="remove-break-btn ml-auto text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1 rounded transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                         `;
                         breakTimesContainer.appendChild(breakEl);
-
-                        breakEl.querySelector('.remove-break-btn').addEventListener('click', () => {
-                            userBreakConfigs.splice(index, 1);
-                            saveUserBreaks();
-                            renderSetupBreaks();
-                        });
-                        breakEl.querySelector('.break-start-time').addEventListener('change', (e) => {
-                            userBreakConfigs[index].startTime = e.target.value;
-                            saveUserBreaks();
-                        });
-                        breakEl.querySelector('.break-duration').addEventListener('change', (e) => {
-                            userBreakConfigs[index].duration = parseInt(e.target.value);
-                            saveUserBreaks();
-                        });
+                        breakEl.querySelector('.remove-break-btn').addEventListener('click', () => { userBreakConfigs.splice(index, 1); saveUserBreaks(); renderSetupBreaks(); });
+                        breakEl.querySelector('.break-start-time').addEventListener('change', (e) => { userBreakConfigs[index].startTime = e.target.value; saveUserBreaks(); });
+                        breakEl.querySelector('.break-duration').addEventListener('change', (e) => { userBreakConfigs[index].duration = parseInt(e.target.value); saveUserBreaks(); });
                     });
                 }
-
-                function saveUserBreaks() {
-                    localStorage.setItem('shiftUserBreakConfigs', JSON.stringify(userBreakConfigs));
-                }
+                function saveUserBreaks() { localStorage.setItem('shiftUserBreakConfigs', JSON.stringify(userBreakConfigs)); }
                 
-                addBreakBtn.addEventListener('click', () => {
-                    userBreakConfigs.push({ startTime: '00:00', duration: 15, type: 'manual' });
-                    saveUserBreaks();
-                    renderSetupBreaks();
-                });
-
+                addBreakBtn.addEventListener('click', () => { userBreakConfigs.push({ startTime: '00:00', duration: 15, type: 'manual' }); saveUserBreaks(); renderSetupBreaks(); });
                 loadMyBreaksBtn.addEventListener('click', () => {
-                    userBreakConfigs = [
-                        { startTime: '22:00', duration: 10, type: 'manual' },
-                        { startTime: '00:00', duration: 10, type: 'manual' },
-                        { startTime: '03:15', duration: 30, type: 'manual' },
-                        { startTime: '05:00', duration: 10, type: 'manual' }
-                    ];
-                    saveUserBreaks();
-                    renderSetupBreaks();
+                    userBreakConfigs = [{ startTime: '22:00', duration: 10, type: 'manual' }, { startTime: '00:00', duration: 10, type: 'manual' }, { startTime: '03:15', duration: 30, type: 'manual' }, { startTime: '05:00', duration: 10, type: 'manual' }];
+                    saveUserBreaks(); renderSetupBreaks();
                 });
 
                 presetNormalBtn.addEventListener('click', () => {
                     const now = new Date();
-                    const nextDay = new Date(now);
-                    nextDay.setDate(now.getHours() >= 7 ? now.getDate() + 1 : now.getDate());
-                    nextDay.setHours(7, 0, 0, 0);
-                    endTimeInput.value = formatDateTimeForInput(nextDay);
+                    const nextEnd = new Date(now);
+                    if (now.getHours() >= 7) nextEnd.setDate(now.getDate() + 1);
+                    nextEnd.setHours(7, 0, 0, 0);
+                    const nextStart = new Date(nextEnd); nextStart.setHours(nextStart.getHours() - 12);
+                    endTimeInput.value = formatDateTimeForInput(nextEnd); startTimeInput.value = formatDateTimeForInput(nextStart);
                 });
 
                 presetOvertimeBtn.addEventListener('click', () => {
                     const now = new Date();
-                    const nextDay = new Date(now);
-                    nextDay.setDate(now.getHours() >= 5 ? now.getDate() + 1 : now.getDate());
-                    nextDay.setHours(5, 0, 0, 0);
-                    endTimeInput.value = formatDateTimeForInput(nextDay);
+                    const nextEnd = new Date(now);
+                    if (now.getHours() >= 5) nextEnd.setDate(now.getDate() + 1);
+                    nextEnd.setHours(5, 0, 0, 0);
+                    const nextStart = new Date(nextEnd); nextStart.setHours(nextStart.getHours() - 12);
+                    endTimeInput.value = formatDateTimeForInput(nextEnd); startTimeInput.value = formatDateTimeForInput(nextStart);
                 });
 
                 function updateShiftDisplay(remainingMs) {
-                    const h = Math.floor(remainingMs / (1000 * 60 * 60));
-                    const m = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((remainingMs % (1000 * 60)) / 1000);
-
+                    const h = Math.floor(remainingMs / (1000 * 60 * 60)); const m = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60)); const s = Math.floor((remainingMs % (1000 * 60)) / 1000);
                     document.getElementById('shift-hours-display').textContent = h.toString().padStart(2, '0');
                     document.getElementById('shift-minutes-display').textContent = m.toString().padStart(2, '0');
                     document.getElementById('shift-seconds-display').textContent = s.toString().padStart(2, '0');
@@ -2709,108 +2606,42 @@
 
                 function generateShiftBlocks() {
                     shiftBlocksContainer.innerHTML = '';
-                    
-                    const indicator = document.createElement('div');
-                    indicator.id = 'shift-global-indicator';
-                    indicator.className = "absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_15px_white] z-20 transition-all duration-1000 ease-linear pointer-events-none";
-                    indicator.style.left = '0%';
-                    
-                    const indicatorTag = document.createElement('div');
-                    indicatorTag.className = "absolute -top-2 left-1/2 -translate-x-1/2 bg-white text-indigo-900 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-tighter transform -translate-y-full";
-                    indicatorTag.textContent = "You Are Here";
-                    
-                    const arrow = document.createElement('div');
-                    arrow.className = "absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-white";
-                    indicatorTag.appendChild(arrow);
-                    
-                    indicator.appendChild(indicatorTag);
-                    shiftBlocksContainer.appendChild(indicator);
-
+                    const indicator = document.createElement('div'); indicator.id = 'shift-global-indicator'; indicator.className = "absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_15px_white] z-20 transition-all duration-1000 ease-linear pointer-events-none"; indicator.style.left = '0%';
+                    const indicatorTag = document.createElement('div'); indicatorTag.className = "absolute -top-2 left-1/2 -translate-x-1/2 bg-white text-indigo-900 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-tighter transform -translate-y-full"; indicatorTag.textContent = "You Are Here";
+                    const arrow = document.createElement('div'); arrow.className = "absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-white";
+                    indicatorTag.appendChild(arrow); indicator.appendChild(indicatorTag); shiftBlocksContainer.appendChild(indicator);
                     const totalHours = Math.ceil(totalShiftDuration / (1000 * 60 * 60));
-                    
                     for (let i = 0; i < totalHours; i++) {
-                        const block = document.createElement('div');
-                        block.className = "flex-1 border-r border-gray-800 last:border-r-0 relative group bg-gray-900/50";
-                        
-                        const fill = document.createElement('div');
-                        fill.id = `shift-block-fill-${i}`;
-                        fill.className = "absolute top-0 left-0 h-full w-0 bg-gradient-to-r from-red-700 to-red-600 transition-all duration-300";
-                        
-                        const label = document.createElement('div');
-                        label.className = "absolute bottom-1 right-1.5 text-[10px] text-gray-600 font-mono font-bold z-10 select-none";
-                        label.textContent = `${i + 1}h`;
-
-                        block.appendChild(fill);
-                        block.appendChild(label);
-                        shiftBlocksContainer.appendChild(block);
+                        const block = document.createElement('div'); block.className = "flex-1 border-r border-gray-800 last:border-r-0 relative group bg-gray-900/50";
+                        const fill = document.createElement('div'); fill.id = `shift-block-fill-${i}`; fill.className = "absolute top-0 left-0 h-full w-0 bg-gradient-to-r from-red-700 to-red-600 transition-all duration-300";
+                        const label = document.createElement('div'); label.className = "absolute bottom-1 right-1.5 text-[10px] text-gray-600 font-mono font-bold z-10 select-none"; label.textContent = `${i + 1}h`;
+                        block.appendChild(fill); block.appendChild(label); shiftBlocksContainer.appendChild(block);
                     }
                 }
 
                 function updateShiftVisuals() {
-                    const now = new Date();
-                    const elapsedMs = now - shiftStartTime;
-                    const totalMs = totalShiftDuration;
-                    const hourMs = 1000 * 60 * 60;
-                    const totalHours = Math.ceil(totalMs / hourMs);
-
+                    const now = new Date(); const elapsedMs = now - shiftStartTime; const totalMs = totalShiftDuration; const hourMs = 1000 * 60 * 60; const totalHours = Math.ceil(totalMs / hourMs);
                     const percentage = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
-                    const indicator = document.getElementById('shift-global-indicator');
-                    if (indicator) {
-                        indicator.style.left = `${percentage}%`;
-                    }
-
+                    const indicator = document.getElementById('shift-global-indicator'); if (indicator) indicator.style.left = `${percentage}%`;
                     for (let i = 0; i < totalHours; i++) {
-                        const fill = document.getElementById(`shift-block-fill-${i}`);
-                        if (!fill) continue;
-                        
-                        const blockStartMs = i * hourMs;
-                        const blockEndMs = (i + 1) * hourMs;
-
-                        if (elapsedMs >= blockEndMs) {
-                            fill.style.width = '100%';
-                        } else if (elapsedMs > blockStartMs) {
-                            const progress = (elapsedMs - blockStartMs) / hourMs;
-                            fill.style.width = `${progress * 100}%`;
-                        } else {
-                            fill.style.width = '0%';
-                        }
+                        const fill = document.getElementById(`shift-block-fill-${i}`); if (!fill) continue;
+                        const blockStartMs = i * hourMs; const blockEndMs = (i + 1) * hourMs;
+                        if (elapsedMs >= blockEndMs) fill.style.width = '100%'; else if (elapsedMs > blockStartMs) { const progress = (elapsedMs - blockStartMs) / hourMs; fill.style.width = `${progress * 100}%`; } else fill.style.width = '0%';
                     }
-
                     const currentHourIndex = Math.floor(elapsedMs / hourMs); 
-                    
                     const activePlan = shiftLocation === 'office' ? shiftPlanOffice : shiftPlanHome;
-                    
                     if (currentHourIndex >= 0 && currentHourIndex < activePlan.length) {
                         const plan = activePlan[currentHourIndex];
-                        guideTitle.textContent = plan.title;
-                        guideTheme.textContent = `// ${plan.theme}`;
-                        guideIcon.textContent = plan.icon;
-                        
+                        guideTitle.textContent = plan.title; guideTheme.textContent = `// ${plan.theme}`; guideIcon.textContent = plan.icon;
                         guideContainer.style.backgroundImage = `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.6)), url('${plan.visual}')`;
-                        
-                        guideContainer.classList.add('vibe-animated');
-                        guideIcon.classList.add('icon-float');
-                        
-                        if (currentEffect !== plan.effect) {
-                            startEffect(plan.effect);
-                        }
-                        
-                        let html = '';
-                        plan.tasks.forEach(task => {
-                            html += `<div class="flex items-start gap-2"><span class="text-teal-400 mt-1">›</span><span>${task}</span></div>`;
-                        });
-                        guideContent.innerHTML = html;
+                        guideContainer.classList.add('vibe-animated'); guideIcon.classList.add('icon-float');
+                        if (currentEffect !== plan.effect) startEffect(plan.effect);
+                        let html = ''; plan.tasks.forEach(task => { html += `<div class="flex items-start gap-2"><span class="text-teal-400 mt-1">›</span><span>${task}</span></div>`; }); guideContent.innerHTML = html;
                     } else if (currentHourIndex >= activePlan.length) {
-                        guideTitle.textContent = "Shift Complete";
-                        guideTheme.textContent = "// Overtime";
-                        guideIcon.textContent = "🦾";
-                        
+                        guideTitle.textContent = "Shift Complete"; guideTheme.textContent = "// Overtime"; guideIcon.textContent = "🦾";
                         guideContainer.style.backgroundImage = `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8))`; 
-                        guideContainer.classList.remove('vibe-animated');
-                        guideIcon.classList.remove('icon-float');
-                        
-                        startEffect('embers'); 
-                        guideContent.innerHTML = "<div class='text-center italic mt-4'>You've passed the 12-hour mark. Keep grinding or wrap up!</div>";
+                        guideContainer.classList.remove('vibe-animated'); guideIcon.classList.remove('icon-float');
+                        startEffect('embers'); guideContent.innerHTML = "<div class='text-center italic mt-4'>You've passed the 12-hour mark. Keep grinding or wrap up!</div>";
                     }
                 }
 
@@ -2818,294 +2649,97 @@
                     activeBreakObjects = [];
                     userBreakConfigs.forEach(config => {
                         const [hours, minutes] = config.startTime.split(':').map(Number);
-                        
-                        let breakStart = new Date(shiftStartTime);
-                        breakStart.setHours(hours, minutes, 0, 0);
-
-                        if (breakStart < shiftStartTime) {
-                            breakStart.setDate(breakStart.getDate() + 1);
-                        }
-                        
+                        let breakStart = new Date(shiftStartTime); breakStart.setHours(hours, minutes, 0, 0);
+                        if (breakStart < shiftStartTime) breakStart.setDate(breakStart.getDate() + 1);
                         const breakEnd = new Date(breakStart.getTime() + config.duration * 60000);
-                        
-                        if (breakStart >= shiftStartTime && breakStart < shiftEndTime) {
-                            activeBreakObjects.push({
-                                start: breakStart,
-                                end: breakEnd,
-                                type: 'Standard Break',
-                                duration: config.duration
-                            });
-                        }
+                        if (breakStart >= shiftStartTime && breakStart < shiftEndTime) activeBreakObjects.push({ start: breakStart, end: breakEnd, type: 'Standard Break', duration: config.duration });
                     });
-
                     if (autoScheduleHealthBreaks) {
                         activeBreakObjects.sort((a, b) => a.start - b.start);
-                        
-                        let pointer = new Date(shiftStartTime);
-                        const healthIntervalMs = 60 * 60 * 1000; // 1 hour
-                        const healthDurationMs = 5 * 60 * 1000; // 5 mins
-                        
+                        let pointer = new Date(shiftStartTime); const healthIntervalMs = 60 * 60 * 1000; const healthDurationMs = 5 * 60 * 1000;
                         while (pointer.getTime() + healthIntervalMs < shiftEndTime.getTime()) {
-                            const potentialHealthStart = new Date(pointer.getTime() + healthIntervalMs);
-                            const potentialHealthEnd = new Date(potentialHealthStart.getTime() + healthDurationMs);
-                            
-                            let collision = false;
-                            
-                            if (potentialHealthEnd > shiftEndTime) break;
-
+                            const potentialHealthStart = new Date(pointer.getTime() + healthIntervalMs); const potentialHealthEnd = new Date(potentialHealthStart.getTime() + healthDurationMs);
+                            let collision = false; if (potentialHealthEnd > shiftEndTime) break;
                             for (let b of activeBreakObjects) {
                                 const buffer = 15 * 60 * 1000;
-                                if (
-                                    (potentialHealthStart >= new Date(b.start.getTime() - buffer) && potentialHealthStart < new Date(b.end.getTime() + buffer)) ||
-                                    (potentialHealthEnd > new Date(b.start.getTime() - buffer) && potentialHealthEnd <= new Date(b.end.getTime() + buffer))
-                                ) {
-                                    collision = true;
-                                    pointer = new Date(b.end);
-                                    break;
-                                }
+                                if ((potentialHealthStart >= new Date(b.start.getTime() - buffer) && potentialHealthStart < new Date(b.end.getTime() + buffer)) || (potentialHealthEnd > new Date(b.start.getTime() - buffer) && potentialHealthEnd <= new Date(b.end.getTime() + buffer))) { collision = true; pointer = new Date(b.end); break; }
                             }
-
-                            if (!collision) {
-                                activeBreakObjects.push({
-                                    start: potentialHealthStart,
-                                    end: potentialHealthEnd,
-                                    type: 'Health Break',
-                                    duration: 5
-                                });
-                                pointer = potentialHealthEnd;
-                            }
+                            if (!collision) { activeBreakObjects.push({ start: potentialHealthStart, end: potentialHealthEnd, type: 'Health Break', duration: 5 }); pointer = potentialHealthEnd; }
                         }
-                        
                         activeBreakObjects.sort((a, b) => a.start - b.start);
                     }
-                    
                     localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
                 }
 
                 function shiftCountdown() {
                     const now = new Date();
-                    
-                    if (now >= shiftEndTime) {
-                        clearInterval(shiftTimer);
-                        updateShiftDisplay(0);
-                        updateShiftVisuals();
-                        countdownView.classList.add('hidden');
-                        endView.classList.remove('hidden');
-                        stopEffect();
-                        localStorage.removeItem('shiftEndTime');
-                        return;
-                    }
-
-                    const remainingMs = shiftEndTime - now;
-                    updateShiftDisplay(remainingMs);
-                    updateShiftVisuals();
-
-                    let currentBreak = null;
-                    let nextBreak = null;
-
+                    if (now >= shiftEndTime) { clearInterval(shiftTimer); updateShiftDisplay(0); updateShiftVisuals(); countdownView.classList.add('hidden'); endView.classList.remove('hidden'); stopEffect(); localStorage.removeItem('shiftEndTime'); return; }
+                    const remainingMs = shiftEndTime - now; updateShiftDisplay(remainingMs); updateShiftVisuals();
+                    let currentBreak = null; let nextBreak = null;
                     for (const b of activeBreakObjects) {
-                        const start = new Date(b.start);
-                        const end = new Date(b.end);
-                        
-                        if (now >= start && now < end) {
-                            currentBreak = b;
-                            break; 
-                        }
-                        if (now < start && !nextBreak) {
-                            nextBreak = b;
-                        }
+                        const start = new Date(b.start); const end = new Date(b.end);
+                        if (now >= start && now < end) { currentBreak = b; break; }
+                        if (now < start && !nextBreak) { nextBreak = b; }
                     }
-
                     if (currentBreak) {
-                        // ON BREAK
-                        // Check if we just entered the break state
-                        if (!wasOnBreak) {
-                            playBreakSound();
-                            wasOnBreak = true;
-                        }
-
-                        breakActiveDisplay.classList.remove('hidden');
-                        breakAlertBanner.classList.remove('hidden');
-                        nextBreakContainer.classList.add('opacity-0'); 
-                        guideContainer.classList.add('opacity-25', 'pointer-events-none', 'blur-sm');
-
-                        const breakRemaining = new Date(currentBreak.end) - now;
-                        breakTimerLarge.textContent = formatTimeShort(breakRemaining);
-                        motivationQuote.textContent = "Recharge Mode On";
+                        if (!wasOnBreak) { playBreakSound(); wasOnBreak = true; }
+                        breakActiveDisplay.classList.remove('hidden'); breakAlertBanner.classList.remove('hidden'); nextBreakContainer.classList.add('opacity-0'); guideContainer.classList.add('opacity-25', 'pointer-events-none', 'blur-sm');
+                        const breakRemaining = new Date(currentBreak.end) - now; breakTimerLarge.textContent = formatTimeShort(breakRemaining); motivationQuote.textContent = "Recharge Mode On";
                     } else {
-                        // WORKING
-                        // Reset break state if we were on break
-                        if (wasOnBreak) {
-                            wasOnBreak = false;
-                            // Optional: play work sound here if desired
-                        }
-
-                        breakActiveDisplay.classList.add('hidden');
-                        breakAlertBanner.classList.add('hidden');
-                        nextBreakContainer.classList.remove('opacity-0');
-                        guideContainer.classList.remove('opacity-25', 'pointer-events-none', 'blur-sm');
+                        if (wasOnBreak) { wasOnBreak = false; }
+                        breakActiveDisplay.classList.add('hidden'); breakAlertBanner.classList.add('hidden'); nextBreakContainer.classList.remove('opacity-0'); guideContainer.classList.remove('opacity-25', 'pointer-events-none', 'blur-sm');
                         motivationQuote.textContent = shiftTitleInput.value || "Let's get this bread!";
-                        
                         if (nextBreak) {
-                            const timeToNext = new Date(nextBreak.start) - now;
-                            timeToNextBreakEl.textContent = formatTime(timeToNext);
-                            const nextBreakTimeStr = new Date(nextBreak.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            nextBreakTimeLabel.textContent = `at ${nextBreakTimeStr} (${nextBreak.type})`;
-                            
-                            // Alert if break is soon (e.g. < 1 min)
-                            if (timeToNext < 60000 && timeToNext > 59000) {
-                                // optional beep or visual flash could go here
-                            }
-                        } else {
-                            timeToNextBreakEl.textContent = "--:--:--";
-                            nextBreakTimeLabel.textContent = "No more breaks scheduled";
-                        }
+                            const timeToNext = new Date(nextBreak.start) - now; timeToNextBreakEl.textContent = formatTime(timeToNext);
+                            const nextBreakTimeStr = new Date(nextBreak.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); nextBreakTimeLabel.textContent = `at ${nextBreakTimeStr} (${nextBreak.type})`;
+                        } else { timeToNextBreakEl.textContent = "--:--:--"; nextBreakTimeLabel.textContent = "No more breaks scheduled"; }
                     }
                 }
 
                 function resetShiftTimer() {
-                    clearInterval(shiftTimer);
-                    stopEffect();
-                    localStorage.removeItem('shiftEndTime');
-                    localStorage.removeItem('shiftStartTime');
-                    localStorage.removeItem('shiftActiveBreakObjects');
-                    localStorage.removeItem('shiftTitle');
-                    
-                    setupView.classList.remove('hidden');
-                    countdownView.classList.add('hidden');
-                    endView.classList.add('hidden');
-                    breakActiveDisplay.classList.add('hidden');
+                    clearInterval(shiftTimer); stopEffect(); localStorage.removeItem('shiftEndTime'); localStorage.removeItem('shiftStartTime'); localStorage.removeItem('shiftActiveBreakObjects'); localStorage.removeItem('shiftTitle');
+                    setupView.classList.remove('hidden'); countdownView.classList.add('hidden'); endView.classList.add('hidden'); breakActiveDisplay.classList.add('hidden');
                 }
                 
                 shareShiftBtn.addEventListener('click', () => {
-                    if (!shiftStartTime || !shiftEndTime) {
-                        showAlert("Cannot share an inactive shift.");
-                        return;
-                    }
-                    
-                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36);
-                    const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36);
-                    const dataParts = [s, d];
-                    
+                    if (!shiftStartTime || !shiftEndTime) { showAlert("Cannot share an inactive shift."); return; }
+                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36); const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36); const dataParts = [s, d];
                     activeBreakObjects.forEach(brk => {
-                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000);
-                        const offset = offsetVal.toString(36);
-                        const typeBit = brk.type === 'Health Break' ? 1 : 0;
-                        const compoundVal = (parseInt(brk.duration) * 2) + typeBit;
-                        const compound = compoundVal.toString(36);
+                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000); const offset = offsetVal.toString(36); const typeBit = brk.type === 'Health Break' ? 1 : 0; const compoundVal = (parseInt(brk.duration) * 2) + typeBit; const compound = compoundVal.toString(36);
                         dataParts.push(offset, compound);
                     });
-                    
-                    const dataString = dataParts.join('.');
-                    let t = shiftTitleInput.value;
-                    t = encodeURIComponent(t).replace(/%20/g, '+');
-                    const rawString = `${dataString}~${t}`;
-                    
-                    let baseUrl = window.location.href.split('?')[0];
-                    const shareUrl = `${baseUrl}?shared_shift=${rawString}`;
-                    
-                    const textArea = document.createElement("textarea");
-                    textArea.value = shareUrl;
-                    
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-9999px";
-                    textArea.style.top = "0";
-                    document.body.appendChild(textArea);
-                    
-                    textArea.focus();
-                    textArea.select();
-                    
-                    try {
-                        const successful = document.execCommand('copy');
-                        if (successful) {
-                            showAlert("Link minimized to max limit!");
-                        } else {
-                            showAlert("Failed to copy link. Please manually copy the URL.");
-                        }
-                    } catch (err) {
-                        console.error("Failed to copy link: ", err);
-                        showAlert("Failed to copy link. Please check permissions.");
-                    }
-                    
-                    document.body.removeChild(textArea);
+                    const dataString = dataParts.join('.'); let t = shiftTitleInput.value; t = encodeURIComponent(t).replace(/%20/g, '+'); const rawString = `${dataString}~${t}`; let baseUrl = window.location.href.split('?')[0]; const shareUrl = `${baseUrl}?shared_shift=${rawString}`;
+                    const textArea = document.createElement("textarea"); textArea.value = shareUrl; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
+                    try { const successful = document.execCommand('copy'); if (successful) { showAlert("Link minimized to max limit!"); } else { showAlert("Failed to copy link. Please manually copy the URL."); } } catch (err) { console.error("Failed to copy link: ", err); showAlert("Failed to copy link. Please check permissions."); } document.body.removeChild(textArea);
                 });
 
                 function checkStoredShift() {
-                    const storedEndTime = localStorage.getItem('shiftEndTime');
-                    const storedStartTime = localStorage.getItem('shiftStartTime');
-                    const storedBreaks = localStorage.getItem('shiftActiveBreakObjects');
-                    const storedTitle = localStorage.getItem('shiftTitle');
-                    
+                    const storedEndTime = localStorage.getItem('shiftEndTime'); const storedStartTime = localStorage.getItem('shiftStartTime'); const storedBreaks = localStorage.getItem('shiftActiveBreakObjects'); const storedTitle = localStorage.getItem('shiftTitle');
                     renderSetupBreaks();
-
                     if (storedEndTime && storedStartTime) {
-                        shiftEndTime = new Date(storedEndTime);
-                        shiftStartTime = new Date(storedStartTime);
-                        if (storedBreaks) activeBreakObjects = JSON.parse(storedBreaks);
-                        if (storedTitle) shiftTitleInput.value = storedTitle;
-                        
+                        shiftEndTime = new Date(storedEndTime); shiftStartTime = new Date(storedStartTime); if (storedBreaks) activeBreakObjects = JSON.parse(storedBreaks); if (storedTitle) shiftTitleInput.value = storedTitle;
                         if (shiftEndTime > new Date()) {
-                            totalShiftDuration = shiftEndTime - shiftStartTime;
-                            setupView.classList.add('hidden');
-                            countdownView.classList.remove('hidden');
-                            
-                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                            startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                            
-                            generateShiftBlocks();
-                            shiftCountdown();
-                            shiftTimer = setInterval(shiftCountdown, 1000);
-                            startEffect('constellation'); 
-                        } else {
-                            resetShiftTimer();
-                        }
+                            totalShiftDuration = shiftEndTime - shiftStartTime; setupView.classList.add('hidden'); countdownView.classList.remove('hidden');
+                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            generateShiftBlocks(); shiftCountdown(); shiftTimer = setInterval(shiftCountdown, 1000); startEffect('constellation'); 
+                        } else { resetShiftTimer(); }
                     }
                 }
 
                 startBtn.addEventListener('click', () => {
-                    const endTimeValue = endTimeInput.value;
-                    if (!endTimeValue) {
-                        showAlert("Please select an end date and time.");
-                        return;
-                    }
-                    
-                    shiftEndTime = new Date(endTimeValue);
-                    shiftStartTime = new Date(shiftEndTime);
-                    shiftStartTime.setHours(19, 0, 0, 0); 
-                    
-                    if (shiftStartTime >= shiftEndTime) {
-                        shiftStartTime.setDate(shiftStartTime.getDate() - 1);
-                    }
-
-                    if (shiftEndTime <= new Date()) {
-                        showAlert("The selected shift end time is in the past.");
-                        return;
-                    }
-
-                    localStorage.setItem('shiftStartTime', shiftStartTime.toISOString());
-                    localStorage.setItem('shiftEndTime', shiftEndTime.toISOString());
-                    localStorage.setItem('shiftTitle', shiftTitleInput.value);
-                    
-                    totalShiftDuration = (shiftEndTime - shiftStartTime);
-                    
-                    calculateActiveBreaks();
-                    
-                    setupView.classList.add('hidden');
-                    countdownView.classList.remove('hidden');
-                    
-                    endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                    startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                    
-                    generateShiftBlocks();
-                    shiftCountdown(); 
-                    shiftTimer = setInterval(shiftCountdown, 1000);
-                    startEffect('constellation');
+                    const startTimeValue = startTimeInput.value; const endTimeValue = endTimeInput.value;
+                    if (!startTimeValue || !endTimeValue) { showAlert("Please select both a start and end date and time."); return; }
+                    shiftStartTime = new Date(startTimeValue); shiftEndTime = new Date(endTimeValue);
+                    if (shiftStartTime >= shiftEndTime) { showAlert("Start time must be before end time."); return; }
+                    if (shiftEndTime <= new Date()) { showAlert("The selected shift end time is in the past."); return; }
+                    localStorage.setItem('shiftStartTime', shiftStartTime.toISOString()); localStorage.setItem('shiftEndTime', shiftEndTime.toISOString()); localStorage.setItem('shiftTitle', shiftTitleInput.value);
+                    totalShiftDuration = (shiftEndTime - shiftStartTime); calculateActiveBreaks();
+                    setupView.classList.add('hidden'); countdownView.classList.remove('hidden');
+                    endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    generateShiftBlocks(); shiftCountdown(); shiftTimer = setInterval(shiftCountdown, 1000); startEffect('constellation');
                 });
 
-                resetBtn.addEventListener('click', resetShiftTimer);
-                newShiftBtn.addEventListener('click', resetShiftTimer);
-                
-                // Initialize setup view
+                resetBtn.addEventListener('click', resetShiftTimer); newShiftBtn.addEventListener('click', resetShiftTimer);
                 checkStoredShift();
             }
             
@@ -3543,33 +3177,39 @@
 
                 async function fetchWeather() {
                     try {
-                        const response = await fetch('https://wttr.in/Liverpool?format=j1');
+                        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=53.4084&longitude=-2.9916&current_weather=true');
+                        if (!response.ok) throw new Error('Weather fetch failed');
+                        
                         const data = await response.json();
-                        const condition = data.current_condition[0];
+                        const weather = data.current_weather;
                         
                         weatherEl.innerHTML = `
-                            <div class="text-3xl">${getWeatherIcon(condition.weatherCode)}</div>
+                            <div class="text-3xl">${getWeatherIcon(weather.weathercode)}</div>
                             <div>
-                                <p class="font-semibold text-xl">${condition.temp_C}°C</p>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">${condition.weatherDesc[0].value}</p>
+                                <p class="font-semibold text-xl">${Math.round(weather.temperature)}°C</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Liverpool, UK</p>
                             </div>
                         `;
                     } catch (error) {
-                        weatherEl.innerHTML = `<p class="text-sm text-red-500">Could not fetch weather.</p>`;
-                        console.error("Error fetching weather:", error);
+                        weatherEl.innerHTML = `
+                            <div class="text-3xl">⛅</div>
+                            <div>
+                                <p class="font-semibold text-xl">--°C</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Weather Unavailable</p>
+                            </div>
+                        `;
                     }
                 }
 
                 function getWeatherIcon(code) {
-                    if (code >= 200 && code < 300) return '⛈️'; 
-                    if (code >= 300 && code < 400) return '🌧️'; 
-                    if (code >= 500 && code < 600) return '🌧️'; 
-                    if (code >= 600 && code < 700) return '❄️'; 
-                    if (code >= 700 && code < 800) return '🌫️'; 
-                    if (code === 800) return '☀️'; 
-                    if (code === 801) return '🌤️'; 
-                    if (code === 802) return '⛅️'; 
-                    if (code === 803 || code === 804) return '☁️'; 
+                    if (code === 0) return '☀️';
+                    if ([1, 2, 3].includes(code)) return '☁️';
+                    if ([45, 48].includes(code)) return '🌫️';
+                    if (code >= 51 && code <= 57) return '💧';
+                    if (code >= 61 && code <= 67) return '🌧️';
+                    if (code >= 71 && code <= 77) return '❄️';
+                    if (code >= 80 && code <= 82) return '🌦️';
+                    if (code >= 95 && code <= 99) return '⛈️';
                     return '🌍'; 
                 }
 
