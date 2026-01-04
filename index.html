@@ -569,14 +569,28 @@
                                         </div>
                                     </div>
                                     <div id="break-times-container" class="space-y-3 max-h-32 overflow-y-auto pr-2 custom-scrollbar"></div>
-                                    <div class="mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
-                                        <div class="text-left pr-4">
-                                            <label for="health-breaks-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Smart Health Breaks</label>
-                                            <p class="text-[10px] text-gray-400 mt-0.5">Adds a 5m walk break every hour if gaps exist.</p>
+                                    <div class="mt-6 pt-6 border-t border-white/10 flex flex-col gap-3">
+                                        <!-- Health Breaks Toggle -->
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-left pr-4">
+                                                <label for="health-breaks-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Smart Health Breaks</label>
+                                                <p class="text-[10px] text-gray-400 mt-0.5">Adds a 5m walk break every hour if gaps exist.</p>
+                                            </div>
+                                            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+                                                <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-green-400"/>
+                                                <label for="health-breaks-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                                            </div>
                                         </div>
-                                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
-                                            <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-green-400"/>
-                                            <label for="health-breaks-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                                        <!-- Reset Breaches Toggle -->
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-left pr-4">
+                                                <label for="reset-breaches-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Reset Completed Breaches</label>
+                                                <p class="text-[10px] text-gray-400 mt-0.5">Uncheck all items to start fresh for this shift.</p>
+                                            </div>
+                                            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+                                                <input type="checkbox" name="reset-breaches-toggle" id="reset-breaches-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-rose-400"/>
+                                                <label for="reset-breaches-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -591,23 +605,34 @@
                                     <h2 id="shift-motivation-quote" class="text-3xl md:text-5xl font-bold tracking-tight text-white neon-text mb-1">Let's get this bread!</h2>
                                     <p id="shift-mode-label" class="text-teal-200/50 font-mono text-xs tracking-widest uppercase">Productivity Station Active</p>
                                 </div>
-                                <div class="flex items-center gap-4">
-                                    <!-- Mode Toggle -->
-                                    <div class="flex bg-slate-800/50 backdrop-blur-md rounded-xl p-1 border border-white/10">
-                                        <button id="shift-mode-call" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent">
-                                            <span>📞</span> Calls
-                                        </button>
-                                        <button id="shift-mode-breach" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)] flex items-center gap-2">
-                                            <span>⚡</span> Breach
+                                <div class="flex flex-col items-end gap-2">
+                                    <div class="flex items-center gap-4">
+                                        <!-- Mode Toggle -->
+                                        <div class="flex bg-slate-800/50 backdrop-blur-md rounded-xl p-1 border border-white/10">
+                                            <button id="shift-mode-call" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent">
+                                                <span>📞</span> Calls
+                                            </button>
+                                            <button id="shift-mode-breach" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)] flex items-center gap-2">
+                                                <span>⚡</span> Breach
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="break-alert-banner" class="hidden py-2 px-6 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-full animate-pulse font-mono text-sm font-bold flex items-center gap-2">
+                                            <span class="text-xl">🌱</span> RECHARGE MODE ACTIVE
+                                        </div>
+                                        <button id="share-shift-btn" class="p-3 bg-indigo-500/20 text-indigo-200 hover:text-white rounded-xl hover:bg-indigo-500/40 transition-all border border-indigo-500/20 shadow-lg backdrop-blur-sm" title="Share Shift Link">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                                         </button>
                                     </div>
-                                    
-                                    <div id="break-alert-banner" class="hidden py-2 px-6 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-full animate-pulse font-mono text-sm font-bold flex items-center gap-2">
-                                        <span class="text-xl">🌱</span> RECHARGE MODE ACTIVE
+                                    <!-- Pace Warning -->
+                                    <div id="breach-pace-warning" class="hidden py-2 px-4 bg-rose-900/60 border border-rose-500/50 text-rose-200 rounded-xl animate-pulse flex items-center gap-3 backdrop-blur-md shadow-lg max-w-sm">
+                                        <span class="text-xl">📉</span>
+                                        <div class="text-left">
+                                            <p class="text-[10px] font-bold uppercase tracking-wider text-rose-300">Target Missed</p>
+                                            <p class="text-xs font-mono">Pace: <span id="pace-display-val" class="font-bold text-white">0</span>/hr</p>
+                                            <p class="text-[10px] font-mono text-rose-300 mt-0.5">Behind: <span id="pace-missed-val" class="font-bold text-white">0</span></p>
+                                        </div>
                                     </div>
-                                    <button id="share-shift-btn" class="p-3 bg-indigo-500/20 text-indigo-200 hover:text-white rounded-xl hover:bg-indigo-500/40 transition-all border border-indigo-500/20 shadow-lg backdrop-blur-sm" title="Share Shift Link">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                                    </button>
                                 </div>
                             </div>
                             <!-- Timer & Break -->
@@ -2425,7 +2450,14 @@
                 const shiftModeCallBtn = document.getElementById('shift-mode-call');
                 const shiftModeBreachBtn = document.getElementById('shift-mode-breach');
                 const shiftModeLabel = document.getElementById('shift-mode-label');
-                let currentShiftMode = 'breach'; // Default
+                const paceWarning = document.getElementById('breach-pace-warning');
+                const paceDisplayVal = document.getElementById('pace-display-val');
+                const paceMissedVal = document.getElementById('pace-missed-val');
+                
+                // State for Breach Tracking
+                let currentShiftMode = localStorage.getItem('currentShiftMode') || 'breach'; 
+                let accumulatedBreachMs = parseInt(localStorage.getItem('shiftBreachTotalMs')) || 0;
+                let lastBreachStart = localStorage.getItem('shiftBreachSessionStart') ? new Date(localStorage.getItem('shiftBreachSessionStart')) : null;
 
                 const shareShiftBtn = document.getElementById('share-shift-btn');
                 // QR Elements
@@ -2439,6 +2471,7 @@
                 const loadMyBreaksBtn = document.getElementById('load-my-breaks-btn');
                 const breakTimesContainer = document.getElementById('break-times-container');
                 const healthBreaksToggle = document.getElementById('health-breaks-toggle');
+                const resetBreachesToggle = document.getElementById('reset-breaches-toggle');
                 
                 const breakActiveDisplay = document.getElementById('break-active-display');
                 const breakTimerLarge = document.getElementById('break-timer-large');
@@ -2537,16 +2570,39 @@
                         shiftModeLabel.className = "text-rose-200/50 font-mono text-xs tracking-widest uppercase transition-colors";
                     }
                 }
+                
+                // Initialize UI on load
+                updateShiftModeUI();
 
-                shiftModeCallBtn.addEventListener('click', () => {
-                    currentShiftMode = 'call';
-                    updateShiftModeUI();
-                });
+                function switchShiftMode(newMode) {
+                    if (currentShiftMode === newMode) return;
+                    
+                    const now = new Date();
 
-                shiftModeBreachBtn.addEventListener('click', () => {
-                    currentShiftMode = 'breach';
+                    if (newMode === 'call') {
+                        // Switching FROM Breach TO Call
+                        // Stop the clock and accumulate time
+                        if (lastBreachStart) {
+                            const sessionDuration = now - lastBreachStart;
+                            accumulatedBreachMs += sessionDuration;
+                            localStorage.setItem('shiftBreachTotalMs', accumulatedBreachMs);
+                        }
+                        lastBreachStart = null;
+                        localStorage.removeItem('shiftBreachSessionStart');
+                    } else {
+                        // Switching FROM Call TO Breach
+                        // Start the clock
+                        lastBreachStart = now;
+                        localStorage.setItem('shiftBreachSessionStart', lastBreachStart.toISOString());
+                    }
+
+                    currentShiftMode = newMode;
+                    localStorage.setItem('currentShiftMode', currentShiftMode);
                     updateShiftModeUI();
-                });
+                }
+
+                shiftModeCallBtn.addEventListener('click', () => switchShiftMode('call'));
+                shiftModeBreachBtn.addEventListener('click', () => switchShiftMode('breach'));
 
                 function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
                 window.addEventListener('resize', resizeCanvas);
@@ -2781,6 +2837,7 @@
                     if (currentBreak) {
                         if (!wasOnBreak) { playBreakSound(); wasOnBreak = true; }
                         breakActiveDisplay.classList.remove('hidden'); breakAlertBanner.classList.remove('hidden'); nextBreakContainer.classList.add('opacity-0'); guideContainer.classList.add('opacity-25', 'pointer-events-none', 'blur-sm');
+                        paceWarning.classList.add('hidden'); // Hide pace warning on break
                         const breakRemaining = new Date(currentBreak.end) - now; breakTimerLarge.textContent = formatTimeShort(breakRemaining); motivationQuote.textContent = "Recharge Mode On";
                     } else {
                         if (wasOnBreak) { wasOnBreak = false; }
@@ -2790,11 +2847,75 @@
                             const timeToNext = new Date(nextBreak.start) - now; timeToNextBreakEl.textContent = formatTime(timeToNext);
                             const nextBreakTimeStr = new Date(nextBreak.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); nextBreakTimeLabel.textContent = `at ${nextBreakTimeStr} (${nextBreak.type})`;
                         } else { timeToNextBreakEl.textContent = "--:--:--"; nextBreakTimeLabel.textContent = "No more breaks scheduled"; }
+
+                        // Pace Calculation Logic (Updated for Fair Tracking)
+                        // Calculate total time spent in breach mode so far
+                        let totalBreachTimeMs = accumulatedBreachMs;
+                        if (currentShiftMode === 'breach' && lastBreachStart) {
+                            totalBreachTimeMs += (now - lastBreachStart);
+                        }
+                        
+                        // Convert to hours for rate calculation
+                        const breachHours = totalBreachTimeMs / (1000 * 60 * 60);
+
+                        // Only show warning if we are currently in breach mode OR if we want to see it persistently
+                        // Requirement: "target should stop and should only be active when it's toggled to breach"
+                        if (currentShiftMode === 'breach') {
+                            // Only calculate after ~5 minutes of actual breach time to allow ramp up
+                            if (breachHours > 0.08) {
+                                const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
+                                const breachesThisShift = breachItems.filter(i => 
+                                    i.completed && 
+                                    i.completedAt && 
+                                    new Date(i.completedAt) >= shiftStartTime
+                                ).length;
+                                
+                                // Rate based on ACTIVE time, not TOTAL time
+                                const currentRate = breachHours > 0 ? (breachesThisShift / breachHours) : 0;
+                                const targetRate = 10;
+                                
+                                // Calculate how many we SHOULD have done in the time we spent in breach mode
+                                const expectedBreaches = Math.floor(breachHours * targetRate);
+                                const missedCount = Math.max(0, expectedBreaches - breachesThisShift);
+
+                                if (missedCount > 0) {
+                                    paceWarning.classList.remove('hidden');
+                                    paceDisplayVal.textContent = currentRate.toFixed(1);
+                                    if(paceMissedVal) paceMissedVal.textContent = missedCount;
+                                } else {
+                                    paceWarning.classList.add('hidden');
+                                }
+                            } else {
+                                paceWarning.classList.add('hidden');
+                            }
+                        } else {
+                            paceWarning.classList.add('hidden');
+                        }
                     }
                 }
 
                 function resetShiftTimer() {
-                    clearInterval(shiftTimer); stopEffect(); localStorage.removeItem('shiftEndTime'); localStorage.removeItem('shiftStartTime'); localStorage.removeItem('shiftActiveBreakObjects'); localStorage.removeItem('shiftTitle');
+                    clearInterval(shiftTimer); stopEffect(); 
+                    localStorage.removeItem('shiftEndTime'); 
+                    localStorage.removeItem('shiftStartTime'); 
+                    localStorage.removeItem('shiftActiveBreakObjects'); 
+                    localStorage.removeItem('shiftTitle');
+                    
+                    // Reset Breach Tracking
+                    localStorage.removeItem('shiftBreachTotalMs');
+                    localStorage.removeItem('shiftBreachSessionStart');
+                    localStorage.removeItem('currentShiftMode');
+                    accumulatedBreachMs = 0;
+                    lastBreachStart = null;
+                    currentShiftMode = 'breach';
+                    updateShiftModeUI();
+
+                    // Reset Inputs to Now to prevent stale start times messing up calc
+                    const now = new Date();
+                    startTimeInput.value = formatDateTimeForInput(now);
+                    const eightHoursLater = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                    endTimeInput.value = formatDateTimeForInput(eightHoursLater);
+
                     setupView.classList.remove('hidden'); countdownView.classList.add('hidden'); endView.classList.add('hidden'); breakActiveDisplay.classList.add('hidden');
                 }
                 
@@ -2969,6 +3090,40 @@
                     if (shiftStartTime >= shiftEndTime) { showAlert("Start time must be before end time."); return; }
                     if (shiftEndTime <= new Date()) { showAlert("The selected shift end time is in the past."); return; }
                     localStorage.setItem('shiftStartTime', shiftStartTime.toISOString()); localStorage.setItem('shiftEndTime', shiftEndTime.toISOString()); localStorage.setItem('shiftTitle', shiftTitleInput.value);
+                    
+                    // Reset Breaches if requested
+                    if (resetBreachesToggle && resetBreachesToggle.checked) {
+                        const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
+                        let hasChanges = false;
+                        breachItems.forEach(item => {
+                            if (item.completed) {
+                                item.completed = false;
+                                delete item.completedAt; // Clear timestamp so it doesn't count towards history if unchecked
+                                hasChanges = true;
+                            }
+                        });
+                        if (hasChanges) {
+                            localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                            // Refresh lists if they are initialized
+                            const uncompletedContainer = document.getElementById('breach-list-uncompleted-container');
+                            if (uncompletedContainer) {
+                                // Trigger a re-render of the list if we can access the render function scope
+                                // Since renderList is scoped inside setupBreachList, we can't call it directly here easily
+                                // but we can reload the page or rely on the user visiting the tab later.
+                                // For immediate feedback, we rely on the Pace Calculation logic which reads from localStorage.
+                            }
+                        }
+                    }
+
+                    // Initialize Breach Tracking
+                    accumulatedBreachMs = 0;
+                    localStorage.setItem('shiftBreachTotalMs', '0');
+                    currentShiftMode = 'breach'; // Default start in breach
+                    localStorage.setItem('currentShiftMode', 'breach');
+                    lastBreachStart = new Date(); // Start the timer immediately
+                    localStorage.setItem('shiftBreachSessionStart', lastBreachStart.toISOString());
+                    updateShiftModeUI();
+
                     totalShiftDuration = (shiftEndTime - shiftStartTime); calculateActiveBreaks();
                     setupView.classList.add('hidden'); countdownView.classList.remove('hidden');
                     endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
