@@ -589,9 +589,19 @@
                             <div class="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
                                 <div>
                                     <h2 id="shift-motivation-quote" class="text-3xl md:text-5xl font-bold tracking-tight text-white neon-text mb-1">Let's get this bread!</h2>
-                                    <p class="text-teal-200/50 font-mono text-xs tracking-widest uppercase">Productivity Station Active</p>
+                                    <p id="shift-mode-label" class="text-teal-200/50 font-mono text-xs tracking-widest uppercase">Productivity Station Active</p>
                                 </div>
                                 <div class="flex items-center gap-4">
+                                    <!-- Mode Toggle -->
+                                    <div class="flex bg-slate-800/50 backdrop-blur-md rounded-xl p-1 border border-white/10">
+                                        <button id="shift-mode-call" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent">
+                                            <span>📞</span> Calls
+                                        </button>
+                                        <button id="shift-mode-breach" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)] flex items-center gap-2">
+                                            <span>⚡</span> Breach
+                                        </button>
+                                    </div>
+                                    
                                     <div id="break-alert-banner" class="hidden py-2 px-6 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-full animate-pulse font-mono text-sm font-bold flex items-center gap-2">
                                         <span class="text-xl">🌱</span> RECHARGE MODE ACTIVE
                                     </div>
@@ -2411,6 +2421,12 @@
                 const shiftTitleInput = document.getElementById('shift-title-input');
                 const motivationQuote = document.getElementById('shift-motivation-quote');
                 
+                // Mode Toggle Elements
+                const shiftModeCallBtn = document.getElementById('shift-mode-call');
+                const shiftModeBreachBtn = document.getElementById('shift-mode-breach');
+                const shiftModeLabel = document.getElementById('shift-mode-label');
+                let currentShiftMode = 'breach'; // Default
+
                 const shareShiftBtn = document.getElementById('share-shift-btn');
                 // QR Elements
                 const qrModal = document.getElementById('qr-modal');
@@ -2505,6 +2521,32 @@
 
                 locHomeBtn.addEventListener('click', () => { shiftLocation = 'home'; localStorage.setItem('shiftLocation', 'home'); updateLocButtons(); });
                 locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
+
+                // Shift Mode Logic
+                function updateShiftModeUI() {
+                    if (currentShiftMode === 'call') {
+                        shiftModeCallBtn.className = "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)] flex items-center gap-2";
+                        shiftModeBreachBtn.className = "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent";
+                        shiftModeLabel.textContent = "Communication Station Active";
+                        shiftModeLabel.className = "text-blue-200/50 font-mono text-xs tracking-widest uppercase transition-colors";
+                    } else {
+                        // Breach Mode
+                        shiftModeCallBtn.className = "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent";
+                        shiftModeBreachBtn.className = "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)] flex items-center gap-2";
+                        shiftModeLabel.textContent = "Task Breach Station Active";
+                        shiftModeLabel.className = "text-rose-200/50 font-mono text-xs tracking-widest uppercase transition-colors";
+                    }
+                }
+
+                shiftModeCallBtn.addEventListener('click', () => {
+                    currentShiftMode = 'call';
+                    updateShiftModeUI();
+                });
+
+                shiftModeBreachBtn.addEventListener('click', () => {
+                    currentShiftMode = 'breach';
+                    updateShiftModeUI();
+                });
 
                 function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
                 window.addEventListener('resize', resizeCanvas);
