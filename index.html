@@ -98,26 +98,6 @@
         .sticky-note:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         .sticky-note.dragging { transform: scale(1.05) rotate(2deg); z-index: 50; cursor: grabbing; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         
-        /* Breach List Items */
-        .breach-item { display: flex; align-items: center; padding: 1rem; background: white; border: 1px solid #f1f5f9; border-radius: 1rem; margin-bottom: 0.5rem; transition: all 0.2s ease; }
-        .dark .breach-item { background: #1e293b; border-color: #334155; }
-        .breach-item:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border-color: #e2e8f0; }
-        .dark .breach-item:hover { border-color: #475569; }
-        
-        .breach-item-checkbox:checked ~ .item-content .item-text { text-decoration: line-through; color: #9ca3af; }
-        .breach-item-checkbox:checked ~ label span { background-color: #6366f1; border-color: #6366f1; }
-        .breach-item-checkbox:checked ~ label span svg { display: block; }
-        
-        details > summary { list-style: none; cursor: pointer; }
-        details > summary::-webkit-details-marker { display: none; }
-        #breach-list-completed-section details > summary .lock-open { display: none; }
-        #breach-list-completed-section details[open] > summary .lock-closed { display: none; }
-        #breach-list-completed-section details[open] > summary .lock-open { display: inline; }
-
-        /* Animation for nested details arrow */
-        details summary .summary-arrow { transition: transform 0.2s; }
-        details[open] summary .summary-arrow { transform: rotate(180deg); }
-
         /* Mindfulness */
         #mindfulness { background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .dark #mindfulness { background-image: linear-gradient(to top, #0f172a 0%, #312e81 100%); }
@@ -755,82 +735,104 @@
                 </div>
 
                 <!-- Breach List -->
-                <div id="breach-list" class="page-view container mx-auto px-6 py-10 max-w-5xl">
-                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Breach List</h1>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                        <!-- Daily Target -->
-                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700">
-                            <div class="flex justify-between items-center mb-6">
-                                <div>
-                                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Daily Target</h2>
-                                    <p class="text-sm text-slate-500">Set your completion goal for the day.</p>
-                                </div>
-                                <div class="flex gap-2">
-                                    <input type="number" id="daily-target-input" class="w-20 p-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-700 text-slate-900 dark:text-white text-center font-bold" value="20" min="1">
-                                    <button id="set-daily-target-btn" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold hover:opacity-90 transition-opacity">Set</button>
+                <div id="breach-list" class="page-view container mx-auto px-6 py-10 max-w-6xl">
+                    <div class="flex flex-col lg:flex-row gap-8 h-[calc(100vh-140px)]">
+                        
+                        <!-- Left Panel: Hourly Control Center -->
+                        <div class="lg:w-1/3 flex flex-col gap-6">
+                            <!-- Current Session Card -->
+                            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden shrink-0">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                                
+                                <div class="relative z-10">
+                                    <div class="flex justify-between items-start mb-6">
+                                        <div>
+                                            <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest mb-1">Current Session</p>
+                                            <h2 id="breach-current-hour-label" class="text-3xl font-mono font-bold">--:00 - --:00</h2>
+                                        </div>
+                                        <div class="animate-pulse">
+                                            <span class="w-3 h-3 bg-emerald-500 rounded-full inline-block shadow-[0_0_10px_#10b981]"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progress Circle / Stats -->
+                                    <div class="flex flex-col items-center justify-center py-6">
+                                        <div class="relative w-40 h-40">
+                                            <svg class="w-full h-full transform -rotate-90">
+                                                <circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="12" fill="transparent" class="text-slate-700" />
+                                                <circle id="breach-hourly-progress-circle" cx="80" cy="80" r="70" stroke="currentColor" stroke-width="12" fill="transparent" stroke-dasharray="440" stroke-dashoffset="440" class="text-indigo-500 transition-all duration-1000 ease-out" />
+                                            </svg>
+                                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                                <span id="breach-hourly-count" class="text-4xl font-bold">0</span>
+                                                <span class="text-xs text-slate-400 uppercase font-bold mt-1">Breaches</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Target Info -->
+                                    <div class="bg-white/5 rounded-2xl p-4 mb-6 border border-white/5 backdrop-blur-sm">
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <p class="text-xs text-slate-400 font-medium">Hourly Target</p>
+                                                <p id="breach-hourly-target-display" class="text-2xl font-bold text-white">--</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-slate-400 font-medium">Pace Required</p>
+                                                <p id="breach-pace-status" class="text-sm font-bold text-emerald-400">On Track</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button id="sync-breach-target-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 group">
+                                        <svg class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        Sync Target to Time
+                                    </button>
+                                    <p class="text-[10px] text-center text-slate-500 mt-3">Calculates target based on remaining minutes in hour.</p>
                                 </div>
                             </div>
-                            
-                            <div class="bg-slate-50 dark:bg-gray-700/30 p-6 rounded-2xl">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="font-bold text-slate-700 dark:text-slate-300 text-sm uppercase tracking-wide">Progress</span>
-                                    <span id="daily-breach-progress-text" class="font-bold text-indigo-600 dark:text-indigo-400">0 / 20</span>
+
+                            <!-- Mini Stats -->
+                             <div class="grid grid-cols-2 gap-4 grow-0">
+                                <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Today Total</p>
+                                    <p id="breach-today-total" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</p>
                                 </div>
-                                <div class="w-full bg-slate-200 dark:bg-gray-600 rounded-full h-4 overflow-hidden">
-                                    <div id="daily-breach-progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-4 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                                <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Efficiency</p>
+                                    <p id="breach-efficiency" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">100%</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Counters -->
-                        <div class="bg-indigo-600 p-8 rounded-[2rem] shadow-lg shadow-indigo-500/30 text-white flex flex-col justify-between">
-                            <h2 class="text-lg font-bold opacity-80 uppercase tracking-widest">Overview</h2>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center border-b border-indigo-500/50 pb-2">
-                                    <span class="text-indigo-200">Total Tasks</span>
-                                    <span id="breach-total-count" class="text-2xl font-bold">0</span>
+                        <!-- Right Panel: The List & History -->
+                        <div class="lg:w-2/3 flex flex-col h-full bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                            <!-- Tabs -->
+                            <div class="flex border-b border-slate-100 dark:border-slate-700 px-8 pt-6">
+                                <button id="tab-breach-current" class="pb-4 px-4 text-sm font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition-colors">Current Hour</button>
+                                <button id="tab-breach-history" class="pb-4 px-4 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">History Log</button>
+                            </div>
+
+                            <!-- Current Hour View -->
+                            <div id="view-breach-current" class="flex-1 flex flex-col p-8 overflow-hidden">
+                                <div class="flex gap-3 mb-6">
+                                    <input type="text" id="breach-item-input" class="flex-1 bg-slate-50 dark:bg-gray-700/50 border-none rounded-xl px-5 py-3 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="Log a breach item..." autocomplete="off">
+                                    <button id="add-breach-item-btn" class="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:opacity-90 transition-opacity shadow-lg">
+                                        Add
+                                    </button>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-indigo-500/50 pb-2">
-                                    <span class="text-indigo-200">Pending</span>
-                                    <span id="breach-uncompleted-count" class="text-2xl font-bold text-pink-300">0</span>
+                                
+                                <div id="breach-list-uncompleted-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                                    <!-- Items go here -->
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-indigo-200">Done</span>
-                                    <span id="breach-completed-count" class="text-2xl font-bold text-emerald-300">0</span>
+                            </div>
+
+                            <!-- History View -->
+                            <div id="view-breach-history" class="hidden flex-1 flex-col p-0 overflow-hidden">
+                                <div id="breach-history-container" class="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-6">
+                                    <!-- History groups go here -->
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Add Item Form -->
-                    <div class="bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 mb-8 flex gap-2">
-                        <input type="text" id="breach-item-input" class="w-full p-4 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white placeholder-slate-400 text-lg" placeholder="What needs to be done?">
-                        <button id="add-breach-item-btn" class="px-8 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-md">Add</button>
-                    </div>
-
-                    <!-- Uncompleted Items -->
-                    <div id="breach-list-uncompleted-container" class="space-y-3 mb-8">
-                        <!-- Items generated by JS -->
-                    </div>
-
-                    <!-- Completed Items Section -->
-                    <div id="breach-list-completed-section" class="mt-8 hidden">
-                        <details class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm overflow-hidden border border-slate-100 dark:border-slate-700">
-                            <summary class="p-6 cursor-pointer flex justify-between items-center font-bold text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                                <div class="flex items-center">
-                                    <span class="lock-icon-container mr-3 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-                                        <svg class="w-5 h-5 text-slate-500 lock-closed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                        <svg class="w-5 h-5 text-slate-500 lock-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
-                                    </span>
-                                    <span>Completed History</span>
-                                </div>
-                                <span id="completed-tasks-count" class="text-sm px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 rounded-full font-bold">0</span>
-                            </summary>
-                            <div id="breach-list-completed-container" class="bg-slate-50/50 dark:bg-gray-800/50">
-                                <!-- Completed items generated by JS -->
-                            </div>
-                        </details>
                     </div>
                 </div>
 
@@ -1675,98 +1677,65 @@
             alertCloseBtn.addEventListener('click', hideAlert);
             // --- End Modal Functions ---
 
-            // --- Helper Functions Definitions ---
-            
-            function updateBreachLog(item, wasCompleted) {
-                let log = JSON.parse(localStorage.getItem('dailyBreachLog')) || {};
-                
-                if (item.completed && !wasCompleted) {
-                    const completedDate = new Date(item.completedAt).toISOString().split('T')[0];
-                    if (!log[completedDate]) log[completedDate] = [];
-                    if (!log[completedDate].some(entry => entry.id === item.id)) {
-                        log[completedDate].push({ id: item.id, text: item.text });
-                    }
-                } else if (!item.completed && wasCompleted) {
-                    const completedDate = new Date(item.completedAt).toISOString().split('T')[0];
-                    if (log[completedDate]) {
-                        log[completedDate] = log[completedDate].filter(entry => entry.id !== item.id);
-                        if (log[completedDate].length === 0) delete log[completedDate];
-                    }
-                }
-                localStorage.setItem('dailyBreachLog', JSON.stringify(log));
-            }
+            // --- Updated Data Helpers ---
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
-                const log = JSON.parse(localStorage.getItem('dailyBreachLog')) || {};
+                const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                 container.innerHTML = ''; 
 
-                const sortedDates = Object.keys(log).sort((a, b) => new Date(b) - new Date(a));
+                // Filter for items completed TODAY
+                const today = new Date().toISOString().split('T')[0];
+                const todayItems = items.filter(item => item.completed && item.completedAt && item.completedAt.startsWith(today));
 
-                if (sortedDates.length === 0) {
-                    container.innerHTML = `<p class="text-center p-4 text-slate-400 text-sm italic">No completed items today.</p>`;
+                if (todayItems.length === 0) {
+                     container.innerHTML = `<p class="text-center p-4 text-slate-400 text-sm italic">No completed items today.</p>`;
                     return;
                 }
 
-                sortedDates.forEach(date => {
-                    const items = log[date];
-                    // For the dashboard mini-log, just show a simple list of today's items if available, or most recent
-                    if (date === new Date().toISOString().split('T')[0]) {
-                         items.forEach(item => {
-                            const div = document.createElement('div');
-                            div.className = "flex items-start gap-3 mb-2 pb-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0";
-                            div.innerHTML = `
-                                <div class="mt-1 w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-                                <span class="text-sm text-slate-600 dark:text-slate-300 line-clamp-1">${item.text}</span>
-                            `;
-                            container.appendChild(div);
-                        });
-                    }
+                // Sort by time
+                todayItems.sort((a,b) => new Date(b.completedAt) - new Date(a.completedAt));
+
+                todayItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-start gap-3 mb-2 pb-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0";
+                    div.innerHTML = `
+                        <div class="mt-1 w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
+                        <span class="text-sm text-slate-600 dark:text-slate-300 line-clamp-1">${item.text}</span>
+                    `;
+                    container.appendChild(div);
                 });
-                
-                // Fallback if no items for today in the mini-view
-                if (container.children.length === 0 && sortedDates.length > 0) {
-                     container.innerHTML = `<p class="text-center p-4 text-slate-400 text-sm">No activity today. Check history in full view.</p>`;
-                }
             }
 
             function renderBreachStats() {
                 const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                const total = breachItems.length;
-                const completed = breachItems.filter(item => item.completed).length;
-                const pending = total - completed;
-                const percentage = total > 0 ? (completed / total) * 100 : 0;
+                // Only count today's completed for stats, or total active? 
+                // Let's stick to Today's Completed for the Dashboard Widget
+                const today = new Date().toISOString().split('T')[0];
+                const completedToday = breachItems.filter(item => item.completed && item.completedAt && item.completedAt.startsWith(today)).length;
+                
+                // Assuming a default target of 20 for the dashboard visualization if not set by hourly
+                const dailyTarget = 100; // Arbitrary high target for the bar or read from localStorage
 
                 const els = {
                     total: document.getElementById('breach-stats-total'),
                     completed: document.getElementById('breach-stats-completed'),
-                    pending: document.getElementById('breach-stats-pending'),
                     bar: document.getElementById('breach-stats-progress-bar'),
                     percent: document.getElementById('breach-stats-progress-percent')
                 };
 
-                if(els.total) els.total.textContent = total;
-                if(els.completed) els.completed.textContent = completed;
-                // If pending exists in specific view
-                if(document.getElementById('breach-stats-pending')) document.getElementById('breach-stats-pending').textContent = pending;
+                // Update simple stats
+                if(els.completed) els.completed.textContent = completedToday;
+                if(els.total) els.total.textContent = dailyTarget;
+                
+                const percentage = Math.min(100, (completedToday / dailyTarget) * 100);
                 if(els.bar) els.bar.style.width = `${percentage}%`;
                 if(els.percent) els.percent.textContent = `${Math.round(percentage)}%`;
             }
 
             function renderDailyBreachProgress() {
-                const log = JSON.parse(localStorage.getItem('dailyBreachLog')) || {};
-                const today = new Date().toISOString().split('T')[0];
-                const todaysCount = log[today] ? log[today].length : 0;
-                const target = parseInt(localStorage.getItem('dailyBreachTarget')) || 20;
-                const percentage = target > 0 ? (todaysCount / target) * 100 : 0;
-
-                const progressBar = document.getElementById('daily-breach-progress-bar');
-                const progressText = document.getElementById('daily-breach-progress-text');
-
-                if (progressBar && progressText) {
-                    progressBar.style.width = `${Math.min(percentage, 100)}%`;
-                    progressText.textContent = `${todaysCount} / ${target}`;
-                }
+                // This function seems redundant with renderBreachStats but kept for safety if used elsewhere
+                renderBreachStats();
             }
 
             function setupSoundscapes() {
@@ -1834,7 +1803,6 @@
 
                 renderBreachCompletionTable(); 
                 renderBreachStats();
-                renderDailyBreachProgress();
                 setupDailyQuote();
                 setupTimeAndWeather();
                 setupNavigation();
@@ -2258,42 +2226,299 @@
             }
 
             function setupBreachList() {
-                // UI references
-                const breachListPage = document.getElementById('breach-list'); const itemInput = document.getElementById('breach-item-input'); const addBtn = document.getElementById('add-breach-item-btn'); const totalCountEl = document.getElementById('breach-total-count'); const completedCountEl = document.getElementById('breach-completed-count'); const uncompletedCountEl = document.getElementById('breach-uncompleted-count'); const dailyTargetInput = document.getElementById('daily-target-input'); const setDailyTargetBtn = document.getElementById('set-daily-target-btn');
+                // UI References
+                const elements = {
+                    currentHourLabel: document.getElementById('breach-current-hour-label'),
+                    hourlyCount: document.getElementById('breach-hourly-count'),
+                    progressCircle: document.getElementById('breach-hourly-progress-circle'),
+                    targetDisplay: document.getElementById('breach-hourly-target-display'),
+                    paceStatus: document.getElementById('breach-pace-status'),
+                    todayTotal: document.getElementById('breach-today-total'),
+                    efficiency: document.getElementById('breach-efficiency'),
+                    input: document.getElementById('breach-item-input'),
+                    addBtn: document.getElementById('add-breach-item-btn'),
+                    syncBtn: document.getElementById('sync-breach-target-btn'),
+                    listContainer: document.getElementById('breach-list-uncompleted-container'),
+                    historyContainer: document.getElementById('breach-history-container'),
+                    viewCurrent: document.getElementById('view-breach-current'),
+                    viewHistory: document.getElementById('view-breach-history'),
+                    tabCurrent: document.getElementById('tab-breach-current'),
+                    tabHistory: document.getElementById('tab-breach-history')
+                };
+
+                // State
                 let breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                if(dailyTargetInput) dailyTargetInput.value = localStorage.getItem('dailyBreachTarget') || 20;
-                if(setDailyTargetBtn) setDailyTargetBtn.addEventListener('click', () => { const newTarget = parseInt(dailyTargetInput.value); if (newTarget && newTarget > 0) { localStorage.setItem('dailyBreachTarget', newTarget); renderDailyBreachProgress(); showAlert('Daily target updated!'); } else { showAlert('Please enter a valid number for the target.'); } });
-                function saveItems() { localStorage.setItem('breachItems', JSON.stringify(breachItems)); }
-                function updateCounters() { const total = breachItems.length; const completed = breachItems.filter(item => item.completed).length; const uncompleted = total - completed; totalCountEl.textContent = total; completedCountEl.textContent = completed; uncompletedCountEl.textContent = uncompleted; }
-                function createBreachItemElement(item) {
-                    const itemEl = document.createElement('div'); itemEl.className = 'breach-item'; itemEl.dataset.id = item.id;
-                    const timestampHTML = item.createdAt ? `<div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-mono">Created: ${new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>` : '';
-                    itemEl.innerHTML = `<input type="checkbox" id="breach-${item.id}" class="breach-item-checkbox hidden" ${item.completed ? 'checked' : ''}><label for="breach-${item.id}" class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300 w-full"><span class="w-6 h-6 mr-4 rounded-lg border-2 border-slate-200 dark:border-slate-600 flex-shrink-0 flex items-center justify-center transition-all bg-slate-50 dark:bg-slate-800"><svg class="w-4 h-4 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></span><div class="flex-grow item-content"><span class="item-text font-medium text-lg block">${item.text}</span>${timestampHTML}</div></label><button class="delete-breach-item ml-4 text-slate-300 hover:text-rose-500 transition-colors p-2 rounded-full hover:bg-rose-50 dark:hover:bg-rose-900/20"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
-                    return itemEl;
+                let hourlyTargets = JSON.parse(localStorage.getItem('breachHourlyTargets')) || {}; // Key: "YYYY-MM-DD-HH", Value: Number
+                
+                // Constants
+                const CIRCLE_CIRCUMFERENCE = 440;
+                const BASE_RATE_PER_HOUR = 10;
+
+                // --- Helper Functions ---
+
+                function getCurrentHourKey() {
+                    const now = new Date();
+                    return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}`;
                 }
-                function renderList() {
-                    const uncompletedContainer = document.getElementById('breach-list-uncompleted-container'); const completedContainer = document.getElementById('breach-list-completed-container'); const completedSection = document.getElementById('breach-list-completed-section'); const completedCountLabel = document.getElementById('completed-tasks-count');
-                    uncompletedContainer.innerHTML = ''; completedContainer.innerHTML = '';
-                    const completedItems = breachItems.filter(item => item.completed); const uncompletedItems = breachItems.filter(item => !item.completed);
-                    if (uncompletedItems.length > 0) { uncompletedItems.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(item => { uncompletedContainer.appendChild(createBreachItemElement(item)); }); } else { uncompletedContainer.innerHTML = `<div class="text-center py-10 opacity-50"><div class="text-6xl mb-4">✨</div><p class="text-xl font-bold">All clear!</p></div>`; }
-                    if (completedItems.length > 0) {
-                        completedSection.classList.remove('hidden'); completedCountLabel.textContent = completedItems.length;
-                        const groups = completedItems.reduce((acc, item) => { const date = item.completedAt ? item.completedAt.split('T')[0] : 'Unknown Date'; if (!acc[date]) acc[date] = []; acc[date].push(item); return acc; }, {});
-                        Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(date => {
-                            const items = groups[date]; const dateDetails = document.createElement('details'); dateDetails.className = "group border-b border-slate-100 dark:border-slate-700 last:border-0"; dateDetails.open = true;
-                            const dateDisplay = date === 'Unknown Date' ? date : new Date(date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                            dateDetails.innerHTML = `<summary class="p-4 cursor-pointer flex justify-between items-center text-sm font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors select-none"><span>${dateDisplay}</span><span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 px-2 py-0.5 rounded text-xs">${items.length}</span></summary><div class="p-4 space-y-2 bg-slate-50/50 dark:bg-gray-800/50"></div>`;
-                            const listContainer = dateDetails.querySelector('div');
-                            items.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)).forEach(item => { listContainer.appendChild(createBreachItemElement(item)); });
-                            completedContainer.appendChild(dateDetails);
-                        });
-                    } else { completedSection.classList.add('hidden'); }
-                    updateCounters();
+
+                function getCurrentHourLabel() {
+                    const now = new Date();
+                    const start = now.getHours();
+                    const end = (start + 1) % 24;
+                    return `${start.toString().padStart(2, '0')}:00 - ${end.toString().padStart(2, '0')}:00`;
                 }
-                addBtn.addEventListener('click', () => { const text = itemInput.value.trim(); if (text) { breachItems.push({ id: Date.now(), text: text, completed: false, createdAt: new Date().toISOString() }); itemInput.value = ''; saveItems(); renderList(); renderBreachStats(); } });
-                itemInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { addBtn.click(); } });
-                breachListPage.addEventListener('click', (e) => { const targetLabel = e.target.closest('label'); const deleteBtn = e.target.closest('.delete-breach-item'); if (targetLabel) { const checkboxId = targetLabel.getAttribute('for'); const checkbox = document.getElementById(checkboxId); const itemId = checkbox.closest('.breach-item').dataset.id; const item = breachItems.find(i => i.id == itemId); const wasCompleted = item.completed; item.completed = !checkbox.checked; if (item.completed && !wasCompleted) { item.completedAt = new Date().toISOString(); } updateBreachLog(item, wasCompleted); if (!item.completed) { delete item.completedAt; } saveItems(); renderList(); renderBreachCompletionTable(); renderBreachStats(); renderDailyBreachProgress(); } if (deleteBtn) { const itemId = deleteBtn.closest('.breach-item').dataset.id; const item = breachItems.find(i => i.id == itemId); if (item && item.completed) { const tempUncompletedItem = { ...item, completed: false }; updateBreachLog(tempUncompletedItem, true); } breachItems = breachItems.filter(i => i.id != itemId); saveItems(); renderList(); renderBreachCompletionTable(); renderBreachStats(); renderDailyBreachProgress(); } });
-                renderList(); renderDailyBreachProgress();
+
+                function calculateDynamicTarget() {
+                    const now = new Date();
+                    const minutesRemaining = 60 - now.getMinutes();
+                    // Calculate proportional target based on 10 per hour
+                    // E.g., 30 mins left = 5 breaches. Always round up to be ambitious, or ceil.
+                    let target = Math.ceil((minutesRemaining / 60) * BASE_RATE_PER_HOUR);
+                    // Ensure at least 1 if there's any time left, unless 0 mins
+                    if (target < 1 && minutesRemaining > 5) target = 1;
+                    
+                    return target;
+                }
+
+                function setHourlyTarget() {
+                    const key = getCurrentHourKey();
+                    const newTarget = calculateDynamicTarget();
+                    
+                    // If a target already exists for this hour and it's higher (from a previous sync), maybe keep it?
+                    // User requested: "get new target depending on the time it was clicked" -> implying overwrite/update.
+                    hourlyTargets[key] = newTarget;
+                    localStorage.setItem('breachHourlyTargets', JSON.stringify(hourlyTargets));
+                    renderDashboard();
+                    showAlert(`Target synced: ${newTarget} breaches for the remaining time.`);
+                }
+
+                function getBreachesForHour(hourKey) {
+                    // Filter items created in this hour key
+                    return breachItems.filter(item => {
+                        const d = new Date(item.createdAt);
+                        const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${d.getHours()}`;
+                        return key === hourKey;
+                    });
+                }
+
+                function updateProgressCircle(count, target) {
+                    if (target <= 0) target = 10; // Fallback
+                    const percentage = Math.min(1, count / target);
+                    const offset = CIRCLE_CIRCUMFERENCE - (percentage * CIRCLE_CIRCUMFERENCE);
+                    elements.progressCircle.style.strokeDashoffset = offset;
+                    
+                    if (count >= target) {
+                        elements.progressCircle.classList.remove('text-indigo-500');
+                        elements.progressCircle.classList.add('text-emerald-500');
+                    } else {
+                        elements.progressCircle.classList.add('text-indigo-500');
+                        elements.progressCircle.classList.remove('text-emerald-500');
+                    }
+                }
+
+                function renderDashboard() {
+                    const currentKey = getCurrentHourKey();
+                    elements.currentHourLabel.textContent = getCurrentHourLabel();
+                    
+                    // Get Target
+                    let target = hourlyTargets[currentKey];
+                    if (target === undefined) {
+                        target = 10; // Default if not synced
+                        elements.targetDisplay.textContent = "10 (Default)";
+                    } else {
+                        elements.targetDisplay.textContent = target;
+                    }
+
+                    // Get Counts
+                    const currentHourItems = getBreachesForHour(currentKey);
+                    
+                    // Usually "Breach per hour" implies completing the breach. 
+                    const completedCount = currentHourItems.filter(i => i.completed).length;
+                    
+                    elements.hourlyCount.textContent = completedCount;
+                    updateProgressCircle(completedCount, target);
+
+                    // Pace Status
+                    if (target > 0) {
+                        if (completedCount >= target) {
+                            elements.paceStatus.textContent = "Crushing It! 🔥";
+                            elements.paceStatus.className = "text-sm font-bold text-emerald-400";
+                        } else if (completedCount >= (target * 0.8)) {
+                            elements.paceStatus.textContent = "Almost There";
+                            elements.paceStatus.className = "text-sm font-bold text-yellow-400";
+                        } else {
+                            elements.paceStatus.textContent = "Catch Up Needed";
+                            elements.paceStatus.className = "text-sm font-bold text-rose-400";
+                        }
+                    }
+
+                    // Total Stats
+                    const todayKey = new Date().toISOString().split('T')[0];
+                    const todayItems = breachItems.filter(i => i.createdAt.startsWith(todayKey) && i.completed);
+                    elements.todayTotal.textContent = todayItems.length;
+                    
+                    // Efficiency (Completed / Total Created today)
+                    const totalTodayCreated = breachItems.filter(i => i.createdAt.startsWith(todayKey)).length;
+                    const eff = totalTodayCreated > 0 ? Math.round((todayItems.length / totalTodayCreated) * 100) : 100;
+                    elements.efficiency.textContent = `${eff}%`;
+
+                    renderCurrentList(currentHourItems);
+                    
+                    // Update global widgets
+                    renderBreachCompletionTable();
+                    renderBreachStats();
+                }
+
+                function renderCurrentList(items) {
+                    elements.listContainer.innerHTML = '';
+                    if (items.length === 0) {
+                        elements.listContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50"><div class="text-4xl mb-2">⚡</div><p>Start your breach session.</p></div>`;
+                        return;
+                    }
+
+                    // Sort: Uncompleted first, then newest
+                    items.sort((a, b) => {
+                        if (a.completed === b.completed) return new Date(b.createdAt) - new Date(a.createdAt);
+                        return a.completed ? 1 : -1;
+                    });
+
+                    items.forEach(item => {
+                        const el = document.createElement('div');
+                        el.className = `group flex items-center p-3 rounded-xl transition-all border ${item.completed ? 'bg-slate-50 dark:bg-slate-800/50 border-transparent opacity-75' : 'bg-white dark:bg-gray-700 border-slate-100 dark:border-gray-600 shadow-sm'}`;
+                        el.innerHTML = `
+                            <button class="toggle-btn w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${item.completed ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-500 hover:border-emerald-400'}">
+                                ${item.completed ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                            </button>
+                            <span class="flex-grow font-medium text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}">${item.text}</span>
+                            <span class="text-[10px] text-slate-400 font-mono mr-3">${new Date(item.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                            <button class="delete-btn text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        `;
+                        
+                        // Event Listeners
+                        el.querySelector('.toggle-btn').addEventListener('click', () => toggleItem(item.id));
+                        el.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id));
+                        
+                        elements.listContainer.appendChild(el);
+                    });
+                }
+
+                function renderHistory() {
+                    elements.historyContainer.innerHTML = '';
+                    
+                    // Group by Hour Key
+                    const groups = {};
+                    breachItems.forEach(item => {
+                        const d = new Date(item.createdAt);
+                        const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${d.getHours()}`;
+                        if (!groups[key]) groups[key] = [];
+                        groups[key].push(item);
+                    });
+
+                    // Sort keys descending
+                    const keys = Object.keys(groups).sort().reverse();
+                    
+                    keys.forEach(key => {
+                        if (key === getCurrentHourKey()) return; // Skip current hour in history view (optional)
+
+                        const items = groups[key];
+                        const completed = items.filter(i => i.completed).length;
+                        const dateObj = new Date(items[0].createdAt); // Use first item for date ref
+                        const timeLabel = `${dateObj.getHours().toString().padStart(2,'0')}:00 - ${(dateObj.getHours()+1).toString().padStart(2,'0')}:00`;
+                        const dateLabel = dateObj.toLocaleDateString();
+
+                        const card = document.createElement('div');
+                        card.className = "bg-slate-50 dark:bg-gray-700/30 rounded-2xl p-4 border border-slate-100 dark:border-gray-700";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <h4 class="font-bold text-slate-700 dark:text-slate-200">${timeLabel}</h4>
+                                    <p class="text-xs text-slate-500">${dateLabel}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xl font-bold text-indigo-500">${completed}</span>
+                                    <span class="text-xs text-slate-500 uppercase">Done</span>
+                                </div>
+                            </div>
+                            <div class="h-1.5 w-full bg-slate-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500" style="width: ${(completed/Math.max(items.length, 1))*100}%"></div>
+                            </div>
+                        `;
+                        elements.historyContainer.appendChild(card);
+                    });
+                }
+
+                // --- Actions ---
+
+                function addItem() {
+                    const text = elements.input.value.trim();
+                    if (!text) return;
+                    
+                    const newItem = {
+                        id: Date.now(),
+                        text: text,
+                        completed: false, // Default uncompleted
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    breachItems.push(newItem);
+                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                    elements.input.value = '';
+                    renderDashboard();
+                }
+
+                function toggleItem(id) {
+                    const item = breachItems.find(i => i.id === id);
+                    if (item) {
+                        item.completed = !item.completed;
+                        if (item.completed) item.completedAt = new Date().toISOString();
+                        else delete item.completedAt;
+                        localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                        renderDashboard();
+                    }
+                }
+
+                function deleteItem(id) {
+                    breachItems = breachItems.filter(i => i.id !== id);
+                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                    renderDashboard();
+                }
+
+                // --- Event Listeners ---
+                
+                elements.syncBtn.addEventListener('click', setHourlyTarget);
+                
+                elements.addBtn.addEventListener('click', addItem);
+                elements.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') addItem();
+                });
+
+                // Tabs
+                elements.tabCurrent.addEventListener('click', () => {
+                    elements.viewCurrent.classList.remove('hidden');
+                    elements.viewHistory.classList.add('hidden');
+                    elements.tabCurrent.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                    elements.tabCurrent.classList.remove('text-slate-500', 'dark:text-slate-400');
+                    elements.tabHistory.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                    elements.tabHistory.classList.add('text-slate-500', 'dark:text-slate-400');
+                });
+
+                elements.tabHistory.addEventListener('click', () => {
+                    elements.viewHistory.classList.remove('hidden');
+                    elements.viewCurrent.classList.add('hidden');
+                    elements.tabHistory.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                    elements.tabHistory.classList.remove('text-slate-500', 'dark:text-slate-400');
+                    elements.tabCurrent.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                    elements.tabCurrent.classList.add('text-slate-500', 'dark:text-slate-400');
+                    renderHistory();
+                });
+
+                // Initial Render
+                renderDashboard();
+                
+                // Refresh dashboard every minute to keep time label accurate
+                setInterval(renderDashboard, 60000);
             }
 
             function setupSalaryCalculator() {
@@ -2565,43 +2790,203 @@
                     { hour: 9, title: "Hour 9 — The 3AM Wall", theme: "Resistance", icon: "🧱", effect: "snow", tasks: ["Hydrate aggressively", "Stand while working", "Switch task types", "Don't stare at the clock"] },
                     { hour: 10, title: "Hour 10 — Solo Pilot", theme: "Quiet Focus", icon: "✈️", effect: "constellation", tasks: ["Report writing", "Documentation", "Maintenance tasks", "Prepare for day shift arrival"] },
                     { hour: 11, title: "Hour 11 — Early Birds", theme: "World Waking Up", icon: "🐦", effect: "rain", tasks: ["Cleaners arriving", "Tidy desk area", "Final emails", "Watch the sunrise"] },
-                    { hour: 12, title: "Hour 12 — Extraction Prep", theme: "Go Home", icon: "🕶️", effect: "bubbles", tasks: ["Sunglasses ON", "Handover to day team", "Log off", "Survive the commute & Sleep"] }
+                    { hour: 12, title: "Hour 12 — Extraction Prep", theme: "Go Home", icon: "🛬", effect: "bubbles", tasks: ["Handover notes ready", "Pack bag", "Logout", "Enjoy the daylight"] }
                 ];
 
-                let shiftTimer;
-                let shiftStartTime;
-                let shiftEndTime;
-                let totalShiftDuration;
-                let animationFrameId; 
-                let currentEffect = 'constellation';
-                let particles = [];
-                let userBreakConfigs = JSON.parse(localStorage.getItem('shiftUserBreakConfigs')) || [];
-                let activeBreakObjects = []; 
-                let autoScheduleHealthBreaks = localStorage.getItem('shiftAutoHealthBreaks') === 'true';
-                let wasOnBreak = false;
-
-                const canvas = document.getElementById('shift-timer-canvas');
-                const ctx = canvas.getContext('2d');
-
-                healthBreaksToggle.checked = autoScheduleHealthBreaks;
-                healthBreaksToggle.addEventListener('change', (e) => {
-                    autoScheduleHealthBreaks = e.target.checked;
-                    localStorage.setItem('shiftAutoHealthBreaks', autoScheduleHealthBreaks);
-                });
+                let shiftTimer; let shiftStartTime; let shiftEndTime; let totalShiftDuration;
+                let activeBreakObjects = []; let wasOnBreak = false;
+                let particles = []; let animationFrameId;
                 
-                updateLocButtons();
+                // --- Helper Functions ---
+
                 function updateLocButtons() {
                     if (shiftLocation === 'home') {
                         locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]";
                         locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
                     } else {
-                        locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
                         locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]";
+                        locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
                     }
                 }
 
-                locHomeBtn.addEventListener('click', () => { shiftLocation = 'home'; localStorage.setItem('shiftLocation', 'home'); updateLocButtons(); });
-                locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
+                function checkStoredShift() {
+                    const storedStart = localStorage.getItem('shiftStartTime');
+                    const storedEnd = localStorage.getItem('shiftEndTime');
+                    const storedTitle = localStorage.getItem('shiftTitle');
+                    if (storedStart && storedEnd) {
+                        const now = new Date();
+                        const end = new Date(storedEnd);
+                        if (now < end) {
+                            shiftStartTime = new Date(storedStart); shiftEndTime = end;
+                            if (storedTitle) shiftTitleInput.value = storedTitle;
+                            totalShiftDuration = (shiftEndTime - shiftStartTime);
+                            calculateActiveBreaks();
+                            setupView.classList.add('hidden'); countdownView.classList.remove('hidden');
+                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                            generateShiftBlocks();
+                            shiftCountdown();
+                            shiftTimer = setInterval(shiftCountdown, 1000);
+                            startEffect('constellation');
+                        } else {
+                            localStorage.removeItem('shiftEndTime'); // Expired
+                        }
+                    } else {
+                         // Set default inputs
+                        const now = new Date();
+                        startTimeInput.value = formatDateTimeForInput(now);
+                        const eightHoursLater = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                        endTimeInput.value = formatDateTimeForInput(eightHoursLater);
+                    }
+                }
+
+                function formatDateTimeForInput(date) {
+                    const d = new Date(date);
+                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                    return d.toISOString().slice(0, 16);
+                }
+
+                function formatTime(ms) {
+                    if (ms < 0) ms = 0;
+                    const h = Math.floor(ms / (1000 * 60 * 60));
+                    const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((ms % (1000 * 60)) / 1000);
+                    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+
+                function formatTimeShort(ms) {
+                    const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((ms % (1000 * 60)) / 1000);
+                    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+
+                function generateShiftBlocks() {
+                    shiftBlocksContainer.innerHTML = '';
+                    const totalMinutes = totalShiftDuration / (1000 * 60);
+                    
+                    // Add Breaks Visuals
+                    activeBreakObjects.forEach(b => {
+                        const startOffset = new Date(b.start) - shiftStartTime;
+                        const duration = new Date(b.end) - new Date(b.start);
+                        const leftPercent = (startOffset / totalShiftDuration) * 100;
+                        const widthPercent = (duration / totalShiftDuration) * 100;
+                        
+                        const el = document.createElement('div');
+                        el.className = "absolute top-0 bottom-0 bg-emerald-500/30 border-l border-r border-emerald-500/50";
+                        el.style.left = `${leftPercent}%`;
+                        el.style.width = `${widthPercent}%`;
+                        el.title = `${b.type} (${new Date(b.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})`;
+                        shiftBlocksContainer.appendChild(el);
+                    });
+
+                    // Add Progress Bar
+                    const progressEl = document.createElement('div');
+                    progressEl.id = 'shift-progress-bar';
+                    progressEl.className = "absolute top-0 bottom-0 left-0 bg-teal-500/20 border-r border-teal-400 shadow-[0_0_10px_rgba(45,212,191,0.3)] transition-all duration-1000";
+                    progressEl.style.width = '0%';
+                    shiftBlocksContainer.appendChild(progressEl);
+                }
+
+                function calculateActiveBreaks() {
+                    const storedBreaks = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
+                    activeBreakObjects = [];
+                    const shiftDateStr = shiftStartTime.toDateString();
+                    
+                    storedBreaks.forEach(b => {
+                        // Construct break start time relative to shift start
+                        // Logic: Break string is "HH:MM". We need to figure out if it's today or tomorrow based on shift start
+                        let breakDate = new Date(`${shiftDateStr} ${b.time}`);
+                        // If shift starts at 22:00 and break is 02:00, break is next day
+                        if (breakDate < shiftStartTime) {
+                             breakDate.setDate(breakDate.getDate() + 1);
+                        }
+                        // If break is still before start (e.g. shift 10pm, break 9pm), it might be invalid or next day?
+                        // Simple check: if break > end time, ignore (or check previous day?)
+                        // For simplicity, assume breaks are within the 24h window of shift start
+                        if (breakDate > shiftEndTime) {
+                             // maybe it belongs to previous day? no.
+                        } else if (breakDate < shiftStartTime) {
+                             // Break is before shift starts? 
+                        }
+                        
+                        // Check if within shift
+                        if (breakDate >= shiftStartTime && breakDate < shiftEndTime) {
+                            activeBreakObjects.push({
+                                start: breakDate.toISOString(),
+                                end: new Date(breakDate.getTime() + b.duration * 60000).toISOString(),
+                                type: b.type
+                            });
+                        }
+                    });
+
+                    // Health Breaks
+                    if (healthBreaksToggle.checked) {
+                        let cursor = new Date(shiftStartTime.getTime() + 60*60000); // Start checking 1 hour in
+                        while (cursor < new Date(shiftEndTime.getTime() - 30*60000)) {
+                            // Check if any existing break overlaps with cursor +/- 30 mins
+                            const conflict = activeBreakObjects.some(b => {
+                                const bStart = new Date(b.start);
+                                const bEnd = new Date(b.end);
+                                return (cursor >= new Date(bStart.getTime() - 30*60000) && cursor <= new Date(bEnd.getTime() + 30*60000));
+                            });
+                            
+                            if (!conflict) {
+                                activeBreakObjects.push({
+                                    start: cursor.toISOString(),
+                                    end: new Date(cursor.getTime() + 5 * 60000).toISOString(),
+                                    type: "Movement"
+                                });
+                            }
+                            cursor = new Date(cursor.getTime() + 60*60000);
+                        }
+                    }
+                    activeBreakObjects.sort((a,b) => new Date(a.start) - new Date(b.start));
+                }
+
+                function updateShiftDisplay(remainingMs) {
+                    if (remainingMs < 0) remainingMs = 0;
+                    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+                    document.getElementById('shift-hours-display').textContent = hours.toString().padStart(2, '0');
+                    document.getElementById('shift-minutes-display').textContent = minutes.toString().padStart(2, '0');
+                    document.getElementById('shift-seconds-display').textContent = seconds.toString().padStart(2, '0');
+                    
+                    const progress = document.getElementById('shift-progress-bar');
+                    if (progress) {
+                        const elapsed = totalShiftDuration - remainingMs;
+                        const pct = (elapsed / totalShiftDuration) * 100;
+                        progress.style.width = `${pct}%`;
+                    }
+                }
+
+                function updateShiftVisuals() {
+                    const elapsedMs = new Date() - shiftStartTime;
+                    const currentHourIdx = Math.floor(elapsedMs / (1000 * 60 * 60));
+                    const plan = shiftLocation === 'home' ? shiftPlanHome : shiftPlanOffice;
+                    
+                    // Safe index access
+                    const hourData = plan[Math.min(currentHourIdx, plan.length - 1)] || plan[plan.length - 1];
+
+                    if (guideTitle.textContent !== hourData.title) {
+                        // New hour theme
+                        guideBadge.textContent = "Current Vibe";
+                        guideTheme.textContent = `// ${hourData.theme}`;
+                        guideTitle.textContent = hourData.title;
+                        guideIcon.textContent = hourData.icon;
+                        
+                        guideContent.innerHTML = '';
+                        hourData.tasks.forEach(task => {
+                            const p = document.createElement('p');
+                            p.className = "flex items-center gap-3";
+                            p.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>${task}`;
+                            guideContent.appendChild(p);
+                        });
+                        
+                        startEffect(hourData.effect || 'constellation');
+                    }
+                }
 
                 // Shift Mode Logic
                 function updateShiftModeUI() {
@@ -2652,224 +3037,21 @@
                 shiftModeCallBtn.addEventListener('click', () => switchShiftMode('call'));
                 shiftModeBreachBtn.addEventListener('click', () => switchShiftMode('breach'));
 
-                function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-                window.addEventListener('resize', resizeCanvas);
-                resizeCanvas(); 
 
-                function initEffect(type) {
-                    particles = [];
-                    currentEffect = type;
-                    const w = canvas.width;
-                    const h = canvas.height;
-                    let count = window.innerWidth < 768 ? 50 : 100;
-                    for (let i = 0; i < count; i++) {
-                        particles.push(createParticle(type, w, h));
-                    }
-                }
-
-                function createParticle(type, w, h) {
-                    const p = { x: Math.random() * w, y: Math.random() * h, type: type };
-                    if (type === 'rain') {
-                        p.vy = Math.random() * 15 + 10; p.vx = 0; p.len = Math.random() * 20 + 10;
-                        p.color = `rgba(174, 194, 224, ${Math.random() * 0.4 + 0.1})`; p.y = Math.random() * -h;
-                    } else if (type === 'snow') {
-                        p.vy = Math.random() * 2 + 0.5; p.vx = Math.random() * 1 - 0.5; p.radius = Math.random() * 2 + 1;
-                        p.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
-                    } else if (type === 'embers') {
-                        p.vy = (Math.random() * 2 + 0.5) * -1; p.vx = Math.random() * 1 - 0.5; p.radius = Math.random() * 3 + 1;
-                        p.color = `rgba(255, ${Math.floor(Math.random() * 100 + 50)}, 0, ${Math.random() * 0.6 + 0.1})`; p.y = h + Math.random() * 100;
-                    } else if (type === 'bubbles') {
-                        p.vy = (Math.random() * 1 + 0.2) * -1; p.vx = Math.random() * 0.5 - 0.25; p.radius = Math.random() * 10 + 2;
-                        p.color = `rgba(100, 200, 255, ${Math.random() * 0.2 + 0.05})`; p.y = h + Math.random() * 100;
-                    } else {
-                        p.vx = Math.random() * 0.5 - 0.25; p.vy = Math.random() * 0.5 - 0.25; p.radius = Math.random() * 2;
-                        p.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
-                    }
-                    return p;
-                }
-
-                function drawParticles() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    const w = canvas.width; const h = canvas.height;
-                    for (let i = 0; i < particles.length; i++) {
-                        const p = particles[i];
-                        p.x += p.vx; p.y += p.vy;
-                        ctx.fillStyle = p.color; ctx.strokeStyle = p.color;
-
-                        if (currentEffect === 'rain') {
-                            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.len); ctx.lineWidth = 1; ctx.stroke();
-                            if (p.y > h) { p.y = -p.len; p.x = Math.random() * w; }
-                        } else if (currentEffect === 'snow') {
-                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
-                            p.x += Math.sin(p.y * 0.01) * 0.5;
-                            if (p.y > h) { p.y = -10; p.x = Math.random() * w; }
-                        } else if (currentEffect === 'embers' || currentEffect === 'bubbles') {
-                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
-                            if (p.y < -20) { p.y = h + 20; p.x = Math.random() * w; }
-                        } else {
-                            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
-                            if (p.x < 0 || p.x > w) p.vx *= -1;
-                            if (p.y < 0 || p.y > h) p.vy *= -1;
-                            for (let j = i + 1; j < particles.length; j++) {
-                                const p2 = particles[j];
-                                const dx = p.x - p2.x; const dy = p.y - p2.y;
-                                const dist = Math.sqrt(dx*dx + dy*dy);
-                                if (dist < 100) {
-                                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.lineWidth = 0.5;
-                                    ctx.strokeStyle = `rgba(255,255,255, ${0.1 - dist/1000})`; ctx.stroke();
-                                }
-                            }
-                        }
-                    }
-                    animationFrameId = requestAnimationFrame(drawParticles);
-                }
-
-                function startEffect(type) { if (animationFrameId) cancelAnimationFrame(animationFrameId); initEffect(type); drawParticles(); }
-                function stopEffect() { if (animationFrameId) cancelAnimationFrame(animationFrameId); ctx.clearRect(0, 0, canvas.width, canvas.height); }
-                
                 function playBreakSound() {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioContext) return;
-                    const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    const now = ctx.currentTime;
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(659.25, now); osc.frequency.exponentialRampToValueAtTime(830.61, now + 0.1);
-                    gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.15, now + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-                    osc.start(now); osc.stop(now + 1.5);
-                }
-
-                function formatTime(ms) {
-                    const totalSeconds = Math.floor(ms / 1000); const h = Math.floor(totalSeconds / 3600); const m = Math.floor((totalSeconds % 3600) / 60); const s = totalSeconds % 60;
-                    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                }
-                function formatTimeShort(ms) {
-                     const totalSeconds = Math.floor(ms / 1000); const h = Math.floor(totalSeconds / 3600); const m = Math.floor((totalSeconds % 3600) / 60); const s = totalSeconds % 60;
-                    if (h > 0) return `${h}h ${m}m ${s}s`; return `${m}m ${s}s`;
-                }
-                function formatDateTimeForInput(date) {
-                    const pad = (num) => num.toString().padStart(2, '0');
-                    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-                }
-
-                function renderSetupBreaks() {
-                    breakTimesContainer.innerHTML = '';
-                    userBreakConfigs.sort((a, b) => a.startTime.localeCompare(b.startTime));
-                    if (userBreakConfigs.length === 0) breakTimesContainer.innerHTML = '<p class="text-gray-500 text-xs italic text-center py-2">No specific breaks set.</p>';
-                    userBreakConfigs.forEach((breakItem, index) => {
-                        const breakEl = document.createElement('div');
-                        breakEl.className = 'flex items-center space-x-2 text-sm text-gray-300 bg-gray-800/50 p-2 rounded-lg';
-                        breakEl.innerHTML = `
-                            <input type="time" value="${breakItem.startTime}" class="break-start-time w-1/3 p-1 rounded bg-gray-700 text-white border-transparent focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-xs">
-                            <div class="flex items-center w-1/3">
-                                <input type="number" value="${breakItem.duration}" min="1" class="break-duration w-full p-1 rounded-l bg-gray-700 text-white border-transparent focus:border-indigo-500 text-xs text-center">
-                                <span class="bg-gray-600 px-2 py-1 rounded-r text-xs">m</span>
-                            </div>
-                            <button class="remove-break-btn ml-auto text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1 rounded transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                        `;
-                        breakTimesContainer.appendChild(breakEl);
-                        breakEl.querySelector('.remove-break-btn').addEventListener('click', () => { userBreakConfigs.splice(index, 1); saveUserBreaks(); renderSetupBreaks(); });
-                        breakEl.querySelector('.break-start-time').addEventListener('change', (e) => { userBreakConfigs[index].startTime = e.target.value; saveUserBreaks(); });
-                        breakEl.querySelector('.break-duration').addEventListener('change', (e) => { userBreakConfigs[index].duration = parseInt(e.target.value); saveUserBreaks(); });
-                    });
-                }
-                function saveUserBreaks() { localStorage.setItem('shiftUserBreakConfigs', JSON.stringify(userBreakConfigs)); }
-                
-                addBreakBtn.addEventListener('click', () => { userBreakConfigs.push({ startTime: '00:00', duration: 15, type: 'manual' }); saveUserBreaks(); renderSetupBreaks(); });
-                loadMyBreaksBtn.addEventListener('click', () => {
-                    userBreakConfigs = [{ startTime: '22:00', duration: 10, type: 'manual' }, { startTime: '00:00', duration: 10, type: 'manual' }, { startTime: '03:15', duration: 30, type: 'manual' }, { startTime: '05:00', duration: 10, type: 'manual' }];
-                    saveUserBreaks(); renderSetupBreaks();
-                });
-
-                presetNormalBtn.addEventListener('click', () => {
-                    const now = new Date();
-                    const nextEnd = new Date(now);
-                    if (now.getHours() >= 7) nextEnd.setDate(now.getDate() + 1);
-                    nextEnd.setHours(7, 0, 0, 0);
-                    const nextStart = new Date(nextEnd); nextStart.setHours(nextStart.getHours() - 12);
-                    endTimeInput.value = formatDateTimeForInput(nextEnd); startTimeInput.value = formatDateTimeForInput(nextStart);
-                });
-
-                presetOvertimeBtn.addEventListener('click', () => {
-                    const now = new Date();
-                    const nextEnd = new Date(now);
-                    if (now.getHours() >= 5) nextEnd.setDate(now.getDate() + 1);
-                    nextEnd.setHours(5, 0, 0, 0);
-                    const nextStart = new Date(nextEnd); nextStart.setHours(nextStart.getHours() - 12);
-                    endTimeInput.value = formatDateTimeForInput(nextEnd); startTimeInput.value = formatDateTimeForInput(nextStart);
-                });
-
-                function updateShiftDisplay(remainingMs) {
-                    const h = Math.floor(remainingMs / (1000 * 60 * 60)); const m = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60)); const s = Math.floor((remainingMs % (1000 * 60)) / 1000);
-                    document.getElementById('shift-hours-display').textContent = h.toString().padStart(2, '0');
-                    document.getElementById('shift-minutes-display').textContent = m.toString().padStart(2, '0');
-                    document.getElementById('shift-seconds-display').textContent = s.toString().padStart(2, '0');
-                }
-
-                function generateShiftBlocks() {
-                    shiftBlocksContainer.innerHTML = '';
-                    const indicator = document.createElement('div'); indicator.id = 'shift-global-indicator'; indicator.className = "absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_15px_white] z-20 transition-all duration-1000 ease-linear pointer-events-none"; indicator.style.left = '0%';
-                    const indicatorTag = document.createElement('div'); indicatorTag.className = "absolute -top-2 left-1/2 -translate-x-1/2 bg-white text-indigo-900 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap uppercase tracking-tighter transform -translate-y-full"; indicatorTag.textContent = "You Are Here";
-                    const arrow = document.createElement('div'); arrow.className = "absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-white";
-                    indicatorTag.appendChild(arrow); indicator.appendChild(indicatorTag); shiftBlocksContainer.appendChild(indicator);
-                    const totalHours = Math.ceil(totalShiftDuration / (1000 * 60 * 60));
-                    for (let i = 0; i < totalHours; i++) {
-                        const block = document.createElement('div'); block.className = "flex-1 border-r border-gray-800 last:border-r-0 relative group bg-gray-900/50";
-                        const fill = document.createElement('div'); fill.id = `shift-block-fill-${i}`; fill.className = "absolute top-0 left-0 h-full w-0 bg-gradient-to-r from-red-700 to-red-600 transition-all duration-300";
-                        const label = document.createElement('div'); label.className = "absolute bottom-1 right-1.5 text-[10px] text-gray-600 font-mono font-bold z-10 select-none"; label.textContent = `${i + 1}h`;
-                        block.appendChild(fill); block.appendChild(label); shiftBlocksContainer.appendChild(block);
-                    }
-                }
-
-                function updateShiftVisuals() {
-                    const now = new Date(); const elapsedMs = now - shiftStartTime; const totalMs = totalShiftDuration; const hourMs = 1000 * 60 * 60; const totalHours = Math.ceil(totalMs / hourMs);
-                    const percentage = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
-                    const indicator = document.getElementById('shift-global-indicator'); if (indicator) indicator.style.left = `${percentage}%`;
-                    for (let i = 0; i < totalHours; i++) {
-                        const fill = document.getElementById(`shift-block-fill-${i}`); if (!fill) continue;
-                        const blockStartMs = i * hourMs; const blockEndMs = (i + 1) * hourMs;
-                        if (elapsedMs >= blockEndMs) fill.style.width = '100%'; else if (elapsedMs > blockStartMs) { const progress = (elapsedMs - blockStartMs) / hourMs; fill.style.width = `${progress * 100}%`; } else fill.style.width = '0%';
-                    }
-                    const currentHourIndex = Math.floor(elapsedMs / hourMs); 
-                    const activePlan = shiftLocation === 'office' ? shiftPlanOffice : shiftPlanHome;
-                    if (currentHourIndex >= 0 && currentHourIndex < activePlan.length) {
-                        const plan = activePlan[currentHourIndex];
-                        guideTitle.textContent = plan.title; guideTheme.textContent = `// ${plan.theme}`; guideIcon.textContent = plan.icon;
-                        guideContainer.style.backgroundImage = `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.6))`;
-                        guideContainer.classList.add('vibe-animated'); guideIcon.classList.add('icon-float');
-                        if (currentEffect !== plan.effect) startEffect(plan.effect);
-                        let html = ''; plan.tasks.forEach(task => { html += `<div class="flex items-start gap-2"><span class="text-teal-400 mt-1">›</span><span>${task}</span></div>`; }); guideContent.innerHTML = html;
-                    } else if (currentHourIndex >= activePlan.length) {
-                        guideTitle.textContent = "Shift Complete"; guideTheme.textContent = "// Overtime"; guideIcon.textContent = "🦾";
-                        guideContainer.style.backgroundImage = `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8))`; 
-                        guideContainer.classList.remove('vibe-animated'); guideIcon.classList.remove('icon-float');
-                        startEffect('embers'); guideContent.innerHTML = "<div class='text-center italic mt-4'>You've passed the 12-hour mark. Keep grinding or wrap up!</div>";
-                    }
-                }
-
-                function calculateActiveBreaks() {
-                    activeBreakObjects = [];
-                    userBreakConfigs.forEach(config => {
-                        const [hours, minutes] = config.startTime.split(':').map(Number);
-                        let breakStart = new Date(shiftStartTime); breakStart.setHours(hours, minutes, 0, 0);
-                        if (breakStart < shiftStartTime) breakStart.setDate(breakStart.getDate() + 1);
-                        const breakEnd = new Date(breakStart.getTime() + config.duration * 60000);
-                        if (breakStart >= shiftStartTime && breakStart < shiftEndTime) activeBreakObjects.push({ start: breakStart, end: breakEnd, type: 'Standard Break', duration: config.duration });
-                    });
-                    if (autoScheduleHealthBreaks) {
-                        activeBreakObjects.sort((a, b) => a.start - b.start);
-                        let pointer = new Date(shiftStartTime); const healthIntervalMs = 60 * 60 * 1000; const healthDurationMs = 5 * 60 * 1000;
-                        while (pointer.getTime() + healthIntervalMs < shiftEndTime.getTime()) {
-                            const potentialHealthStart = new Date(pointer.getTime() + healthIntervalMs); const potentialHealthEnd = new Date(potentialHealthStart.getTime() + healthDurationMs);
-                            let collision = false; if (potentialHealthEnd > shiftEndTime) break;
-                            for (let b of activeBreakObjects) {
-                                const buffer = 15 * 60 * 1000;
-                                if ((potentialHealthStart >= new Date(b.start.getTime() - buffer) && potentialHealthStart < new Date(b.end.getTime() + buffer)) || (potentialHealthEnd > new Date(b.start.getTime() - buffer) && potentialHealthEnd <= new Date(b.end.getTime() + buffer))) { collision = true; pointer = new Date(b.end); break; }
-                            }
-                            if (!collision) { activeBreakObjects.push({ start: potentialHealthStart, end: potentialHealthEnd, type: 'Health Break', duration: 5 }); pointer = potentialHealthEnd; }
-                        }
-                        activeBreakObjects.sort((a, b) => a.start - b.start);
-                    }
-                    localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
+                     // Simple notification sound
+                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                     const osc = ctx.createOscillator();
+                     const gain = ctx.createGain();
+                     osc.type = 'sine';
+                     osc.frequency.setValueAtTime(440, ctx.currentTime);
+                     osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+                     gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                     osc.connect(gain);
+                     gain.connect(ctx.destination);
+                     osc.start();
+                     osc.stop(ctx.currentTime + 0.5);
                 }
 
                 function shiftCountdown() {
@@ -2967,169 +3149,147 @@
                     setupView.classList.remove('hidden'); countdownView.classList.add('hidden'); endView.classList.add('hidden'); breakActiveDisplay.classList.add('hidden');
                 }
                 
-                // --- NEW: Shared Shift Logic ---
-                function checkSharedShift() {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const sharedData = urlParams.get('shared_shift');
+                // --- Canvas Animation Logic (Particles) ---
+                function initParticles(effectType) {
+                    const canvas = document.getElementById('shift-timer-canvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    particles = [];
                     
-                    if (sharedData) {
-                        try {
-                            const [dataString, encodedTitle] = sharedData.split('~');
-                            const parts = dataString.split('.');
-                            
-                            if (parts.length < 2) return;
-
-                            const startMin = parseInt(parts[0], 36);
-                            const durationMin = parseInt(parts[1], 36);
-                            
-                            const startMs = startMin * 60000;
-                            const endMs = startMs + (durationMin * 60000);
-                            
-                            const newStartTime = new Date(startMs);
-                            const newEndTime = new Date(endMs);
-                            
-                            const newTitle = decodeURIComponent((encodedTitle || '').replace(/\+/g, '%20'));
-                            
-                            const newBreaks = [];
-                            for (let i = 2; i < parts.length; i += 2) {
-                                if (i + 1 >= parts.length) break;
-                                const offsetMin = parseInt(parts[i], 36);
-                                const compoundVal = parseInt(parts[i+1], 36);
-                                
-                                const typeBit = compoundVal % 2;
-                                const duration = Math.floor(compoundVal / 2);
-                                
-                                const breakStart = new Date(startMs + (offsetMin * 60000));
-                                const breakEnd = new Date(breakStart.getTime() + (duration * 60000));
-                                
-                                newBreaks.push({
-                                    start: breakStart,
-                                    end: breakEnd,
-                                    type: typeBit === 1 ? 'Health Break' : 'Standard Break',
-                                    duration: duration
-                                });
+                    const count = window.innerWidth > 768 ? 100 : 50;
+                    
+                    for(let i=0; i<count; i++) {
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: Math.random() * canvas.height,
+                            size: Math.random() * 2 + 1,
+                            speedX: (Math.random() - 0.5) * 0.5,
+                            speedY: (Math.random() - 0.5) * 0.5,
+                            opacity: Math.random() * 0.5 + 0.1,
+                            type: effectType
+                        });
+                    }
+                }
+                
+                function animateParticles() {
+                    const canvas = document.getElementById('shift-timer-canvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        
+                        // Style based on type
+                        if (p.type === 'snow') ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                        else if (p.type === 'rain') ctx.fillStyle = `rgba(173, 216, 230, ${p.opacity})`;
+                        else if (p.type === 'embers') ctx.fillStyle = `rgba(255, 140, 0, ${p.opacity})`;
+                        else if (p.type === 'bubbles') ctx.fillStyle = `rgba(135, 206, 235, ${p.opacity})`;
+                        else ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`; // constellation default
+                        
+                        ctx.fill();
+                        
+                        // Move
+                        if (p.type === 'snow' || p.type === 'rain') {
+                             p.y += (Math.random() * 1 + 0.5); // Fall down
+                             if (p.y > canvas.height) p.y = 0;
+                        } else if (p.type === 'bubbles') {
+                             p.y -= (Math.random() * 1 + 0.5); // Float up
+                             if (p.y < 0) p.y = canvas.height;
+                        } else {
+                             p.x += p.speedX;
+                             p.y += p.speedY;
+                             if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                             if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                        }
+                    });
+                    
+                    // Constellation lines
+                    if (particles.length > 0 && particles[0].type === 'constellation') {
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                        ctx.lineWidth = 0.5;
+                        for(let i=0; i<particles.length; i++) {
+                            for(let j=i+1; j<particles.length; j++) {
+                                const dx = particles[i].x - particles[j].x;
+                                const dy = particles[i].y - particles[j].y;
+                                const dist = Math.sqrt(dx*dx + dy*dy);
+                                if (dist < 100) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(particles[i].x, particles[i].y);
+                                    ctx.lineTo(particles[j].x, particles[j].y);
+                                    ctx.stroke();
+                                }
                             }
-
-                            // Apply to state
-                            shiftStartTime = newStartTime;
-                            shiftEndTime = newEndTime;
-                            shiftTitleInput.value = newTitle;
-                            activeBreakObjects = newBreaks;
-                            totalShiftDuration = shiftEndTime - shiftStartTime;
-
-                            // Save to local storage
-                            localStorage.setItem('shiftStartTime', shiftStartTime.toISOString());
-                            localStorage.setItem('shiftEndTime', shiftEndTime.toISOString());
-                            localStorage.setItem('shiftTitle', newTitle);
-                            localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
-                            
-                            // Clean URL
-                            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                            window.history.pushState({path:newUrl},'',newUrl);
-                            
-                            // Switch UI
-                            navigateToView('shift-timer');
-                            setupView.classList.add('hidden');
-                            countdownView.classList.remove('hidden');
-                            endView.classList.add('hidden');
-                            
-                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                            startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                            
-                            generateShiftBlocks();
-                            shiftCountdown();
-                            if (shiftTimer) clearInterval(shiftTimer);
-                            shiftTimer = setInterval(shiftCountdown, 1000);
-                            startEffect('constellation');
-                            
-                            showAlert("Sync successful! Viewing shared shift.");
-
-                        } catch (e) {
-                            console.error("Error parsing shared shift:", e);
-                            showAlert("Invalid shared shift link.");
                         }
                     }
+                    
+                    animationFrameId = requestAnimationFrame(animateParticles);
+                }
+                
+                function startEffect(type) {
+                    cancelAnimationFrame(animationFrameId);
+                    initParticles(type);
+                    animateParticles();
+                }
+                
+                function stopEffect() {
+                    cancelAnimationFrame(animationFrameId);
                 }
 
-                // QR Code & Share Logic
-                shareShiftBtn.addEventListener('click', () => {
-                    if (!shiftStartTime || !shiftEndTime) { showAlert("Cannot share an inactive shift."); return; }
-                    
-                    // 1. Generate Data String
-                    const s = Math.floor(shiftStartTime.getTime() / 60000).toString(36); 
-                    const d = Math.floor((shiftEndTime - shiftStartTime) / 60000).toString(36); 
-                    const dataParts = [s, d];
-                    
-                    activeBreakObjects.forEach(brk => {
-                        const offsetVal = Math.floor((new Date(brk.start) - shiftStartTime) / 60000); 
-                        const offset = offsetVal.toString(36); 
-                        const typeBit = brk.type === 'Health Break' ? 1 : 0; 
-                        const compoundVal = (parseInt(brk.duration) * 2) + typeBit; 
-                        const compound = compoundVal.toString(36);
-                        dataParts.push(offset, compound);
+                function resizeCanvas() { 
+                    const c = document.getElementById('shift-timer-canvas');
+                    if(c) { c.width = window.innerWidth; c.height = window.innerHeight; initParticles(particles.length > 0 ? particles[0].type : 'constellation'); }
+                }
+                window.addEventListener('resize', resizeCanvas);
+
+                // --- Event Listeners & Init ---
+
+                locHomeBtn.addEventListener('click', () => { shiftLocation = 'home'; localStorage.setItem('shiftLocation', 'home'); updateLocButtons(); });
+                locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
+                updateLocButtons();
+
+                // Break Management Logic
+                let setupBreakList = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
+                function renderSetupBreaks() {
+                    breakTimesContainer.innerHTML = '';
+                    setupBreakList.forEach((b, idx) => {
+                        const div = document.createElement('div');
+                        div.className = "flex justify-between items-center bg-white/10 p-2 rounded-lg border border-white/5";
+                        div.innerHTML = `<span class="font-mono text-sm font-bold text-gray-300">${b.time}</span><span class="text-xs text-gray-400 uppercase tracking-wider">${b.duration}m - ${b.type}</span><button class="text-red-400 hover:text-red-300 px-2" data-idx="${idx}">×</button>`;
+                        breakTimesContainer.appendChild(div);
                     });
-                    
-                    const dataString = dataParts.join('.'); 
-                    let t = shiftTitleInput.value; 
-                    t = encodeURIComponent(t).replace(/%20/g, '+'); 
-                    const rawString = `${dataString}~${t}`; 
-                    let baseUrl = window.location.href.split('?')[0]; 
-                    
-                    // 2. Set URL
-                    currentShareUrl = `${baseUrl}?shared_shift=${rawString}`;
-                    
-                    // 3. Generate QR
-                    qrContainer.innerHTML = ''; // Clear previous
-                    new QRCode(qrContainer, {
-                        text: currentShareUrl,
-                        width: 180,
-                        height: 180,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
+                    localStorage.setItem('shiftBreakTimes', JSON.stringify(setupBreakList));
+                    // Bind delete buttons
+                    breakTimesContainer.querySelectorAll('button').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const idx = parseInt(e.target.dataset.idx);
+                            setupBreakList.splice(idx, 1);
+                            renderSetupBreaks();
+                        });
                     });
-
-                    // 4. Show Modal
-                    qrModal.classList.remove('hidden');
-                    qrModal.classList.add('flex');
-                });
-
-                closeQrBtn.addEventListener('click', () => {
-                    qrModal.classList.add('hidden');
-                    qrModal.classList.remove('flex');
-                });
-
-                copyLinkFallbackBtn.addEventListener('click', () => {
-                    if (!currentShareUrl) return;
-                    const textArea = document.createElement("textarea"); 
-                    textArea.value = currentShareUrl; 
-                    textArea.style.position = "fixed"; 
-                    textArea.style.left = "-9999px"; 
-                    document.body.appendChild(textArea); 
-                    textArea.focus(); 
-                    textArea.select();
-                    try { 
-                        document.execCommand('copy'); 
-                        showAlert("Link copied to clipboard!"); 
-                    } catch (err) { 
-                        console.error("Failed to copy", err); 
-                        showAlert("Failed to copy link."); 
-                    } 
-                    document.body.removeChild(textArea);
-                });
-
-                function checkStoredShift() {
-                    const storedEndTime = localStorage.getItem('shiftEndTime'); const storedStartTime = localStorage.getItem('shiftStartTime'); const storedBreaks = localStorage.getItem('shiftActiveBreakObjects'); const storedTitle = localStorage.getItem('shiftTitle');
+                }
+                
+                addBreakBtn.addEventListener('click', () => {
+                    const time = prompt("Enter break start time (HH:MM, 24h format):", "02:00");
+                    if (!time) return;
+                    const duration = prompt("Enter duration in minutes:", "30");
+                    if (!duration) return;
+                    setupBreakList.push({ time, duration: parseInt(duration), type: "Break" });
+                    setupBreakList.sort((a,b) => a.time.localeCompare(b.time));
                     renderSetupBreaks();
-                    if (storedEndTime && storedStartTime) {
-                        shiftEndTime = new Date(storedEndTime); shiftStartTime = new Date(storedStartTime); if (storedBreaks) activeBreakObjects = JSON.parse(storedBreaks); if (storedTitle) shiftTitleInput.value = storedTitle;
-                        if (shiftEndTime > new Date()) {
-                            totalShiftDuration = shiftEndTime - shiftStartTime; setupView.classList.add('hidden'); countdownView.classList.remove('hidden');
-                            endTimeLabel.textContent = `End: ${shiftEndTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; startTimeLabel.textContent = `Start: ${shiftStartTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                            generateShiftBlocks(); shiftCountdown(); shiftTimer = setInterval(shiftCountdown, 1000); startEffect('constellation'); 
-                        } else { resetShiftTimer(); }
-                    }
-                }
+                });
+                
+                loadMyBreaksBtn.addEventListener('click', () => {
+                    setupBreakList = [
+                        { time: "22:00", duration: 15, type: "Short Break" },
+                        { time: "02:00", duration: 30, type: "Lunch" },
+                        { time: "05:00", duration: 15, type: "Short Break" }
+                    ];
+                    renderSetupBreaks();
+                });
 
                 startBtn.addEventListener('click', () => {
                     const startTimeValue = startTimeInput.value; const endTimeValue = endTimeInput.value;
@@ -3180,25 +3340,38 @@
 
                 resetBtn.addEventListener('click', resetShiftTimer); newShiftBtn.addEventListener('click', resetShiftTimer);
                 
-                checkStoredShift();
-                checkSharedShift();
-            }
-
-            // --- Updated Initialization Logic ---
-            if (localStorage.getItem('appEntered') === 'true' || new URLSearchParams(window.location.search).has('shared_shift')) {
-                initializeDashboard();
-                landingPage.style.display = 'none';
-                appLayout.classList.remove('hidden-fade');
-                appLayout.classList.add('visible-fade');
+                // Share QR Code
+                shareShiftBtn.addEventListener('click', () => {
+                    currentShareUrl = window.location.href; // In a real app this would be a deep link
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: currentShareUrl,
+                        width: 128,
+                        height: 128,
+                        colorDark : "#0f172a",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                    qrModal.classList.remove('hidden');
+                    qrModal.classList.add('flex');
+                });
                 
-                if (new URLSearchParams(window.location.search).has('shared_shift')) {
-                    // checkSharedShift in setupShiftTimer will handle navigation
-                } else {
-                    const lastView = localStorage.getItem('lastActiveView') || 'dashboard-home';
-                    navigateToView(lastView);
-                }
-            }
-        });
+                closeQrBtn.addEventListener('click', () => {
+                    qrModal.classList.add('hidden');
+                    qrModal.classList.remove('flex');
+                });
+                
+                copyLinkFallbackBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(currentShareUrl).then(() => {
+                        copyLinkFallbackBtn.textContent = 'Copied!';
+                        setTimeout(() => copyLinkFallbackBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy Link`, 2000);
+                    });
+                });
+
+                checkStoredShift();
+                renderSetupBreaks();
+            } // end setupShiftTimer
+        }); // end DOMContentLoaded
     </script>
 </body>
 </html>
