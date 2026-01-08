@@ -2863,51 +2863,102 @@
 
                 function generateShiftBlocks() {
                     shiftBlocksContainer.innerHTML = '';
-                    const totalMinutes = totalShiftDuration / (1000 * 60);
                     
-                    // Add Breaks Visuals
+                    // 1. Add Progress Bar (Background Layer) - UPDATED TO GREEN & HIGH VISIBILITY
+                    const progressEl = document.createElement('div');
+                    progressEl.id = 'shift-progress-bar';
+                    // Increased opacity from /20 to /50 for better visibility
+                    progressEl.className = "absolute top-0 bottom-0 left-0 bg-green-500/50 border-r-2 border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all duration-1000 z-0";
+                    progressEl.style.width = '0%';
+                    shiftBlocksContainer.appendChild(progressEl);
+
+                    // 2. Add Hourly Markers (Middle Layer) - RELATIVE HOURS (H1, H2...)
+                    // Start cursor exactly 1 hour after start time
+                    let cursor = new Date(shiftStartTime.getTime() + (60 * 60 * 1000));
+                    let hourCounter = 1;
+
+                    // Safety break for loop
+                    let loops = 0;
+                    while (cursor < shiftEndTime && loops < 24) {
+                        const offset = cursor - shiftStartTime;
+                        const pct = (offset / totalShiftDuration) * 100;
+
+                        if (pct > 0 && pct < 100) {
+                            // Line - Full height, solid, clearer visibility
+                            const line = document.createElement('div');
+                            line.className = "absolute top-0 bottom-0 w-px bg-white/40 z-10";
+                            line.style.left = `${pct}%`;
+                            shiftBlocksContainer.appendChild(line);
+
+                            // Label
+                            const label = document.createElement('div');
+                            label.className = "absolute top-1 text-[10px] text-white/90 font-mono font-bold -translate-x-1/2 z-10 select-none pointer-events-none drop-shadow-md";
+                            label.style.left = `${pct}%`;
+                            label.textContent = `${hourCounter}`;
+                            shiftBlocksContainer.appendChild(label);
+                        }
+                        
+                        // Increment by exactly 1 hour
+                        cursor = new Date(cursor.getTime() + (60 * 60 * 1000));
+                        hourCounter++;
+                        loops++;
+                    }
+
+                    // 3. Add Breaks Visuals (Top Layer) - BLUE
                     activeBreakObjects.forEach(b => {
                         const startOffset = new Date(b.start) - shiftStartTime;
-                        const duration = new Date(b.end) - new Date(b.start);
-                        const leftPercent = (startOffset / totalShiftDuration) * 100;
-                        const widthPercent = (duration / totalShiftDuration) * 100;
+                        let endOffset = new Date(b.end) - shiftStartTime;
+                        
+                        // Clamp to prevent overflow
+                        if (endOffset > totalShiftDuration) endOffset = totalShiftDuration;
+                        if (startOffset < 0) return; 
+
+                        const duration = endOffset - startOffset;
+                        // Clamp widths to ensure they don't exceed container
+                        const leftPercent = Math.max(0, Math.min(100, (startOffset / totalShiftDuration) * 100));
+                        const widthPercent = Math.max(0, Math.min(100 - leftPercent, (duration / totalShiftDuration) * 100));
                         
                         const el = document.createElement('div');
-                        el.className = "absolute top-0 bottom-0 bg-emerald-500/30 border-l border-r border-emerald-500/50";
+                        el.className = "absolute top-2 bottom-2 bg-blue-500/60 border border-blue-300/60 rounded-sm z-20 flex items-center justify-center overflow-hidden group hover:bg-blue-500/80 transition-colors cursor-help shadow-md";
                         el.style.left = `${leftPercent}%`;
                         el.style.width = `${widthPercent}%`;
-                        el.title = `${b.type} (${new Date(b.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})`;
+                        el.title = `${b.type}: ${new Date(b.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} - ${new Date(b.end).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+                        
+                        // Break Icon
+                        el.innerHTML = '<span class="text-[10px] opacity-90 group-hover:opacity-100 drop-shadow-md text-white font-bold">☕</span>';
+                        
                         shiftBlocksContainer.appendChild(el);
                     });
 
-                    // Add Progress Bar
-                    const progressEl = document.createElement('div');
-                    progressEl.id = 'shift-progress-bar';
-                    progressEl.className = "absolute top-0 bottom-0 left-0 bg-teal-500/20 border-r border-teal-400 shadow-[0_0_10px_rgba(45,212,191,0.3)] transition-all duration-1000";
-                    progressEl.style.width = '0%';
-                    shiftBlocksContainer.appendChild(progressEl);
+                    // 4. Progress Marker (Needle) - RED
+                    const marker = document.createElement('div');
+                    marker.id = 'shift-progress-marker';
+                    marker.className = "absolute top-0 bottom-0 w-0.5 bg-red-500 z-40 shadow-[0_0_10px_rgba(239,68,68,1)] transition-all duration-1000 pointer-events-none";
+                    marker.style.left = '0%';
+                    // Arrow Head - Red
+                    marker.innerHTML = '<div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-red-500 filter drop-shadow-md"></div><div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[6px] border-b-red-500 filter drop-shadow-md"></div>';
+                    shiftBlocksContainer.appendChild(marker);
                 }
 
                 function calculateActiveBreaks() {
-                    const storedBreaks = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
+                    let storedBreaks = [];
+                    try {
+                        storedBreaks = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
+                    } catch (e) {
+                        console.error("Error parsing break times", e);
+                        storedBreaks = [];
+                    }
+
                     activeBreakObjects = [];
                     const shiftDateStr = shiftStartTime.toDateString();
                     
                     storedBreaks.forEach(b => {
                         // Construct break start time relative to shift start
-                        // Logic: Break string is "HH:MM". We need to figure out if it's today or tomorrow based on shift start
                         let breakDate = new Date(`${shiftDateStr} ${b.time}`);
-                        // If shift starts at 22:00 and break is 02:00, break is next day
+                        
+                        // Handle date crossover (e.g. shift starts 22:00, break is 02:00 next day)
                         if (breakDate < shiftStartTime) {
                              breakDate.setDate(breakDate.getDate() + 1);
-                        }
-                        // If break is still before start (e.g. shift 10pm, break 9pm), it might be invalid or next day?
-                        // Simple check: if break > end time, ignore (or check previous day?)
-                        // For simplicity, assume breaks are within the 24h window of shift start
-                        if (breakDate > shiftEndTime) {
-                             // maybe it belongs to previous day? no.
-                        } else if (breakDate < shiftStartTime) {
-                             // Break is before shift starts? 
                         }
                         
                         // Check if within shift
@@ -2919,29 +2970,9 @@
                             });
                         }
                     });
-
-                    // Health Breaks
-                    if (healthBreaksToggle.checked) {
-                        let cursor = new Date(shiftStartTime.getTime() + 60*60000); // Start checking 1 hour in
-                        while (cursor < new Date(shiftEndTime.getTime() - 30*60000)) {
-                            // Check if any existing break overlaps with cursor +/- 30 mins
-                            const conflict = activeBreakObjects.some(b => {
-                                const bStart = new Date(b.start);
-                                const bEnd = new Date(b.end);
-                                return (cursor >= new Date(bStart.getTime() - 30*60000) && cursor <= new Date(bEnd.getTime() + 30*60000));
-                            });
-                            
-                            if (!conflict) {
-                                activeBreakObjects.push({
-                                    start: cursor.toISOString(),
-                                    end: new Date(cursor.getTime() + 5 * 60000).toISOString(),
-                                    type: "Movement"
-                                });
-                            }
-                            cursor = new Date(cursor.getTime() + 60*60000);
-                        }
-                    }
-                    activeBreakObjects.sort((a,b) => new Date(a.start) - new Date(b.start));
+                    
+                    // Save calculated breaks for current session usage
+                    localStorage.setItem('shiftActiveBreakObjects', JSON.stringify(activeBreakObjects));
                 }
 
                 function updateShiftDisplay(remainingMs) {
@@ -2950,15 +2981,24 @@
                     const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
 
-                    document.getElementById('shift-hours-display').textContent = hours.toString().padStart(2, '0');
-                    document.getElementById('shift-minutes-display').textContent = minutes.toString().padStart(2, '0');
-                    document.getElementById('shift-seconds-display').textContent = seconds.toString().padStart(2, '0');
+                    const hoursEl = document.getElementById('shift-hours-display');
+                    const minutesEl = document.getElementById('shift-minutes-display');
+                    const secondsEl = document.getElementById('shift-seconds-display');
+
+                    if(hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+                    if(minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+                    if(secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
                     
                     const progress = document.getElementById('shift-progress-bar');
-                    if (progress) {
+                    const marker = document.getElementById('shift-progress-marker');
+                    
+                    if (progress && totalShiftDuration > 0) {
                         const elapsed = totalShiftDuration - remainingMs;
-                        const pct = (elapsed / totalShiftDuration) * 100;
+                        let pct = (elapsed / totalShiftDuration) * 100;
+                        pct = Math.max(0, Math.min(100, pct)); 
+
                         progress.style.width = `${pct}%`;
+                        if (marker) marker.style.left = `${pct}%`;
                     }
                 }
 
