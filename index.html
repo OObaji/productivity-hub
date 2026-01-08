@@ -3252,6 +3252,42 @@
                 locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
                 updateLocButtons();
 
+                // Preset Button Listeners
+                presetNormalBtn.addEventListener('click', () => {
+                    const now = new Date();
+                    // If it's morning (e.g. 01:00), assume shift started yesterday
+                    const isMorning = now.getHours() < 12;
+                    
+                    const start = new Date(now);
+                    if (isMorning) start.setDate(start.getDate() - 1);
+                    start.setHours(19, 0, 0, 0);
+                    
+                    const end = new Date(start);
+                    end.setDate(end.getDate() + 1);
+                    end.setHours(7, 0, 0, 0);
+
+                    startTimeInput.value = formatDateTimeForInput(start);
+                    endTimeInput.value = formatDateTimeForInput(end);
+                    shiftTitleInput.value = "Night Shift Grind";
+                });
+
+                presetOvertimeBtn.addEventListener('click', () => {
+                    const now = new Date();
+                    const isMorning = now.getHours() < 12;
+                    
+                    const start = new Date(now);
+                    if (isMorning) start.setDate(start.getDate() - 1);
+                    start.setHours(17, 0, 0, 0);
+                    
+                    const end = new Date(start);
+                    end.setDate(end.getDate() + 1);
+                    end.setHours(5, 0, 0, 0);
+
+                    startTimeInput.value = formatDateTimeForInput(start);
+                    endTimeInput.value = formatDateTimeForInput(end);
+                    shiftTitleInput.value = "Early Start Shift";
+                });
+
                 // Break Management Logic
                 let setupBreakList = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
                 function renderSetupBreaks() {
