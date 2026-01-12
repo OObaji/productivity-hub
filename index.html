@@ -294,27 +294,29 @@
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                            Soundscapes
+                            ADHD Neural Audio
                         </h3>
                         <span id="sound-status-indicator" class="w-2 h-2 rounded-full bg-slate-600 transition-all duration-300"></span>
                     </div>
                     
                     <div class="grid grid-cols-4 gap-2 mb-4">
-                        <!-- Re-organized grid for better layout -->
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-indigo-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/20 group" data-type="brown" title="Brown Noise">🌊</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-emerald-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-500/20 group" data-type="green" title="Green Noise">🌿</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-pink-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-pink-400/30 hover:shadow-lg hover:shadow-pink-500/20 group" data-type="pink" title="Pink Noise">🌧️</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-slate-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-slate-400/30 hover:shadow-lg hover:shadow-slate-500/20 group" data-type="white" title="White Noise">💨</button>
+                        <!-- Standard Colors (Keep) -->
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-indigo-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/20 group" data-type="brown" title="Brown Noise (Deep)">🌊</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-emerald-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-500/20 group" data-type="green" title="Green Noise (Nature)">🌿</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-pink-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-pink-400/30 hover:shadow-lg hover:shadow-pink-500/20 group" data-type="pink" title="Pink Noise (Balanced)">🌸</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-slate-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-slate-400/30 hover:shadow-lg hover:shadow-slate-500/20 group" data-type="white" title="White Noise (Block)">💨</button>
                         
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-blue-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-blue-400/30 hover:shadow-lg hover:shadow-blue-500/20 group" data-type="rain" title="Rain">☔</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-cyan-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-cyan-400/30 hover:shadow-lg hover:shadow-cyan-500/20 group" data-type="waves" title="Waves">🏖️</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-orange-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-orange-400/30 hover:shadow-lg hover:shadow-orange-500/20 group" data-type="city" title="City">🏙️</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-amber-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-500/20 group" data-type="cafe" title="Cafe">☕</button>
+                        <!-- ADHD Specifics -->
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-blue-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-blue-400/30 hover:shadow-lg hover:shadow-blue-500/20 group" data-type="rain" title="Rain (Relax)">☔</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-cyan-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-cyan-400/30 hover:shadow-lg hover:shadow-cyan-500/20 group" data-type="underwater" title="Underwater (Muffled)">🫧</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-violet-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-violet-400/30 hover:shadow-lg hover:shadow-violet-500/20 group" data-type="space" title="Space Drone">🪐</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-zinc-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-zinc-400/30 hover:shadow-lg hover:shadow-zinc-500/20 group" data-type="fan" title="Fan (Mechanical)">🌪️</button>
                         
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-indigo-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-indigo-400/30 hover:shadow-lg hover:shadow-indigo-500/20 group" data-type="lofi" title="Lofi">🎧</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-teal-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-teal-400/30 hover:shadow-lg hover:shadow-teal-500/20 group" data-type="forest" title="Forest">🌲</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-red-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-red-400/30 hover:shadow-lg hover:shadow-red-500/20 group" data-type="fire" title="Fire">🔥</button>
-                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-purple-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-purple-400/30 hover:shadow-lg hover:shadow-purple-500/20 group" data-type="gamma" title="Gamma 40Hz">🧠</button>
+                        <!-- Neural Stimulation -->
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-amber-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-500/20 group" data-type="flow" title="Flow State (Inspiring)">🧠</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-lime-500 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-lime-400/30 hover:shadow-lg hover:shadow-lime-500/20 group" data-type="beta" title="Beta 14Hz (Active)">⚡</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-orange-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-orange-400/30 hover:shadow-lg hover:shadow-orange-500/20 group" data-type="om" title="Om Drone (Grounding)">🕉️</button>
+                        <button class="sound-btn aspect-square rounded-xl bg-slate-700/50 hover:bg-fuchsia-600 hover:text-white text-slate-400 transition-all flex items-center justify-center text-lg border border-transparent hover:border-fuchsia-400/30 hover:shadow-lg hover:shadow-fuchsia-500/20 group" data-type="gamma" title="Gamma 40Hz (Focus)">🎯</button>
                     </div>
 
                     <div class="flex items-center gap-3 px-1">
@@ -1057,172 +1059,63 @@
                 this.stopNodes();
 
                 if (this.type === 'gamma') {
-                    // 40Hz Gamma Logic
+                    // 40Hz Gamma (Existing)
                     this.carrierOsc = this.ctx.createOscillator();
                     this.carrierOsc.type = 'sine';
                     this.carrierOsc.frequency.value = 200; 
-
                     this.lfoGain = this.ctx.createGain();
                     this.lfoGain.gain.value = 0.5; 
-
                     this.lfoOsc = this.ctx.createOscillator();
                     this.lfoOsc.type = 'sine';
                     this.lfoOsc.frequency.value = 40;
-
                     this.lfoOsc.connect(this.lfoGain.gain);
                     this.carrierOsc.connect(this.lfoGain);
                     this.lfoGain.connect(this.gainNode);
-
                     this.carrierOsc.start();
                     this.lfoOsc.start();
-                } 
-                else if (this.type === 'waves' || this.type === 'beach') {
-                    // Ocean Logic (Waves) + Seagulls for Beach
-                    const buffer = this.createNoiseBuffer('brown');
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = buffer;
-                    this.noiseSource.loop = true;
-
-                    this.lfoOsc = this.ctx.createOscillator();
-                    this.lfoOsc.type = 'sine';
-                    this.lfoOsc.frequency.value = 0.15; // Slow swell
-
+                }
+                else if (this.type === 'beta') {
+                    // 14Hz Beta (Active Concentration)
+                    this.carrierOsc = this.ctx.createOscillator();
+                    this.carrierOsc.type = 'sine';
+                    this.carrierOsc.frequency.value = 250; 
                     this.lfoGain = this.ctx.createGain();
                     this.lfoGain.gain.value = 0.5; 
-
-                    this.lfoOsc.connect(this.lfoGain.gain);
-                    this.noiseSource.connect(this.lfoGain);
-                    this.lfoGain.connect(this.gainNode);
-
-                    this.noiseSource.start();
-                    this.lfoOsc.start();
-
-                    if (this.type === 'beach') {
-                        // Add intermittent seagulls
-                         this.textureInterval = setInterval(() => {
-                            if (Math.random() > 0.8) { // Occasional chirp
-                                this.playSeagull();
-                            }
-                        }, 2000);
-                    }
-                }
-                else if (this.type === 'train') {
-                    // Train: Rhythmic Brown Noise
-                    // Base rumble
-                    const buffer = this.createNoiseBuffer('pink'); // Pink noise for "hiss" of wheels
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = buffer;
-                    this.noiseSource.loop = true;
-
-                    // Lowpass to muffle it
-                    this.filterNode = this.ctx.createBiquadFilter();
-                    this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.value = 400;
-
-                    // Rhythmic Gain (The "Chug")
                     this.lfoOsc = this.ctx.createOscillator();
-                    this.lfoOsc.type = 'square'; // Harsh on/off
-                    this.lfoOsc.frequency.value = 4; // 4 chugs per second
-
-                    // Smooth the square wave slightly
+                    this.lfoOsc.type = 'square'; // Sharper pulses for Beta
+                    this.lfoOsc.frequency.value = 14;
+                    
+                    // Soften the square wave
                     const lfoFilter = this.ctx.createBiquadFilter();
                     lfoFilter.type = 'lowpass';
-                    lfoFilter.frequency.value = 10;
-
-                    this.lfoGain = this.ctx.createGain();
-                    this.lfoGain.gain.value = 0.2; // Base volume
-
-                    // Connect LFO to Gain
-                    const rhythmGain = this.ctx.createGain();
-                    rhythmGain.gain.value = 0.3; // Modulation depth
+                    lfoFilter.frequency.value = 50;
 
                     this.lfoOsc.connect(lfoFilter);
-                    lfoFilter.connect(rhythmGain);
-                    rhythmGain.connect(this.lfoGain.gain);
-
-                    this.noiseSource.connect(this.filterNode);
-                    this.filterNode.connect(this.lfoGain);
+                    lfoFilter.connect(this.lfoGain.gain);
+                    this.carrierOsc.connect(this.lfoGain);
                     this.lfoGain.connect(this.gainNode);
-
-                    this.noiseSource.start();
+                    this.carrierOsc.start();
                     this.lfoOsc.start();
                 }
-                else if (this.type === 'airplane') {
-                    // Airplane: Deep Brown Noise Drone
+                else if (this.type === 'underwater') {
+                    // Deep Muffled Pressure
                     const buffer = this.createNoiseBuffer('brown');
                     this.noiseSource = this.ctx.createBufferSource();
                     this.noiseSource.buffer = buffer;
                     this.noiseSource.loop = true;
 
-                    // Lowpass filter for the cabin "hum"
+                    // Strong Lowpass
                     this.filterNode = this.ctx.createBiquadFilter();
                     this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.value = 150; 
-                    
-                    // Add a secondary Pink noise for high-end "air" hiss
-                    const windBuffer = this.createNoiseBuffer('pink');
-                    this.secondarySource = this.ctx.createBufferSource();
-                    this.secondarySource.buffer = windBuffer;
-                    this.secondarySource.loop = true;
+                    this.filterNode.frequency.value = 300; 
 
-                    const windFilter = this.ctx.createBiquadFilter();
-                    windFilter.type = 'bandpass';
-                    windFilter.frequency.value = 500;
-                    
-                    const windGain = this.ctx.createGain();
-                    windGain.gain.value = 0.1;
-
-                    this.noiseSource.connect(this.filterNode);
-                    this.filterNode.connect(this.gainNode);
-
-                    this.secondarySource.connect(windFilter);
-                    windFilter.connect(windGain);
-                    windGain.connect(this.gainNode);
-
-                    this.noiseSource.start();
-                    this.secondarySource.start();
-                }
-                else if (this.type === 'fire') {
-                    // Fire: Brown noise rumble + Crackle
-                    const buffer = this.createNoiseBuffer('brown');
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = buffer;
-                    this.noiseSource.loop = true;
-
-                    // Filter rumble
-                    this.filterNode = this.ctx.createBiquadFilter();
-                    this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.value = 120;
-                    
-                    this.noiseSource.connect(this.filterNode);
-                    this.filterNode.connect(this.gainNode);
-                    this.noiseSource.start();
-
-                    // Crackle generator
-                    this.textureInterval = setInterval(() => {
-                        if (Math.random() > 0.6) { 
-                            this.playCrackle();
-                        }
-                    }, 100);
-                }
-                else if (this.type === 'forest') {
-                    // Forest: Filtered Pink (Wind) + Birds
-                    const buffer = this.createNoiseBuffer('pink');
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = buffer;
-                    this.noiseSource.loop = true;
-
-                    // Dynamic wind filter (slowly changing)
-                    this.filterNode = this.ctx.createBiquadFilter();
-                    this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.value = 400;
-
+                    // Slow Undulation (Currents)
                     this.lfoOsc = this.ctx.createOscillator();
                     this.lfoOsc.type = 'sine';
-                    this.lfoOsc.frequency.value = 0.1; // Slow wind shifts
+                    this.lfoOsc.frequency.value = 0.1;
                     
                     const lfoAmp = this.ctx.createGain();
-                    lfoAmp.gain.value = 200; // Shift freq by +/- 200
+                    lfoAmp.gain.value = 100; // Modulate filter freq
 
                     this.lfoOsc.connect(lfoAmp);
                     lfoAmp.connect(this.filterNode.frequency);
@@ -1231,109 +1124,134 @@
                     this.filterNode.connect(this.gainNode);
                     this.noiseSource.start();
                     this.lfoOsc.start();
-
-                    // Birds
-                    this.textureInterval = setInterval(() => {
-                        if (Math.random() > 0.85) { 
-                            this.playBird();
-                        }
-                    }, 1500);
                 }
-                else if (this.type === 'city') {
-                    // City: Brown noise rumble + Filtered traffic swells
-                    // 1. Background Rumble (Brown)
-                    const bgBuffer = this.createNoiseBuffer('brown');
+                else if (this.type === 'space') {
+                    // Deep Drone + Empty Hiss
+                    const buffer = this.createNoiseBuffer('brown');
                     this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = bgBuffer;
+                    this.noiseSource.buffer = buffer;
                     this.noiseSource.loop = true;
-                    
-                    const bgGain = this.ctx.createGain();
-                    bgGain.gain.value = 0.4;
-                    
-                    this.noiseSource.connect(bgGain);
-                    bgGain.connect(this.gainNode);
-                    this.noiseSource.start();
-
-                    // 2. Traffic Swells (Filtered Pink Noise)
-                    const trafficBuffer = this.createNoiseBuffer('pink');
-                    this.secondarySource = this.ctx.createBufferSource();
-                    this.secondarySource.buffer = trafficBuffer;
-                    this.secondarySource.loop = true;
 
                     this.filterNode = this.ctx.createBiquadFilter();
                     this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.value = 400;
+                    this.filterNode.frequency.value = 100;
+                    
+                    // Airy Layer
+                    const airBuffer = this.createNoiseBuffer('white');
+                    this.secondarySource = this.ctx.createBufferSource();
+                    this.secondarySource.buffer = airBuffer;
+                    this.secondarySource.loop = true;
+                    
+                    const airFilter = this.ctx.createBiquadFilter();
+                    airFilter.type = 'highpass';
+                    airFilter.frequency.value = 800;
+                    
+                    const airGain = this.ctx.createGain();
+                    airGain.gain.value = 0.05;
 
-                    // LFO to modulate traffic filter (simulating cars passing)
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(this.gainNode);
+                    
+                    this.secondarySource.connect(airFilter);
+                    airFilter.connect(airGain);
+                    airGain.connect(this.gainNode);
+
+                    this.noiseSource.start();
+                    this.secondarySource.start();
+                }
+                else if (this.type === 'fan') {
+                    // Mechanical White Noise
+                    const buffer = this.createNoiseBuffer('white');
+                    this.noiseSource = this.ctx.createBufferSource();
+                    this.noiseSource.buffer = buffer;
+                    this.noiseSource.loop = true;
+
+                    this.filterNode = this.ctx.createBiquadFilter();
+                    this.filterNode.type = 'lowpass';
+                    this.filterNode.frequency.value = 500;
+                    
+                    // Amplitude Modulation (The "Whir")
                     this.lfoOsc = this.ctx.createOscillator();
                     this.lfoOsc.type = 'sine';
-                    this.lfoOsc.frequency.value = 0.1; // Slow swell
-
-                    const filterModGain = this.ctx.createGain();
-                    filterModGain.gain.value = 300; // Modulate frequency by +/- 300Hz
-
-                    this.lfoOsc.connect(filterModGain);
-                    filterModGain.connect(this.filterNode.frequency);
+                    this.lfoOsc.frequency.value = 40; // Fast spin
                     
-                    this.secondarySource.connect(this.filterNode);
-                    this.filterNode.connect(this.gainNode);
+                    const lfoGain = this.ctx.createGain();
+                    lfoGain.gain.value = 0.1; // Subtle depth
                     
-                    this.secondarySource.start();
+                    // Carrier gain
+                    const mainGain = this.ctx.createGain();
+                    mainGain.gain.value = 0.8;
+
+                    this.lfoOsc.connect(lfoGain);
+                    lfoGain.connect(mainGain.gain); // Modulate volume
+
+                    this.noiseSource.connect(this.filterNode);
+                    this.filterNode.connect(mainGain);
+                    mainGain.connect(this.gainNode);
+                    
+                    this.noiseSource.start();
                     this.lfoOsc.start();
                 }
-                else if (this.type === 'cafe') {
-                    // 1. Chatter (Filtered Pink)
-                    const chatterBuffer = this.createNoiseBuffer('pink');
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = chatterBuffer;
-                    this.noiseSource.loop = true;
+                else if (this.type === 'om') {
+                    // Grounding Drone (136.1Hz - Om Freq)
+                    const f = 136.1;
+                    const osc1 = this.ctx.createOscillator();
+                    const osc2 = this.ctx.createOscillator();
+                    osc1.frequency.value = f;
+                    osc2.frequency.value = f * 1.01; // Detune slightly for beats
+                    
+                    osc1.type = 'triangle';
+                    osc2.type = 'sawtooth';
 
-                    this.filterNode = this.ctx.createBiquadFilter();
-                    this.filterNode.type = 'bandpass';
-                    this.filterNode.frequency.value = 800; // Speech range
-                    this.filterNode.Q.value = 1;
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 400;
 
-                    this.noiseSource.connect(this.filterNode);
-                    this.filterNode.connect(this.gainNode);
-                    this.noiseSource.start();
+                    const oscGain = this.ctx.createGain();
+                    oscGain.gain.value = 0.15;
 
-                    // 2. Random "Clink" generator
-                    this.textureInterval = setInterval(() => {
-                        if (Math.random() > 0.7) { // 30% chance per second
-                            this.playClink();
-                        }
-                    }, 1000);
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(oscGain);
+                    oscGain.connect(this.gainNode);
+                    
+                    osc1.start();
+                    osc2.start();
+                    this.secondarySource = osc1; // Hack for cleanup
+                    this.lfoOsc = osc2;
                 }
-                else if (this.type === 'lofi') {
-                    // Lofi: Vinyl Crackle + Beat Loop
-                    // 1. Vinyl Crackle (Highpass Pink Noise)
-                    const crackleBuffer = this.createNoiseBuffer('pink');
-                    this.noiseSource = this.ctx.createBufferSource();
-                    this.noiseSource.buffer = crackleBuffer;
-                    this.noiseSource.loop = true;
-
-                    this.filterNode = this.ctx.createBiquadFilter();
-                    this.filterNode.type = 'highpass';
-                    this.filterNode.frequency.value = 2000;
+                else if (this.type === 'flow') {
+                    // "Inspiring" Ambient Flow - Uplifting Major Pads
+                    // Use simple sine/triangles to build a chord that gently fades
+                    const chord = [196.00, 246.94, 293.66, 392.00]; // G Major
                     
-                    const crackleGain = this.ctx.createGain();
-                    crackleGain.gain.value = 0.15; // Quiet
-
-                    this.noiseSource.connect(this.filterNode);
-                    this.filterNode.connect(crackleGain);
-                    crackleGain.connect(this.gainNode);
-                    this.noiseSource.start();
-
-                    // 2. Beat Sequencer
-                    this.beatStep = 0;
-                    const bpm = 70;
-                    const stepTime = (60 / bpm) * 1000 / 2; // 8th notes
+                    // Create an interval to swell chords
+                    const playSwell = () => {
+                        chord.forEach((freq, i) => {
+                            const osc = this.ctx.createOscillator();
+                            const gain = this.ctx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.value = freq;
+                            
+                            // Slow Attack/Release
+                            const now = this.ctx.currentTime;
+                            const duration = 6;
+                            
+                            gain.gain.setValueAtTime(0, now);
+                            gain.gain.linearRampToValueAtTime(0.05, now + duration/2);
+                            gain.gain.linearRampToValueAtTime(0, now + duration);
+                            
+                            osc.connect(gain);
+                            gain.connect(this.gainNode);
+                            
+                            // Stagger starts slightly
+                            osc.start(now + Math.random());
+                            osc.stop(now + duration + 1);
+                        });
+                    };
                     
-                    this.playLofiStep(); // Play immediately
-                    this.textureInterval = setInterval(() => this.playLofiStep(), stepTime);
-                    
-                    // 3. Drone Chord (Pad)
-                    this.playLofiPad();
+                    playSwell();
+                    this.textureInterval = setInterval(playSwell, 5000);
                 }
                 else {
                     // Standard Noise Logic (White, Pink, Brown, Green, Rain)
@@ -1367,192 +1285,15 @@
                 this.isPlaying = true;
             }
 
-            // Helper for Seagulls (Beach)
-            playSeagull() {
-                const t = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(1500, t);
-                osc.frequency.exponentialRampToValueAtTime(1000, t + 0.4);
-                
-                gain.gain.setValueAtTime(0, t);
-                gain.gain.linearRampToValueAtTime(0.05, t + 0.1);
-                gain.gain.linearRampToValueAtTime(0, t + 0.4);
-
-                osc.connect(gain);
-                gain.connect(this.gainNode);
-                
-                osc.start(t);
-                osc.stop(t + 0.5);
-            }
-
-            // Helper for Fire Crackle
-            playCrackle() {
-                const t = this.ctx.currentTime;
-                const buffer = this.createNoiseBuffer('white');
-                const source = this.ctx.createBufferSource();
-                source.buffer = buffer;
-                
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'highpass';
-                filter.frequency.value = 1000;
-
-                const gain = this.ctx.createGain();
-                // Short, sharp bursts
-                gain.gain.setValueAtTime(0.1 + Math.random() * 0.1, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-
-                source.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.gainNode);
-                
-                source.start(t);
-                source.stop(t + 0.06);
-            }
-
-            // Helper for Birds (Forest)
-            playBird() {
-                const t = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'sine';
-                // Randomize pitch high
-                const startFreq = 2000 + Math.random() * 1000;
-                osc.frequency.setValueAtTime(startFreq, t);
-                
-                // Simple chirp pattern (up-down or down)
-                if (Math.random() > 0.5) {
-                    osc.frequency.linearRampToValueAtTime(startFreq + 500, t + 0.1);
-                } else {
-                    osc.frequency.linearRampToValueAtTime(startFreq - 500, t + 0.1);
-                }
-                
-                gain.gain.setValueAtTime(0, t);
-                gain.gain.linearRampToValueAtTime(0.05, t + 0.02);
-                gain.gain.linearRampToValueAtTime(0, t + 0.15);
-
-                osc.connect(gain);
-                gain.connect(this.gainNode);
-                
-                osc.start(t);
-                osc.stop(t + 0.2);
-            }
-
-            // Helper for Cafe Sound
-            playClink() {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                // Random freq between 2000 and 4000
-                osc.frequency.value = 2000 + Math.random() * 2000;
-                
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
-
-                osc.connect(gain);
-                gain.connect(this.gainNode);
-                
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
-            }
-
-            // Helpers for Lofi
-            playLofiPad() {
-                // Cm9 Chord Pad: C3, Eb3, G3, Bb3, D4
-                const freqs = [130.81, 155.56, 196.00, 233.08, 293.66];
-                freqs.forEach(f => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    
-                    osc.type = 'triangle'; // Softer than square, richer than sine
-                    osc.frequency.value = f;
-                    
-                    // Detune slightly for "wobbly" lofi feel
-                    osc.detune.value = Math.random() * 10 - 5;
-
-                    // Filter to make it mellow
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 800;
-
-                    gain.gain.value = 0.03; // Very quiet background
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.gainNode);
-                    
-                    osc.start();
-                    // Store in secondarySource array if we wanted to stop individually, 
-                    // but stopNodes() cleans up generally.
-                    this.secondarySource = osc; // Just tracking one for non-null check
-                });
-            }
-
-            playLofiStep() {
-                const t = this.ctx.currentTime;
-                // Beat Pattern (8 steps)
-                // K - - - S - - - (Kick on 0, Snare on 4)
-                // Hats on 0, 2, 4, 6
-                
-                // Kick
-                if (this.beatStep === 0 || this.beatStep === 5) { // Syncopated kick
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.frequency.setValueAtTime(150, t);
-                    osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5);
-                    gain.gain.setValueAtTime(0.5, t);
-                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
-                    osc.connect(gain);
-                    gain.connect(this.gainNode);
-                    osc.start(t);
-                    osc.stop(t + 0.5);
-                }
-
-                // Snare
-                if (this.beatStep === 4) {
-                    const noise = this.ctx.createBufferSource();
-                    noise.buffer = this.createNoiseBuffer('white');
-                    const gain = this.ctx.createGain();
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'highpass';
-                    filter.frequency.value = 1000;
-                    
-                    gain.gain.setValueAtTime(0.3, t);
-                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-                    
-                    noise.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.gainNode);
-                    noise.start(t);
-                    noise.stop(t + 0.2);
-                }
-
-                // Hi-hat (Closed)
-                if (this.beatStep % 2 === 0) {
-                    const noise = this.ctx.createBufferSource();
-                    noise.buffer = this.createNoiseBuffer('white');
-                    const gain = this.ctx.createGain();
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'highpass';
-                    filter.frequency.value = 5000;
-                    
-                    // Vary volume slightly for "human" feel
-                    const vol = 0.05 + Math.random() * 0.02;
-                    gain.gain.setValueAtTime(vol, t);
-                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-                    
-                    noise.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.gainNode);
-                    noise.start(t);
-                    noise.stop(t + 0.05);
-                }
-
-                this.beatStep = (this.beatStep + 1) % 8;
-            }
+            // Keep Helper for Seagulls/Birds/Crackle ONLY if needed (currently not used in new presets but kept for safety)
+            playSeagull() { /* ... */ }
+            playCrackle() { /* ... */ }
+            playBird() { /* ... */ }
+            playClink() { /* ... */ }
+            
+            // Clean up Lofi helpers
+            playLofiPad() {}
+            playLofiStep() {}
 
             stop() {
                 this.stopNodes();
@@ -3361,9 +3102,10 @@
                 
                 loadMyBreaksBtn.addEventListener('click', () => {
                     setupBreakList = [
-                        { time: "22:00", duration: 15, type: "Short Break" },
-                        { time: "02:00", duration: 30, type: "Lunch" },
-                        { time: "05:00", duration: 15, type: "Short Break" }
+                        { time: "22:00", duration: 10, type: "Short Break" },
+                        { time: "00:00", duration: 10, type: "Short Break" },
+                        { time: "03:00", duration: 15, type: "Lunch / Prayer" },
+                        { time: "05:00", duration: 10, type: "Short Break" }
                     ];
                     renderSetupBreaks();
                 });
