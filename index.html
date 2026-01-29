@@ -2141,6 +2141,11 @@
                             </button>
                             <span class="flex-grow font-medium text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}">${item.text}</span>
                             <span class="text-[10px] text-slate-400 font-mono mr-3">${new Date(item.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                            
+                            <button class="copy-btn text-slate-400 hover:text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity mr-2" title="Copy to clipboard">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                            </button>
+
                             <button class="delete-btn text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -2150,8 +2155,47 @@
                         el.querySelector('.toggle-btn').addEventListener('click', () => toggleItem(item.id));
                         el.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id));
                         
+                        // Copy Button Logic (Fixed with Fallback)
+                        const copyBtn = el.querySelector('.copy-btn');
+                        copyBtn.addEventListener('click', () => {
+                            const textToCopy = item.text;
+                            
+                            const handleSuccess = () => {
+                                const originalIcon = copyBtn.innerHTML;
+                                copyBtn.innerHTML = `<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                                setTimeout(() => copyBtn.innerHTML = originalIcon, 1500);
+                            };
+
+                            // Try Async API first, fallback to execCommand if it fails or is blocked
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(textToCopy).then(handleSuccess).catch(() => {
+                                    fallbackCopy(textToCopy, handleSuccess);
+                                });
+                            } else {
+                                fallbackCopy(textToCopy, handleSuccess);
+                            }
+                        });
+                        
                         elements.listContainer.appendChild(el);
                     });
+                }
+                
+                // Helper for clipboard fallback
+                function fallbackCopy(text, onSuccess) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed"; // Avoid scrolling to bottom
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful && onSuccess) onSuccess();
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
                 }
 
                 function renderHistory() {
@@ -3193,12 +3237,40 @@
                     qrModal.classList.remove('flex');
                 });
                 
+                // Fixed Share Copy Button with Fallback
                 copyLinkFallbackBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(currentShareUrl).then(() => {
+                    const textToCopy = currentShareUrl;
+                    
+                    const handleSuccess = () => {
                         copyLinkFallbackBtn.textContent = 'Copied!';
                         setTimeout(() => copyLinkFallbackBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy Link`, 2000);
-                    });
+                    };
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(textToCopy).then(handleSuccess).catch(() => {
+                            fallbackCopyQr(textToCopy, handleSuccess);
+                        });
+                    } else {
+                        fallbackCopyQr(textToCopy, handleSuccess);
+                    }
                 });
+                
+                function fallbackCopyQr(text, onSuccess) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful && onSuccess) onSuccess();
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
 
                 checkStoredShift();
                 renderSetupBreaks();
