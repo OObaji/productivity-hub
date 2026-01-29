@@ -776,8 +776,8 @@
                                         <div class="flex flex-col gap-4">
                                             <div class="flex justify-between items-center">
                                                 <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Hourly Target</p>
-                                                <!-- UPDATED: Input field for manual target setting -->
-                                                <input type="number" id="breach-hourly-target-input" class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-1 text-right text-xl font-bold text-white w-24 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-500" min="1" max="999" placeholder="10">
+                                                <!-- UPDATED: Input placeholder to 6 -->
+                                                <input type="number" id="breach-hourly-target-input" class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-1 text-right text-xl font-bold text-white w-24 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-500" min="1" max="999" placeholder="6">
                                             </div>
                                             <div class="w-full h-px bg-white/10"></div>
                                             <div class="flex justify-between items-center">
@@ -1995,7 +1995,7 @@
                 
                 // Constants
                 const CIRCLE_CIRCUMFERENCE = 440;
-                const BASE_RATE_PER_HOUR = 10;
+                const BASE_RATE_PER_HOUR = 6; // Updated default rate
 
                 // --- Helper Functions ---
 
@@ -2014,8 +2014,8 @@
                 function calculateDynamicTarget() {
                     const now = new Date();
                     const minutesRemaining = 60 - now.getMinutes();
-                    // Calculate proportional target based on 10 per hour
-                    // E.g., 30 mins left = 5 breaches. Always round up to be ambitious, or ceil.
+                    // Calculate proportional target based on 6 per hour
+                    // E.g., 30 mins left = 3 breaches. Always round up to be ambitious, or ceil.
                     let target = Math.ceil((minutesRemaining / 60) * BASE_RATE_PER_HOUR);
                     // Ensure at least 1 if there's any time left, unless 0 mins
                     if (target < 1 && minutesRemaining > 5) target = 1;
@@ -2050,7 +2050,7 @@
                 }
 
                 function updateProgressCircle(count, target) {
-                    if (target <= 0) target = 10; // Fallback
+                    if (target <= 0) target = 6; // Fallback updated to 6
                     const percentage = Math.min(1, count / target);
                     const offset = CIRCLE_CIRCUMFERENCE - (percentage * CIRCLE_CIRCUMFERENCE);
                     elements.progressCircle.style.strokeDashoffset = offset;
@@ -2071,7 +2071,7 @@
                     // Get Target
                     let target = hourlyTargets[currentKey];
                     if (target === undefined) {
-                        target = 10; // Default if not synced
+                        target = 6; // Default updated to 6 if not synced
                     }
                     
                     // Update Input Value if not currently focused (to avoid jumping while typing)
