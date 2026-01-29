@@ -2126,9 +2126,9 @@
                         return;
                     }
 
-                    // Sort: Uncompleted first, then newest
+                    // Sort: Uncompleted first, then Oldest (so new items appear at the bottom)
                     items.sort((a, b) => {
-                        if (a.completed === b.completed) return new Date(b.createdAt) - new Date(a.createdAt);
+                        if (a.completed === b.completed) return new Date(a.createdAt) - new Date(b.createdAt);
                         return a.completed ? 1 : -1;
                     });
 
