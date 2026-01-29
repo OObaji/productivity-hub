@@ -776,7 +776,8 @@
                                         <div class="flex flex-col gap-4">
                                             <div class="flex justify-between items-center">
                                                 <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Hourly Target</p>
-                                                <p id="breach-hourly-target-display" class="text-2xl font-bold text-white">--</p>
+                                                <!-- UPDATED: Input field for manual target setting -->
+                                                <input type="number" id="breach-hourly-target-input" class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-1 text-right text-xl font-bold text-white w-24 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-500" min="1" max="999" placeholder="10">
                                             </div>
                                             <div class="w-full h-px bg-white/10"></div>
                                             <div class="flex justify-between items-center">
@@ -786,11 +787,11 @@
                                         </div>
                                     </div>
 
-                                    <button id="sync-breach-target-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 group">
-                                        <svg class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                        Sync Target to Time
+                                    <button id="sync-breach-target-btn" class="w-full py-3 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-200 hover:text-white font-bold rounded-xl transition-all border border-indigo-500/30 flex items-center justify-center gap-2 group text-sm">
+                                        <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        Auto-Calc (Time Remaining)
                                     </button>
-                                    <p class="text-[10px] text-center text-slate-500 mt-3">Calculates target based on remaining minutes in hour.</p>
+                                    <p class="text-[10px] text-center text-slate-500 mt-3">Enter manually or click to calc based on minutes left.</p>
                                 </div>
                             </div>
 
@@ -1973,7 +1974,7 @@
                     currentHourLabel: document.getElementById('breach-current-hour-label'),
                     hourlyCount: document.getElementById('breach-hourly-count'),
                     progressCircle: document.getElementById('breach-hourly-progress-circle'),
-                    targetDisplay: document.getElementById('breach-hourly-target-display'),
+                    targetInput: document.getElementById('breach-hourly-target-input'), // Updated Reference
                     paceStatus: document.getElementById('breach-pace-status'),
                     todayTotal: document.getElementById('breach-today-total'),
                     efficiency: document.getElementById('breach-efficiency'),
@@ -2021,17 +2022,22 @@
                     
                     return target;
                 }
+                
+                function saveTarget(val) {
+                    const key = getCurrentHourKey();
+                    const newTarget = parseInt(val);
+                    if (!isNaN(newTarget) && newTarget > 0) {
+                        hourlyTargets[key] = newTarget;
+                        localStorage.setItem('breachHourlyTargets', JSON.stringify(hourlyTargets));
+                        renderDashboard();
+                    }
+                }
 
                 function setHourlyTarget() {
-                    const key = getCurrentHourKey();
                     const newTarget = calculateDynamicTarget();
-                    
-                    // If a target already exists for this hour and it's higher (from a previous sync), maybe keep it?
-                    // User requested: "get new target depending on the time it was clicked" -> implying overwrite/update.
-                    hourlyTargets[key] = newTarget;
-                    localStorage.setItem('breachHourlyTargets', JSON.stringify(hourlyTargets));
-                    renderDashboard();
-                    showAlert(`Target synced: ${newTarget} breaches for the remaining time.`);
+                    elements.targetInput.value = newTarget; // Update Input
+                    saveTarget(newTarget);
+                    showAlert(`Auto-calculated target: ${newTarget} breaches based on time left.`);
                 }
 
                 function getBreachesForHour(hourKey) {
@@ -2066,9 +2072,11 @@
                     let target = hourlyTargets[currentKey];
                     if (target === undefined) {
                         target = 10; // Default if not synced
-                        elements.targetDisplay.textContent = "10 (Default)";
-                    } else {
-                        elements.targetDisplay.textContent = target;
+                    }
+                    
+                    // Update Input Value if not currently focused (to avoid jumping while typing)
+                    if (document.activeElement !== elements.targetInput) {
+                        elements.targetInput.value = target;
                     }
 
                     // Get Counts
@@ -2084,13 +2092,13 @@
                     if (target > 0) {
                         if (completedCount >= target) {
                             elements.paceStatus.textContent = "Crushing It! 🔥";
-                            elements.paceStatus.className = "text-sm font-bold text-emerald-400";
+                            elements.paceStatus.className = "text-lg font-bold text-emerald-400";
                         } else if (completedCount >= (target * 0.8)) {
                             elements.paceStatus.textContent = "Almost There";
-                            elements.paceStatus.className = "text-sm font-bold text-yellow-400";
+                            elements.paceStatus.className = "text-lg font-bold text-yellow-400";
                         } else {
                             elements.paceStatus.textContent = "Catch Up Needed";
-                            elements.paceStatus.className = "text-sm font-bold text-rose-400";
+                            elements.paceStatus.className = "text-lg font-bold text-rose-400";
                         }
                     }
 
@@ -2107,8 +2115,8 @@
                     renderCurrentList(currentHourItems);
                     
                     // Update global widgets
-                    renderBreachCompletionTable();
-                    renderBreachStats();
+                    if (typeof renderBreachCompletionTable === 'function') renderBreachCompletionTable();
+                    if (typeof renderBreachStats === 'function') renderBreachStats();
                 }
 
                 function renderCurrentList(items) {
@@ -2230,6 +2238,11 @@
                 // --- Event Listeners ---
                 
                 elements.syncBtn.addEventListener('click', setHourlyTarget);
+                
+                // New Event Listener for Manual Target Input
+                elements.targetInput.addEventListener('change', (e) => {
+                    saveTarget(e.target.value);
+                });
                 
                 elements.addBtn.addEventListener('click', addItem);
                 elements.input.addEventListener('keypress', (e) => {
