@@ -2594,6 +2594,8 @@
                 let currentVibeData = null;
                 let lastBaseHourTitle = null;
                 let customMission = null;
+                let currentVibeCompleted = false;
+                let lastRenderedCompletionState = null;
 
                 const shiftPlanHome = [
                     { hour: 1, title: "Hour 1", theme: "Laser Focus", icon: "🎯", effect: "constellation", task: "Deep work (Focus on work only)" },
@@ -2914,6 +2916,7 @@
                     if (lastBaseHourTitle !== activeData.title) {
                         lastBaseHourTitle = activeData.title;
                         currentVibeData = activeData;
+                        currentVibeCompleted = false; // Reset completion state on new hour
                         
                         // Update motivation quote on hour change
                         const randomMotivation = shiftMotivations[Math.floor(Math.random() * shiftMotivations.length)];
@@ -2931,7 +2934,9 @@
                     const currentDisplayedTask = guideContent.querySelector('p.text-2xl')?.textContent;
 
                     // Re-render if the state is out of sync with currentVibeData
-                    if (guideTitle.textContent !== currentVibeData.title || currentDisplayedTask !== currentVibeData.task) {
+                    if (guideTitle.textContent !== currentVibeData.title || currentDisplayedTask !== currentVibeData.task || lastRenderedCompletionState !== currentVibeCompleted) {
+                        lastRenderedCompletionState = currentVibeCompleted;
+                        
                         // New hour theme
                         guideBadge.textContent = "Hourly Objective";
                         guideTheme.textContent = `// ${currentVibeData.theme}`;
@@ -2939,16 +2944,22 @@
                         guideIcon.textContent = currentVibeData.icon;
                         
                         guideContent.innerHTML = `
-                            <div class="col-span-full bg-teal-500/10 border border-teal-500/20 p-6 md:p-8 rounded-2xl flex items-center gap-6 shadow-inner w-full">
-                                <div class="flex-grow">
+                            <div class="col-span-full border p-6 md:p-8 rounded-2xl flex items-center gap-6 shadow-inner w-full transition-all duration-500 ${currentVibeCompleted ? 'bg-teal-900/10 border-teal-500/10 opacity-60' : 'bg-teal-500/10 border-teal-500/20'}">
+                                <div class="flex-grow transition-all duration-500">
                                     <p class="text-xs text-teal-300 uppercase tracking-widest font-bold mb-2">Primary Task</p>
-                                    <p class="text-2xl md:text-3xl font-semibold text-white tracking-wide leading-snug">${currentVibeData.task}</p>
+                                    <p class="text-2xl md:text-3xl font-semibold text-white tracking-wide leading-snug transition-all duration-500 ${currentVibeCompleted ? 'line-through text-gray-500' : ''}">${currentVibeData.task}</p>
                                 </div>
-                                <div class="w-12 h-12 rounded-full border-2 border-teal-500/30 flex items-center justify-center shrink-0 text-teal-400">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
+                                <button id="complete-vibe-btn" class="w-14 h-14 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 focus:outline-none hover:scale-105 ${currentVibeCompleted ? 'bg-teal-500 border-teal-500 text-white shadow-[0_0_20px_rgba(20,184,166,0.5)]' : 'border-teal-500/30 text-teal-400 hover:bg-teal-500/20 hover:border-teal-400'}" title="${currentVibeCompleted ? 'Uncheck Task' : 'Mark as Complete'}">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </button>
                             </div>
                         `;
+                        
+                        // Add interactive listener to the checkbox button
+                        document.getElementById('complete-vibe-btn').addEventListener('click', () => {
+                            currentVibeCompleted = !currentVibeCompleted;
+                            updateShiftVisuals(); // Instantly trigger UI re-render
+                        });
                         
                         startEffect(currentVibeData.effect || 'constellation');
                     }
@@ -3109,6 +3120,9 @@
                     currentVibeData = null;
                     lastBaseHourTitle = null;
                     customMission = null;
+                    currentVibeCompleted = false;
+                    lastRenderedCompletionState = null;
+                    
                     localStorage.removeItem('shiftCustomMission');
                     bonusTaskInput.value = "";
                     bonusTaskDuration.value = "60";
@@ -3307,8 +3321,8 @@
                         ...randomItem,
                         title: baseHourData.title // Keep the actual hour title matching reality
                     };
-
-                    guideTitle.textContent = ""; 
+                    
+                    currentVibeCompleted = false; // Reset completion state on shuffle
                     updateShiftVisuals();
                     
                     // Also shuffle motivation for an instant boost
