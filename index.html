@@ -683,6 +683,7 @@
                             </div>
                             <!-- Timeline -->
                             <div class="w-full mt-auto glass-panel rounded-3xl p-6">
+                                <div id="shift-phases-container" class="flex w-full gap-2 mb-4 h-10"></div>
                                 <div class="flex justify-between text-xs text-gray-500 font-mono tracking-widest px-1 uppercase mb-3"><span id="shift-start-time-label">Start</span><span class="flex-grow text-center text-gray-600">Shift Progress</span><span id="shift-end-time-label">End</span></div>
                                 <div id="shift-blocks-container" class="relative w-full h-12 bg-black/40 rounded-xl border border-white/5 shadow-inner overflow-hidden flex backdrop-blur-sm"></div>
                             </div>
@@ -2536,6 +2537,7 @@
                 const endTimeLabel = document.getElementById('shift-end-time-label');
                 const startTimeLabel = document.getElementById('shift-start-time-label');
                 const shiftBlocksContainer = document.getElementById('shift-blocks-container');
+                const shiftPhasesContainer = document.getElementById('shift-phases-container');
                 const presetNormalBtn = document.getElementById('preset-normal-btn');
                 const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
                 const shiftTitleInput = document.getElementById('shift-title-input');
@@ -2659,6 +2661,7 @@
                 let shiftTimer; let shiftStartTime; let shiftEndTime; let totalShiftDuration;
                 let activeBreakObjects = []; let wasOnBreak = false;
                 let particles = []; let animationFrameId;
+                let totalShiftPhases = 0;
                 
                 // --- Helper Functions ---
 
@@ -2732,6 +2735,32 @@
                 function generateShiftBlocks() {
                     shiftBlocksContainer.innerHTML = '';
                     
+                    // Generate Phases (3-hour blocks)
+                    if(shiftPhasesContainer) {
+                        shiftPhasesContainer.innerHTML = '';
+                        const phaseDurationMs = 3 * 60 * 60 * 1000;
+                        totalShiftPhases = Math.ceil(totalShiftDuration / phaseDurationMs);
+                        
+                        for (let i = 0; i < totalShiftPhases; i++) {
+                            const phaseStart = i * phaseDurationMs;
+                            const phaseEnd = Math.min((i + 1) * phaseDurationMs, totalShiftDuration);
+                            const actualDuration = phaseEnd - phaseStart;
+                            const widthPct = (actualDuration / totalShiftDuration) * 100;
+                            
+                            const dStart = new Date(shiftStartTime.getTime() + phaseStart);
+                            const dEnd = new Date(shiftStartTime.getTime() + phaseEnd);
+                            const timeStr = `${dStart.getHours().toString().padStart(2, '0')}:${dStart.getMinutes().toString().padStart(2, '0')} - ${dEnd.getHours().toString().padStart(2, '0')}:${dEnd.getMinutes().toString().padStart(2, '0')}`;
+                            
+                            const phaseEl = document.createElement('div');
+                            phaseEl.id = `phase-block-${i}`;
+                            phaseEl.style.width = `${widthPct}%`;
+                            phaseEl.className = "flex flex-col items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-500 border bg-white/5 border-white/10 text-gray-500 overflow-hidden";
+                            phaseEl.innerHTML = `<span class="leading-none mt-1">Phase ${i + 1}</span><span class="text-[8px] font-mono opacity-80 normal-case tracking-normal mt-1">${timeStr}</span>`;
+                            
+                            shiftPhasesContainer.appendChild(phaseEl);
+                        }
+                    }
+
                     // 1. Add Progress Bar (Background Layer) - UPDATED TO GREEN & HIGH VISIBILITY
                     const progressEl = document.createElement('div');
                     progressEl.id = 'shift-progress-bar';
@@ -2895,6 +2924,25 @@
                     const now = new Date();
                     const elapsedMs = now - shiftStartTime;
                     const currentHourIdx = Math.floor(elapsedMs / (1000 * 60 * 60));
+                    
+                    // Update Phases Highlighting
+                    const currentPhaseIdx = Math.floor(elapsedMs / (3 * 60 * 60 * 1000));
+                    for (let i = 0; i < totalShiftPhases; i++) {
+                        const phaseEl = document.getElementById(`phase-block-${i}`);
+                        if (phaseEl) {
+                            if (i === currentPhaseIdx) {
+                                // Active Phase
+                                phaseEl.className = "flex flex-col items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-500 border bg-teal-500/20 border-teal-500/50 text-teal-300 shadow-[0_0_10px_rgba(20,184,166,0.3)] overflow-hidden";
+                            } else if (i < currentPhaseIdx) {
+                                // Completed Phase
+                                phaseEl.className = "flex flex-col items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-500 border bg-white/10 border-white/20 text-gray-400 overflow-hidden";
+                            } else {
+                                // Future Phase
+                                phaseEl.className = "flex flex-col items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-500 border bg-white/5 border-white/10 text-gray-500 overflow-hidden";
+                            }
+                        }
+                    }
+
                     const plan = shiftLocation === 'home' ? shiftPlanHome : shiftPlanOffice;
                     
                     // Safe index access
