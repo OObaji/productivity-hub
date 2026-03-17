@@ -860,6 +860,23 @@
                                     <!-- History groups go here -->
                                 </div>
                             </div>
+                            
+                            <!-- Reports View -->
+                            <div id="view-breach-reports" class="hidden flex-1 flex-col p-0 overflow-y-auto custom-scrollbar">
+                                <div class="p-8 pb-0">
+                                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Performance Trends</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="breach-trend-stats">
+                                        <!-- Stats populated by JS -->
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-gray-700 mb-8 h-64 relative">
+                                        <canvas id="breach-trend-chart"></canvas>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Recent Shifts</h3>
+                                </div>
+                                <div id="breach-reports-container" class="px-8 pb-8 space-y-6">
+                                    <!-- Shift Report cards go here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2126,14 +2143,23 @@
                         }
                     }
 
-                    // Total Stats
-                    const todayKey = new Date().toISOString().split('T')[0];
-                    const todayItems = breachItems.filter(i => i.createdAt.startsWith(todayKey) && i.completed);
-                    elements.todayTotal.textContent = todayItems.length;
+                    // Total Stats (Using Logical Shift Date to handle night shifts properly)
+                    const logicalNow = new Date();
+                    if (logicalNow.getHours() < 12) logicalNow.setDate(logicalNow.getDate() - 1);
+                    const todayDateStr = logicalNow.toISOString().split('T')[0];
+
+                    const currentShiftItemsAll = breachItems.filter(i => {
+                        const itemLogical = new Date(i.createdAt);
+                        if (itemLogical.getHours() < 12) itemLogical.setDate(itemLogical.getDate() - 1);
+                        return itemLogical.toISOString().split('T')[0] === todayDateStr;
+                    });
                     
-                    // Efficiency (Completed / Total Created today)
-                    const totalTodayCreated = breachItems.filter(i => i.createdAt.startsWith(todayKey)).length;
-                    const eff = totalTodayCreated > 0 ? Math.round((todayItems.length / totalTodayCreated) * 100) : 100;
+                    const completedToday = currentShiftItemsAll.filter(i => i.completed);
+
+                    elements.todayTotal.textContent = completedToday.length;
+                    
+                    // Efficiency
+                    const eff = currentShiftItemsAll.length > 0 ? Math.round((completedToday.length / currentShiftItemsAll.length) * 100) : 100;
                     elements.efficiency.textContent = `${eff}%`;
 
                     renderCurrentList(currentHourItems);
@@ -2276,6 +2302,236 @@
                             </div>
                         `;
                         elements.historyContainer.appendChild(card);
+                    });
+                }
+
+                function getLogicalDate(dateStr) {
+                    const d = new Date(dateStr);
+                    // If time is before noon, count it as the previous calendar day's shift
+                    if (d.getHours() < 12) {
+                        d.setDate(d.getDate() - 1);
+                    }
+                    return d;
+                }
+
+                function renderReports() {
+                    const reportsContainer = document.getElementById('breach-reports-container');
+                    const statsContainer = document.getElementById('breach-trend-stats');
+                    if(!reportsContainer || !statsContainer) return;
+                    
+                    reportsContainer.innerHTML = '';
+                    
+                    const shiftGroups = {};
+                    const now = new Date();
+                    const logicalToday = getLogicalDate(now);
+                    const todayTime = logicalToday.getTime();
+                    const oneDay = 24 * 60 * 60 * 1000;
+
+                    let stats = {
+                        day: { total: 0, completed: 0 },
+                        week: { total: 0, completed: 0 },
+                        month: { total: 0, completed: 0 },
+                        year: { total: 0, completed: 0 }
+                    };
+                    
+                    breachItems.forEach(item => {
+                        const logicalDate = getLogicalDate(item.createdAt);
+                        const shiftKey = logicalDate.toISOString().split('T')[0]; // YYYY-MM-DD
+                        
+                        if (!shiftGroups[shiftKey]) {
+                            shiftGroups[shiftKey] = {
+                                dateLabel: logicalDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
+                                timestamp: logicalDate.getTime(),
+                                dateObj: logicalDate,
+                                total: 0,
+                                completed: 0
+                            };
+                        }
+                        
+                        shiftGroups[shiftKey].total++;
+                        if (item.completed) {
+                            shiftGroups[shiftKey].completed++;
+                        }
+                    });
+
+                    // Sort shifts by timestamp ascending for the chart, descending for the list
+                    const sortedShiftsDesc = Object.values(shiftGroups).sort((a, b) => b.timestamp - a.timestamp);
+                    const sortedShiftsAsc = Object.values(shiftGroups).sort((a, b) => a.timestamp - b.timestamp);
+
+                    // Aggregate Stats
+                    sortedShiftsDesc.forEach(shift => {
+                        const shiftDate = shift.dateObj;
+                        const diffDays = Math.floor((todayTime - shift.timestamp) / oneDay);
+                        
+                        // Day (Today)
+                        if (shiftDate.getDate() === logicalToday.getDate() && shiftDate.getMonth() === logicalToday.getMonth() && shiftDate.getFullYear() === logicalToday.getFullYear()) {
+                            stats.day.total += shift.total;
+                            stats.day.completed += shift.completed;
+                        }
+                        // Week (Last 7 days)
+                        if (diffDays <= 7 && diffDays >= 0) {
+                            stats.week.total += shift.total;
+                            stats.week.completed += shift.completed;
+                        }
+                        // Month
+                        if (shiftDate.getMonth() === logicalToday.getMonth() && shiftDate.getFullYear() === logicalToday.getFullYear()) {
+                            stats.month.total += shift.total;
+                            stats.month.completed += shift.completed;
+                        }
+                        // Year
+                        if (shiftDate.getFullYear() === logicalToday.getFullYear()) {
+                            stats.year.total += shift.total;
+                            stats.year.completed += shift.completed;
+                        }
+                    });
+
+                    // Render Stats Cards
+                    const renderStatCard = (title, stat) => {
+                        const eff = stat.total > 0 ? Math.round((stat.completed / stat.total) * 100) : 0;
+                        const colorClass = eff >= 80 ? 'emerald' : (eff >= 50 ? 'indigo' : 'rose');
+                        return `
+                            <div class="bg-slate-50 dark:bg-gray-700/40 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-gray-600/50 shadow-sm">
+                                <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">${title}</p>
+                                <p class="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 font-mono">${stat.completed}</p>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="text-${colorClass}-500 font-bold bg-${colorClass}-500/10 px-2 py-0.5 rounded-md">${eff}% Eff</span>
+                                    <span class="text-slate-400">/ ${stat.total}</span>
+                                </div>
+                            </div>
+                        `;
+                    };
+
+                    statsContainer.innerHTML = 
+                        renderStatCard('Today', stats.day) +
+                        renderStatCard('Last 7 Days', stats.week) +
+                        renderStatCard('This Month', stats.month) +
+                        renderStatCard('This Year', stats.year);
+
+                    // Render Chart (Last 14 Shifts)
+                    const chartShifts = sortedShiftsAsc.slice(-14);
+                    const labels = chartShifts.map(s => s.dateLabel);
+                    const completedData = chartShifts.map(s => s.completed);
+                    const totalData = chartShifts.map(s => s.total);
+
+                    const ctx = document.getElementById('breach-trend-chart').getContext('2d');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const textColor = isDark ? '#94a3b8' : '#64748b';
+                    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+                    if (window.breachTrendChartInstance) {
+                        window.breachTrendChartInstance.destroy();
+                    }
+                    
+                    window.breachTrendChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Completed',
+                                    data: completedData,
+                                    borderColor: '#6366f1', // Indigo-500
+                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointBackgroundColor: '#6366f1',
+                                    pointRadius: 4
+                                },
+                                {
+                                    label: 'Total Generated',
+                                    data: totalData,
+                                    borderColor: isDark ? '#475569' : '#cbd5e1', // Slate-600 / Slate-300
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    fill: false,
+                                    tension: 0.4,
+                                    pointRadius: 0
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true, 
+                                    grid: { color: gridColor, drawBorder: false },
+                                    ticks: { color: textColor, precision: 0 }
+                                },
+                                x: { 
+                                    grid: { display: false, drawBorder: false },
+                                    ticks: { color: textColor }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: true, position: 'top', labels: { color: textColor, usePointStyle: true, boxWidth: 8 } },
+                                tooltip: {
+                                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                    titleColor: isDark ? '#f8fafc' : '#0f172a',
+                                    bodyColor: isDark ? '#cbd5e1' : '#475569',
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    cornerRadius: 8
+                                }
+                            }
+                        }
+                    });
+
+                    // Render Recent Shifts List
+                    if (sortedShiftsDesc.length === 0) {
+                        reportsContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50 pt-10"><div class="text-4xl mb-2">📊</div><p>No shift data available yet.</p></div>`;
+                        return;
+                    }
+
+                    sortedShiftsDesc.forEach(shift => {
+                        const efficiency = shift.total > 0 ? Math.round((shift.completed / shift.total) * 100) : 0;
+                        
+                        let badgeHtml = '';
+                        if (efficiency >= 90) badgeHtml = '<span class="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-widest font-bold rounded-full border border-emerald-500/20">Elite</span>';
+                        else if (efficiency >= 70) badgeHtml = '<span class="px-3 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] uppercase tracking-widest font-bold rounded-full border border-blue-500/20">Good</span>';
+                        else badgeHtml = '<span class="px-3 py-1 bg-rose-500/20 text-rose-700 dark:text-rose-500 text-[10px] uppercase tracking-widest font-bold rounded-full border border-rose-500/20">Needs Focus</span>';
+
+                        const card = document.createElement('div');
+                        card.className = "bg-white dark:bg-gray-800 rounded-3xl p-6 border border-slate-100 dark:border-gray-700 shadow-sm relative overflow-hidden group";
+                        card.innerHTML = `
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/10 transition-all"></div>
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <p class="text-xs text-indigo-500 font-bold uppercase tracking-widest mb-1">Shift Log</p>
+                                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">${shift.dateLabel}</h3>
+                                    </div>
+                                    <div>${badgeHtml}</div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-2xl border border-slate-100 dark:border-gray-600/50 text-center">
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Completed</p>
+                                        <p class="text-3xl font-mono font-extrabold text-slate-800 dark:text-white">${shift.completed}</p>
+                                        <p class="text-[10px] text-slate-400 mt-1">out of ${shift.total} generated</p>
+                                    </div>
+                                    <div class="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-2xl border border-slate-100 dark:border-gray-600/50 text-center">
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Efficiency</p>
+                                        <p class="text-3xl font-mono font-extrabold text-${efficiency >= 80 ? 'emerald' : (efficiency >= 50 ? 'indigo' : 'rose')}-500">${efficiency}%</p>
+                                        <p class="text-[10px] text-slate-400 mt-1">completion rate</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                        <span>Progress</span>
+                                        <span>${efficiency}%</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000" style="width: ${efficiency}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        reportsContainer.appendChild(card);
                     });
                 }
 
