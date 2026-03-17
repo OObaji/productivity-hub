@@ -566,8 +566,8 @@
                                         <!-- Reset Breaches Toggle -->
                                         <div class="flex items-center justify-between">
                                             <div class="text-left pr-4">
-                                                <label for="reset-breaches-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Reset Completed Breaches</label>
-                                                <p class="text-[10px] text-gray-400 mt-0.5">Uncheck all items to start fresh for this shift.</p>
+                                                <label for="reset-breaches-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Clear Stale Breaches</label>
+                                                <p class="text-[10px] text-gray-400 mt-0.5">Remove uncompleted items from previous shifts.</p>
                                             </div>
                                             <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                                                 <input type="checkbox" name="reset-breaches-toggle" id="reset-breaches-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-rose-400"/>
@@ -1493,33 +1493,42 @@
 
             function renderBreachStats() {
                 const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                // Only count today's completed for stats, or total active? 
-                // Let's stick to Today's Completed for the Dashboard Widget
-                const today = new Date().toISOString().split('T')[0];
-                const completedToday = breachItems.filter(item => item.completed && item.completedAt && item.completedAt.startsWith(today)).length;
                 
-                // Assuming a default target of 20 for the dashboard visualization if not set by hourly
-                const dailyTarget = 100; // Arbitrary high target for the bar or read from localStorage
+                let currentShiftItems = [];
+                let isShiftActive = false;
+                
+                const storedStart = localStorage.getItem('shiftStartTime');
+                const storedEnd = localStorage.getItem('shiftEndTime');
+                const now = new Date();
+                
+                if (storedStart && storedEnd && now < new Date(storedEnd)) {
+                    isShiftActive = true;
+                    const shiftStart = new Date(storedStart);
+                    currentShiftItems = breachItems.filter(i => new Date(i.createdAt) >= shiftStart);
+                } else {
+                    const today = new Date().toISOString().split('T')[0];
+                    currentShiftItems = breachItems.filter(item => item.createdAt && item.createdAt.startsWith(today));
+                }
+                
+                const completedToday = currentShiftItems.filter(item => item.completed).length;
+                const dailyTarget = Math.max(10, currentShiftItems.length); // Dynamic target
 
                 const els = {
                     total: document.getElementById('breach-stats-total'),
                     completed: document.getElementById('breach-stats-completed'),
                     bar: document.getElementById('breach-stats-progress-bar'),
-                    percent: document.getElementById('breach-stats-progress-percent')
+                    percent: document.getElementById('breach-stats-progress-percent'),
+                    badge: document.querySelector('#breach-stats-card .bg-indigo-100')
                 };
 
                 // Update simple stats
                 if(els.completed) els.completed.textContent = completedToday;
                 if(els.total) els.total.textContent = dailyTarget;
+                if(els.badge) els.badge.textContent = isShiftActive ? 'Current Shift' : 'Today';
                 
                 const percentage = Math.min(100, (completedToday / dailyTarget) * 100);
                 if(els.bar) els.bar.style.width = `${percentage}%`;
                 if(els.percent) els.percent.textContent = `${Math.round(percentage)}%`;
-            }
-
-            function renderDailyBreachProgress() {
-                // This function seems redundant with renderBreachStats but kept for safety if used elsewhere
-                renderBreachStats();
             }
 
             function setupSoundscapes() {
@@ -2143,20 +2152,33 @@
                         }
                     }
 
-                    // Total Stats (Using Logical Shift Date to handle night shifts properly)
-                    const logicalNow = new Date();
-                    if (logicalNow.getHours() < 12) logicalNow.setDate(logicalNow.getDate() - 1);
-                    const todayDateStr = logicalNow.toISOString().split('T')[0];
+                    // Total Stats (Current Shift Logic)
+                    const storedStart = localStorage.getItem('shiftStartTime');
+                    const storedEnd = localStorage.getItem('shiftEndTime');
+                    const now = new Date();
+                    let currentShiftItemsAll = [];
+                    let label = "Today Total";
 
-                    const currentShiftItemsAll = breachItems.filter(i => {
-                        const itemLogical = new Date(i.createdAt);
-                        if (itemLogical.getHours() < 12) itemLogical.setDate(itemLogical.getDate() - 1);
-                        return itemLogical.toISOString().split('T')[0] === todayDateStr;
-                    });
+                    if (storedStart && storedEnd && now < new Date(storedEnd)) {
+                        const sTime = new Date(storedStart);
+                        currentShiftItemsAll = breachItems.filter(i => new Date(i.createdAt) >= sTime);
+                        label = "Shift Total";
+                    } else {
+                        const logicalNow = new Date();
+                        if (logicalNow.getHours() < 12) logicalNow.setDate(logicalNow.getDate() - 1);
+                        const todayDateStr = logicalNow.toISOString().split('T')[0];
+
+                        currentShiftItemsAll = breachItems.filter(i => {
+                            const itemLogical = new Date(i.createdAt);
+                            if (itemLogical.getHours() < 12) itemLogical.setDate(itemLogical.getDate() - 1);
+                            return itemLogical.toISOString().split('T')[0] === todayDateStr;
+                        });
+                    }
                     
                     const completedToday = currentShiftItemsAll.filter(i => i.completed);
 
                     elements.todayTotal.textContent = completedToday.length;
+                    elements.todayTotal.previousElementSibling.textContent = label;
                     
                     // Efficiency
                     const eff = currentShiftItemsAll.length > 0 ? Math.round((completedToday.length / currentShiftItemsAll.length) * 100) : 100;
@@ -2610,25 +2632,44 @@
                     }
                 });
 
-                // Tabs
-                elements.tabCurrent.addEventListener('click', () => {
-                    elements.viewCurrent.classList.remove('hidden');
-                    elements.viewHistory.classList.add('hidden');
-                    elements.tabCurrent.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                    elements.tabCurrent.classList.remove('text-slate-500', 'dark:text-slate-400');
-                    elements.tabHistory.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                    elements.tabHistory.classList.add('text-slate-500', 'dark:text-slate-400');
-                });
+                // Tabs & Navigation
+                function switchBreachTab(activeTab) {
+                    [elements.tabCurrent, elements.tabHistory, elements.tabReports].forEach(tab => {
+                        if(tab) {
+                            tab.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                            tab.classList.add('text-slate-500', 'dark:text-slate-400');
+                        }
+                    });
+                    [elements.viewCurrent, elements.viewHistory, elements.viewReports].forEach(view => {
+                        if(view) view.classList.add('hidden');
+                    });
 
-                elements.tabHistory.addEventListener('click', () => {
-                    elements.viewHistory.classList.remove('hidden');
-                    elements.viewCurrent.classList.add('hidden');
-                    elements.tabHistory.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                    elements.tabHistory.classList.remove('text-slate-500', 'dark:text-slate-400');
-                    elements.tabCurrent.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                    elements.tabCurrent.classList.add('text-slate-500', 'dark:text-slate-400');
-                    renderHistory();
-                });
+                    if (activeTab === 'current') {
+                        if(elements.tabCurrent) {
+                            elements.tabCurrent.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                            elements.tabCurrent.classList.remove('text-slate-500', 'dark:text-slate-400');
+                        }
+                        if(elements.viewCurrent) elements.viewCurrent.classList.remove('hidden');
+                    } else if (activeTab === 'history') {
+                        if(elements.tabHistory) {
+                            elements.tabHistory.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                            elements.tabHistory.classList.remove('text-slate-500', 'dark:text-slate-400');
+                        }
+                        if(elements.viewHistory) elements.viewHistory.classList.remove('hidden');
+                        renderHistory();
+                    } else if (activeTab === 'reports') {
+                        if(elements.tabReports) {
+                            elements.tabReports.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
+                            elements.tabReports.classList.remove('text-slate-500', 'dark:text-slate-400');
+                        }
+                        if(elements.viewReports) elements.viewReports.classList.remove('hidden');
+                        renderReports();
+                    }
+                }
+
+                if(elements.tabCurrent) elements.tabCurrent.addEventListener('click', () => switchBreachTab('current'));
+                if(elements.tabHistory) elements.tabHistory.addEventListener('click', () => switchBreachTab('history'));
+                if(elements.tabReports) elements.tabReports.addEventListener('click', () => switchBreachTab('reports'));
 
                 // Initial Render
                 renderDashboard();
@@ -3546,7 +3587,7 @@
                     
                     if(resetBreachesToggle.checked) {
                         let bItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                        bItems.forEach(i => { i.completed = false; delete i.completedAt; });
+                        bItems = bItems.filter(i => i.completed); // Protect history, only clear stale uncompleted items
                         localStorage.setItem('breachItems', JSON.stringify(bItems));
                         if(typeof renderDashboard === 'function') renderDashboard(); 
                     }
