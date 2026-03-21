@@ -765,19 +765,32 @@
                     <div class="flex flex-col lg:flex-row gap-8 relative items-start">
                         
                         <!-- Left Panel: Hourly Control Center -->
-                        <div class="lg:w-1/3 shrink-0 flex flex-col gap-6">
+                        <div class="lg:w-[380px] shrink-0 flex flex-col gap-6">
                             <!-- Current Session Card -->
-                            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden ring-1 ring-white/10">
+                                <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
+                                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
                                 
                                 <div class="relative z-10">
                                     <div class="flex justify-between items-start mb-6">
                                         <div>
-                                            <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest mb-1">Current Session</p>
-                                            <h2 id="breach-current-hour-label" class="text-3xl font-mono font-bold">--:00 - --:00</h2>
+                                            <p class="text-indigo-300 text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 opacity-80">Current Session</p>
+                                            <h2 id="breach-current-hour-label" class="text-3xl font-mono font-extrabold tracking-tight">--:00 - --:00</h2>
                                         </div>
-                                        <div class="animate-pulse">
-                                            <span class="w-3 h-3 bg-emerald-500 rounded-full inline-block shadow-[0_0_10px_#10b981]"></span>
+                                        <div class="relative">
+                                            <button id="breach-status-btn" class="flex items-center gap-2.5 bg-black/30 hover:bg-black/50 border border-white/10 rounded-xl px-3.5 py-2 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-white/20 backdrop-blur-md">
+                                                <span id="breach-status-indicator" class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse"></span>
+                                                <span id="breach-status-text" class="text-[10px] font-bold text-white uppercase tracking-wider">Breach</span>
+                                                <svg class="w-3 h-3 text-white/60 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            </button>
+                                            <div id="breach-status-menu" class="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden hidden z-50 transform origin-top-right transition-all">
+                                                <button class="w-full text-left px-4 py-3 text-[11px] uppercase tracking-wider font-bold text-slate-200 hover:bg-slate-700 hover:text-white flex items-center gap-3 transition-colors border-b border-slate-700/50" data-status="breach">
+                                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span> Breaches
+                                                </button>
+                                                <button class="w-full text-left px-4 py-3 text-[11px] uppercase tracking-wider font-bold text-slate-200 hover:bg-slate-700 hover:text-white flex items-center gap-3 transition-colors" data-status="call">
+                                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span> Calls
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -2024,30 +2037,72 @@
                     currentHourLabel: document.getElementById('breach-current-hour-label'),
                     hourlyCount: document.getElementById('breach-hourly-count'),
                     progressCircle: document.getElementById('breach-hourly-progress-circle'),
-                    targetInput: document.getElementById('breach-hourly-target-input'), // Updated Reference
+                    targetInput: document.getElementById('breach-hourly-target-input'), 
                     paceStatus: document.getElementById('breach-pace-status'),
                     todayTotal: document.getElementById('breach-today-total'),
                     efficiency: document.getElementById('breach-efficiency'),
-                    input: document.getElementById('breach-item-input'),
-                    addBtn: document.getElementById('add-breach-item-btn'),
+                    blocksContainer: document.getElementById('breach-blocks-container'),
                     syncBtn: document.getElementById('sync-breach-target-btn'),
-                    listContainer: document.getElementById('breach-list-uncompleted-container'),
                     historyContainer: document.getElementById('breach-history-container'),
                     viewCurrent: document.getElementById('view-breach-current'),
                     viewHistory: document.getElementById('view-breach-history'),
                     tabCurrent: document.getElementById('tab-breach-current'),
-                    tabHistory: document.getElementById('tab-breach-history')
+                    tabHistory: document.getElementById('tab-breach-history'),
+                    statusBtn: document.getElementById('breach-status-btn'),
+                    statusMenu: document.getElementById('breach-status-menu'),
+                    statusIndicator: document.getElementById('breach-status-indicator'),
+                    statusText: document.getElementById('breach-status-text')
                 };
 
                 // State
                 let breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                let hourlyTargets = JSON.parse(localStorage.getItem('breachHourlyTargets')) || {}; // Key: "YYYY-MM-DD-HH", Value: Number
+                let hourlyTargets = JSON.parse(localStorage.getItem('breachHourlyTargets')) || {}; 
                 
                 // Constants
-                const CIRCLE_CIRCUMFERENCE = 440;
-                const BASE_RATE_PER_HOUR = 6; // Updated default rate
+                const CIRCLE_CIRCUMFERENCE = 478; 
+                const BASE_RATE_PER_HOUR = 6; 
+                
+                let currentShiftMode = localStorage.getItem('currentShiftMode') || 'breach';
 
                 // --- Helper Functions ---
+                
+                function updateStatusUI(status, shouldRender = true) {
+                    if (!elements.statusIndicator) return;
+                    if (status === 'call') {
+                        elements.statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse";
+                        elements.statusText.textContent = "Calls";
+                    } else {
+                        elements.statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse";
+                        elements.statusText.textContent = "Breach";
+                    }
+                    if (shouldRender && typeof renderDashboard === 'function') {
+                        renderDashboard(); 
+                    }
+                }
+
+                function getActiveHourKeys() {
+                    let keys = [];
+                    const storedStart = localStorage.getItem('shiftStartTime');
+                    const storedEnd = localStorage.getItem('shiftEndTime');
+                    const now = new Date();
+                    
+                    let startCursor;
+                    if (storedStart && storedEnd && now < new Date(storedEnd)) {
+                        startCursor = new Date(storedStart);
+                        startCursor.setMinutes(0, 0, 0);
+                        startCursor = new Date(startCursor.getTime() - (2 * 60 * 60 * 1000));
+                    } else {
+                        startCursor = new Date(now);
+                        startCursor.setHours(0, 0, 0, 0);
+                    }
+
+                    let cursor = new Date(startCursor);
+                    for (let i = 0; i < 24; i++) {
+                        keys.push(`${cursor.getFullYear()}-${cursor.getMonth()+1}-${cursor.getDate()}-${cursor.getHours()}`);
+                        cursor = new Date(cursor.getTime() + 60 * 60 * 1000);
+                    }
+                    return keys;
+                }
 
                 function getCurrentHourKey() {
                     const now = new Date();
@@ -2064,12 +2119,8 @@
                 function calculateDynamicTarget() {
                     const now = new Date();
                     const minutesRemaining = 60 - now.getMinutes();
-                    // Calculate proportional target based on 6 per hour
-                    // E.g., 30 mins left = 3 breaches. Always round up to be ambitious, or ceil.
                     let target = Math.ceil((minutesRemaining / 60) * BASE_RATE_PER_HOUR);
-                    // Ensure at least 1 if there's any time left, unless 0 mins
                     if (target < 1 && minutesRemaining > 5) target = 1;
-                    
                     return target;
                 }
                 
@@ -2085,14 +2136,14 @@
 
                 function setHourlyTarget() {
                     const newTarget = calculateDynamicTarget();
-                    elements.targetInput.value = newTarget; // Update Input
+                    elements.targetInput.value = newTarget; 
                     saveTarget(newTarget);
                     showAlert(`Auto-calculated target: ${newTarget} breaches based on time left.`);
                 }
 
                 function getBreachesForHour(hourKey) {
-                    // Filter items created in this hour key
                     return breachItems.filter(item => {
+                        if (item.targetHourKey) return item.targetHourKey === hourKey;
                         const d = new Date(item.createdAt);
                         const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${d.getHours()}`;
                         return key === hourKey;
@@ -2100,59 +2151,378 @@
                 }
 
                 function updateProgressCircle(count, target) {
-                    if (target <= 0) target = 6; // Fallback updated to 6
+                    if (!elements.progressCircle) return;
+                    if (target <= 0) target = 6; 
                     const percentage = Math.min(1, count / target);
                     const offset = CIRCLE_CIRCUMFERENCE - (percentage * CIRCLE_CIRCUMFERENCE);
                     elements.progressCircle.style.strokeDashoffset = offset;
                     
-                    if (count >= target) {
-                        elements.progressCircle.classList.remove('text-indigo-500');
-                        elements.progressCircle.classList.add('text-emerald-500');
+                    if (currentShiftMode === 'call') {
+                        elements.progressCircle.classList.remove('text-indigo-400', 'text-emerald-400');
+                        elements.progressCircle.classList.add('text-red-500/60');
                     } else {
-                        elements.progressCircle.classList.add('text-indigo-500');
-                        elements.progressCircle.classList.remove('text-emerald-500');
+                        elements.progressCircle.classList.remove('text-red-500/60');
+                        if (count >= target) {
+                            elements.progressCircle.classList.remove('text-indigo-400');
+                            elements.progressCircle.classList.add('text-emerald-400');
+                        } else {
+                            elements.progressCircle.classList.add('text-indigo-400');
+                            elements.progressCircle.classList.remove('text-emerald-400');
+                        }
                     }
                 }
 
-                function renderDashboard() {
-                    const currentKey = getCurrentHourKey();
-                    elements.currentHourLabel.textContent = getCurrentHourLabel();
+                function createBreachItemElement(item) {
+                    const el = document.createElement('div');
+                    el.className = `group flex items-start p-3 rounded-2xl transition-all border ${item.completed ? 'bg-slate-50/50 dark:bg-slate-800/30 opacity-60 border-l-4 border-l-emerald-500 border-t-transparent border-r-transparent border-b-transparent' : 'bg-white dark:bg-slate-800 border-l-4 border-l-transparent hover:border-l-indigo-400 shadow-sm border border-slate-100 dark:border-slate-700/50'}`;
+                    el.innerHTML = `
+                        <button class="toggle-btn w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center mr-3 transition-colors shrink-0 ${item.completed ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-500 hover:border-emerald-400'}">
+                            ${item.completed ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                        </button>
+                        <span class="breach-text-copy flex-grow font-medium text-[14px] cursor-pointer transition-colors ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400'}" title="Click to copy">${item.text}</span>
+                        <span class="text-[9px] text-slate-400 font-mono font-medium mx-2 mt-0.5">${new Date(item.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                        
+                        <button class="copy-btn p-1 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all mr-1" title="Copy to clipboard">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                        </button>
+
+                        <button class="delete-btn p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    `;
                     
-                    // Get Target
-                    let target = hourlyTargets[currentKey];
-                    if (target === undefined) {
-                        target = 6; // Default updated to 6 if not synced
+                    el.querySelector('.toggle-btn').addEventListener('click', () => toggleItem(item.id));
+                    el.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id));
+                    
+                    const copyBtn = el.querySelector('.copy-btn');
+                    const textSpan = el.querySelector('.breach-text-copy');
+                    
+                    const handleCopy = () => {
+                        const textToCopy = item.text;
+                        const handleSuccess = () => {
+                            const originalText = textSpan.innerHTML;
+                            const originalIcon = copyBtn.innerHTML;
+                            textSpan.innerHTML = `<span class="text-emerald-500 font-bold">Copied!</span>`;
+                            copyBtn.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                            setTimeout(() => {
+                                textSpan.innerHTML = originalText;
+                                copyBtn.innerHTML = originalIcon;
+                            }, 1000);
+                        };
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(textToCopy).then(handleSuccess).catch(() => {
+                                fallbackCopy(textToCopy, handleSuccess);
+                            });
+                        } else {
+                            fallbackCopy(textToCopy, handleSuccess);
+                        }
+                    };
+                    
+                    copyBtn.addEventListener('click', handleCopy);
+                    textSpan.addEventListener('click', handleCopy);
+                    
+                    return el;
+                }
+
+                function renderHourlyBlocks() {
+                    if (!elements.blocksContainer) return;
+                    elements.blocksContainer.innerHTML = '';
+                    
+                    const keys = getActiveHourKeys();
+                    let currentHourElement = null; 
+                    
+                    const storedStart = localStorage.getItem('shiftStartTime');
+                    const storedEnd = localStorage.getItem('shiftEndTime');
+                    let shiftStart = null, shiftEnd = null;
+                    if (storedStart && storedEnd && new Date() < new Date(storedEnd)) {
+                        shiftStart = new Date(storedStart);
+                        shiftEnd = new Date(storedEnd);
+                    }
+
+                    keys.forEach(key => {
+                        const hourItems = getBreachesForHour(key);
+                        
+                        const parts = key.split('-');
+                        const h = parseInt(parts[3]);
+                        const nextH = (h + 1) % 24;
+                        const label = `${h.toString().padStart(2,'0')}:00 - ${nextH.toString().padStart(2,'0')}:00`;
+                        
+                        const isCurrentHour = key === getCurrentHourKey();
+                        
+                        let isShiftHour = false;
+                        if (shiftStart && shiftEnd) {
+                            const blockStart = new Date();
+                            blockStart.setFullYear(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+                            blockStart.setHours(h, 0, 0, 0);
+                            const blockEnd = new Date(blockStart.getTime() + 60*60*1000);
+                            if (blockStart < shiftEnd && blockEnd > shiftStart) {
+                                isShiftHour = true;
+                            }
+                        }
+
+                        const blockEl = document.createElement('div');
+                        blockEl.className = `bg-white dark:bg-slate-800/40 rounded-3xl border ${isCurrentHour ? 'border-indigo-500 shadow-[0_8px_30px_rgb(99,102,241,0.12)] ring-1 ring-indigo-500/20 dark:bg-gray-800/80' : (isShiftHour ? 'border-teal-500/30 shadow-sm bg-teal-50/10 dark:bg-teal-900/10' : 'border-slate-200 dark:border-slate-700 shadow-sm')} overflow-hidden flex flex-col h-full transition-all group/block`;
+                        
+                        if (isCurrentHour) {
+                            currentHourElement = blockEl;
+                        }
+
+                        blockEl.innerHTML = `
+                            <div class="flex justify-between items-center p-4 md:px-5 border-b ${isCurrentHour ? 'border-indigo-100 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-500/5' : (isShiftHour ? 'border-teal-100 dark:border-teal-500/30 bg-teal-50/30 dark:bg-teal-500/5' : 'border-slate-100 dark:border-gray-700/50 bg-slate-50/80 dark:bg-gray-800/80')}">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-base tracking-tight ${isCurrentHour ? 'text-indigo-600 dark:text-indigo-400' : (isShiftHour ? 'text-teal-600 dark:text-teal-400' : 'text-slate-800 dark:text-white')}">${label}</h3>
+                                    ${isCurrentHour ? '<span class="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-[9px] font-black uppercase tracking-widest shadow-sm">Current</span>' : (isShiftHour ? '<span class="px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400 text-[9px] font-bold uppercase tracking-widest">Shift</span>' : '')}
+                                </div>
+                                <span class="text-xs font-bold ${isCurrentHour ? 'text-indigo-600 bg-indigo-100/50' : 'text-slate-500 bg-slate-200/50 dark:text-slate-400 dark:bg-gray-700/50'} px-2.5 py-1 rounded-md shadow-inner">${hourItems.filter(i=>i.completed).length} / ${hourItems.length}</span>
+                            </div>
+                            <div class="p-3 md:p-4 space-y-2 hour-items-container flex-1 max-h-56 overflow-y-auto custom-scrollbar"></div>
+                            
+                            <div class="p-2.5 bg-slate-50/50 dark:bg-gray-900/50 border-t border-slate-100 dark:border-gray-700/50 transition-colors focus-within:bg-indigo-50/30 dark:focus-within:bg-indigo-900/10 mt-auto">
+                                <div class="relative flex items-center group-focus-within:ring-2 group-focus-within:ring-indigo-500/20 rounded-xl transition-all">
+                                    <div class="absolute left-3 text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    </div>
+                                    <input type="text" class="quick-add-input w-full bg-transparent border-0 pl-9 pr-10 py-2 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:ring-0 focus:outline-none" placeholder="Add task..." data-key="${key}">
+                                    <button class="quick-add-btn absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow" title="Add Item">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        const itemsContainer = blockEl.querySelector('.hour-items-container');
+                        
+                        if (hourItems.length === 0) {
+                            itemsContainer.innerHTML = `<div class="py-6 text-center text-slate-400 text-sm font-medium">No tasks logged for this block.</div>`;
+                        } else {
+                            hourItems.sort((a, b) => {
+                                if (a.completed === b.completed) return new Date(a.createdAt) - new Date(b.createdAt);
+                                return a.completed ? 1 : -1;
+                            }).forEach(item => {
+                                itemsContainer.appendChild(createBreachItemElement(item));
+                            });
+                        }
+                        
+                        const qInput = blockEl.querySelector('.quick-add-input');
+                        const qBtn = blockEl.querySelector('.quick-add-btn');
+                        
+                        const handleQuickAdd = () => {
+                            const text = qInput.value.trim();
+                            if(!text) return;
+                            addItemWithKey(text, key);
+                        };
+                        
+                        qBtn.addEventListener('click', handleQuickAdd);
+                        qInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') handleQuickAdd();
+                        });
+                        
+                        qInput.addEventListener('paste', (e) => {
+                            const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                            if (pasteData.includes('\n')) {
+                                e.preventDefault();
+                                addItemWithKey(pasteData, key);
+                            }
+                        });
+                        
+                        elements.blocksContainer.appendChild(blockEl);
+                    });
+                    
+                    if (currentHourElement && !window.hasScrolledToCurrentHour) {
+                        setTimeout(() => {
+                            currentHourElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            window.hasScrolledToCurrentHour = true;
+                        }, 200);
+                    }
+                }
+                
+                function fallbackCopy(text, onSuccess) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed"; 
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful && onSuccess) onSuccess();
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+
+                function renderHistory() {
+                    elements.historyContainer.innerHTML = '';
+                    
+                    const groups = {};
+                    breachItems.forEach(item => {
+                        let key;
+                        if (item.targetHourKey) {
+                            key = item.targetHourKey;
+                        } else {
+                            const d = new Date(item.createdAt);
+                            key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${d.getHours()}`;
+                        }
+                        
+                        if (!groups[key]) groups[key] = [];
+                        groups[key].push(item);
+                    });
+
+                    const keys = Object.keys(groups).sort().reverse();
+                    
+                    keys.forEach(key => {
+                        if (key === getCurrentHourKey()) return; 
+
+                        const items = groups[key];
+                        const completed = items.filter(i => i.completed).length;
+                        
+                        const parts = key.split('-');
+                        const h = parseInt(parts[3]);
+                        const timeLabel = `${h.toString().padStart(2,'0')}:00 - ${((h+1)%24).toString().padStart(2,'0')}:00`;
+                        const dateLabel = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+
+                        const card = document.createElement('div');
+                        card.className = "bg-white dark:bg-gray-800 rounded-3xl p-6 border border-slate-100 dark:border-gray-700 shadow-sm";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h4 class="font-extrabold text-lg tracking-tight text-slate-800 dark:text-white">${timeLabel}</h4>
+                                    <p class="text-xs font-medium text-slate-500 uppercase tracking-widest mt-0.5">${dateLabel}</p>
+                                </div>
+                                <div class="text-right bg-slate-50 dark:bg-gray-900/50 px-4 py-2 rounded-xl border border-slate-100 dark:border-gray-700">
+                                    <span class="text-2xl font-black text-indigo-500">${completed}</span>
+                                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest ml-1">Done</span>
+                                </div>
+                            </div>
+                            <div class="h-2 w-full bg-slate-100 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                                <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500" style="width: ${(completed/Math.max(items.length, 1))*100}%"></div>
+                            </div>
+                        `;
+                        elements.historyContainer.appendChild(card);
+                    });
+                }
+
+                function getLogicalDate(dateStr) {
+                    const d = new Date(dateStr);
+                    if (d.getHours() < 12) {
+                        d.setDate(d.getDate() - 1);
+                    }
+                    return d;
+                }
+
+                function addItemWithKey(text, targetKey) {
+                    if (!text) return;
+                    
+                    if (text.includes('\n')) {
+                        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+                        lines.forEach((line, idx) => {
+                            breachItems.push({
+                                id: Date.now() + idx + Math.random(),
+                                text: line,
+                                completed: false,
+                                createdAt: new Date().toISOString(),
+                                targetHourKey: targetKey
+                            });
+                        });
+                    } else {
+                        breachItems.push({
+                            id: Date.now(),
+                            text: text,
+                            completed: false,
+                            createdAt: new Date().toISOString(),
+                            targetHourKey: targetKey
+                        });
                     }
                     
-                    // Update Input Value if not currently focused (to avoid jumping while typing)
-                    if (document.activeElement !== elements.targetInput) {
+                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                    renderDashboard();
+                }
+
+                function toggleItem(id) {
+                    const item = breachItems.find(i => i.id === id);
+                    if (item) {
+                        item.completed = !item.completed;
+                        if (item.completed) item.completedAt = new Date().toISOString();
+                        else delete item.completedAt;
+                        localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                        renderDashboard();
+                    }
+                }
+
+                function deleteItem(id) {
+                    breachItems = breachItems.filter(i => i.id !== id);
+                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
+                    renderDashboard();
+                }
+
+                function renderDashboard() {
+                    currentShiftMode = localStorage.getItem('currentShiftMode') || 'breach';
+                    
+                    const currentKey = getCurrentHourKey();
+                    if(elements.currentHourLabel) elements.currentHourLabel.textContent = getCurrentHourLabel();
+                    
+                    let target = hourlyTargets[currentKey];
+                    if (target === undefined) {
+                        target = 6; 
+                    }
+                    
+                    if (elements.targetInput && document.activeElement !== elements.targetInput) {
                         elements.targetInput.value = target;
                     }
 
-                    // Get Counts
                     const currentHourItems = getBreachesForHour(currentKey);
-                    
-                    // Usually "Breach per hour" implies completing the breach. 
                     const completedCount = currentHourItems.filter(i => i.completed).length;
                     
-                    elements.hourlyCount.textContent = completedCount;
-                    updateProgressCircle(completedCount, target);
+                    if(elements.hourlyCount) elements.hourlyCount.textContent = completedCount;
+                    if(elements.progressCircle) updateProgressCircle(completedCount, target);
 
-                    // Pace Status
-                    if (target > 0) {
-                        if (completedCount >= target) {
-                            elements.paceStatus.textContent = "Crushing It! 🔥";
-                            elements.paceStatus.className = "text-lg font-bold text-emerald-400";
-                        } else if (completedCount >= (target * 0.8)) {
-                            elements.paceStatus.textContent = "Almost There";
-                            elements.paceStatus.className = "text-lg font-bold text-yellow-400";
-                        } else {
-                            elements.paceStatus.textContent = "Catch Up Needed";
-                            elements.paceStatus.className = "text-lg font-bold text-rose-400";
+                    if (currentShiftMode === 'call') {
+                        if(elements.paceStatus) {
+                            elements.paceStatus.textContent = "Paused (On Call)";
+                            elements.paceStatus.className = "text-sm font-bold text-red-400 tracking-wide animate-pulse";
+                        }
+                        
+                        if(elements.targetInput) {
+                            elements.targetInput.disabled = true;
+                            elements.targetInput.parentElement.classList.add('opacity-40');
+                        }
+                        
+                        if(elements.syncBtn) {
+                            elements.syncBtn.disabled = true;
+                            elements.syncBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                        }
+                        
+                        if(elements.progressCircle) elements.progressCircle.classList.add('opacity-60');
+                    } else {
+                        if(elements.targetInput) {
+                            elements.targetInput.disabled = false;
+                            elements.targetInput.parentElement.classList.remove('opacity-40');
+                        }
+                        
+                        if(elements.syncBtn) {
+                            elements.syncBtn.disabled = false;
+                            elements.syncBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                        }
+                        
+                        if(elements.progressCircle) elements.progressCircle.classList.remove('opacity-60');
+                        
+                        if (target > 0 && elements.paceStatus) {
+                            if (completedCount >= target) {
+                                elements.paceStatus.textContent = "Crushing It! 🔥";
+                                elements.paceStatus.className = "text-sm font-bold text-emerald-400 tracking-wide";
+                            } else if (completedCount >= (target * 0.8)) {
+                                elements.paceStatus.textContent = "Almost There";
+                                elements.paceStatus.className = "text-sm font-bold text-yellow-400 tracking-wide";
+                            } else {
+                                elements.paceStatus.textContent = "Catch Up Needed";
+                                elements.paceStatus.className = "text-sm font-bold text-rose-400 tracking-wide";
+                            }
                         }
                     }
 
-                    // Total Stats (Current Shift Logic)
                     const storedStart = localStorage.getItem('shiftStartTime');
                     const storedEnd = localStorage.getItem('shiftEndTime');
                     const now = new Date();
@@ -2177,504 +2547,85 @@
                     
                     const completedToday = currentShiftItemsAll.filter(i => i.completed);
 
-                    elements.todayTotal.textContent = completedToday.length;
-                    elements.todayTotal.previousElementSibling.textContent = label;
+                    if(elements.todayTotal) {
+                        elements.todayTotal.textContent = completedToday.length;
+                        if(elements.todayTotal.previousElementSibling) elements.todayTotal.previousElementSibling.textContent = label;
+                    }
                     
-                    // Efficiency
                     const eff = currentShiftItemsAll.length > 0 ? Math.round((completedToday.length / currentShiftItemsAll.length) * 100) : 100;
-                    elements.efficiency.textContent = `${eff}%`;
+                    if(elements.efficiency) elements.efficiency.textContent = `${eff}%`;
 
-                    renderCurrentList(currentHourItems);
+                    renderHourlyBlocks();
                     
-                    // Update global widgets
                     if (typeof renderBreachCompletionTable === 'function') renderBreachCompletionTable();
                     if (typeof renderBreachStats === 'function') renderBreachStats();
                 }
 
-                function renderCurrentList(items) {
-                    elements.listContainer.innerHTML = '';
-                    if (items.length === 0) {
-                        elements.listContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50"><div class="text-4xl mb-2">⚡</div><p>Start your breach session.</p></div>`;
-                        return;
-                    }
-
-                    // Sort: Uncompleted first, then Oldest (so new items appear at the bottom)
-                    items.sort((a, b) => {
-                        if (a.completed === b.completed) return new Date(a.createdAt) - new Date(b.createdAt);
-                        return a.completed ? 1 : -1;
-                    });
-
-                    items.forEach(item => {
-                        const el = document.createElement('div');
-                        el.className = `group flex items-center p-3 rounded-xl transition-all border ${item.completed ? 'bg-slate-50 dark:bg-slate-800/50 border-transparent opacity-75' : 'bg-white dark:bg-gray-700 border-slate-100 dark:border-gray-600 shadow-sm'}`;
-                        el.innerHTML = `
-                            <button class="toggle-btn w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${item.completed ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-500 hover:border-emerald-400'}">
-                                ${item.completed ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
-                            </button>
-                            <span class="breach-text-copy flex-grow font-medium text-sm cursor-pointer transition-colors ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400'}" title="Click to copy">${item.text}</span>
-                            <span class="text-[10px] text-slate-400 font-mono mr-3">${new Date(item.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                            
-                            <button class="copy-btn text-slate-400 hover:text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity mr-2" title="Copy to clipboard">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                            </button>
-
-                            <button class="delete-btn text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        `;
-                        
-                        // Event Listeners
-                        el.querySelector('.toggle-btn').addEventListener('click', () => toggleItem(item.id));
-                        el.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id));
-                        
-                        // Copy Button Logic (Clicking text or button copies to clipboard)
-                        const copyBtn = el.querySelector('.copy-btn');
-                        const textSpan = el.querySelector('.breach-text-copy');
-                        
-                        const handleCopy = () => {
-                            const textToCopy = item.text;
-                            
-                            const handleSuccess = () => {
-                                const originalText = textSpan.innerHTML;
-                                const originalIcon = copyBtn.innerHTML;
-                                
-                                textSpan.innerHTML = `<span class="text-emerald-500 font-bold">Copied!</span>`;
-                                copyBtn.innerHTML = `<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                                
-                                setTimeout(() => {
-                                    textSpan.innerHTML = originalText;
-                                    copyBtn.innerHTML = originalIcon;
-                                }, 1000);
-                            };
-
-                            // Try Async API first, fallback to execCommand if it fails or is blocked
-                            if (navigator.clipboard && navigator.clipboard.writeText) {
-                                navigator.clipboard.writeText(textToCopy).then(handleSuccess).catch(() => {
-                                    fallbackCopy(textToCopy, handleSuccess);
-                                });
-                            } else {
-                                fallbackCopy(textToCopy, handleSuccess);
-                            }
-                        };
-                        
-                        copyBtn.addEventListener('click', handleCopy);
-                        textSpan.addEventListener('click', handleCopy);
-                        
-                        elements.listContainer.appendChild(el);
-                    });
-                }
-                
-                // Helper for clipboard fallback
-                function fallbackCopy(text, onSuccess) {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    textArea.style.position = "fixed"; // Avoid scrolling to bottom
-                    textArea.style.left = "-9999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        const successful = document.execCommand('copy');
-                        if (successful && onSuccess) onSuccess();
-                    } catch (err) {
-                        console.error('Fallback copy failed', err);
-                    }
-                    document.body.removeChild(textArea);
-                }
-
-                function renderHistory() {
-                    elements.historyContainer.innerHTML = '';
-                    
-                    // Group by Hour Key
-                    const groups = {};
-                    breachItems.forEach(item => {
-                        const d = new Date(item.createdAt);
-                        const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}-${d.getHours()}`;
-                        if (!groups[key]) groups[key] = [];
-                        groups[key].push(item);
-                    });
-
-                    // Sort keys descending
-                    const keys = Object.keys(groups).sort().reverse();
-                    
-                    keys.forEach(key => {
-                        if (key === getCurrentHourKey()) return; // Skip current hour in history view (optional)
-
-                        const items = groups[key];
-                        const completed = items.filter(i => i.completed).length;
-                        const dateObj = new Date(items[0].createdAt); // Use first item for date ref
-                        const timeLabel = `${dateObj.getHours().toString().padStart(2,'0')}:00 - ${(dateObj.getHours()+1).toString().padStart(2,'0')}:00`;
-                        const dateLabel = dateObj.toLocaleDateString();
-
-                        const card = document.createElement('div');
-                        card.className = "bg-slate-50 dark:bg-gray-700/30 rounded-2xl p-4 border border-slate-100 dark:border-gray-700";
-                        card.innerHTML = `
-                            <div class="flex justify-between items-center mb-2">
-                                <div>
-                                    <h4 class="font-bold text-slate-700 dark:text-slate-200">${timeLabel}</h4>
-                                    <p class="text-xs text-slate-500">${dateLabel}</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xl font-bold text-indigo-500">${completed}</span>
-                                    <span class="text-xs text-slate-500 uppercase">Done</span>
-                                </div>
-                            </div>
-                            <div class="h-1.5 w-full bg-slate-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-500" style="width: ${(completed/Math.max(items.length, 1))*100}%"></div>
-                            </div>
-                        `;
-                        elements.historyContainer.appendChild(card);
-                    });
-                }
-
-                function getLogicalDate(dateStr) {
-                    const d = new Date(dateStr);
-                    // If time is before noon, count it as the previous calendar day's shift
-                    if (d.getHours() < 12) {
-                        d.setDate(d.getDate() - 1);
-                    }
-                    return d;
-                }
-
-                function renderReports() {
-                    const reportsContainer = document.getElementById('breach-reports-container');
-                    const statsContainer = document.getElementById('breach-trend-stats');
-                    if(!reportsContainer || !statsContainer) return;
-                    
-                    reportsContainer.innerHTML = '';
-                    
-                    const shiftGroups = {};
-                    const now = new Date();
-                    const logicalToday = getLogicalDate(now);
-                    const todayTime = logicalToday.getTime();
-                    const oneDay = 24 * 60 * 60 * 1000;
-
-                    let stats = {
-                        day: { total: 0, completed: 0 },
-                        week: { total: 0, completed: 0 },
-                        month: { total: 0, completed: 0 },
-                        year: { total: 0, completed: 0 }
-                    };
-                    
-                    breachItems.forEach(item => {
-                        const logicalDate = getLogicalDate(item.createdAt);
-                        const shiftKey = logicalDate.toISOString().split('T')[0]; // YYYY-MM-DD
-                        
-                        if (!shiftGroups[shiftKey]) {
-                            shiftGroups[shiftKey] = {
-                                dateLabel: logicalDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
-                                timestamp: logicalDate.getTime(),
-                                dateObj: logicalDate,
-                                total: 0,
-                                completed: 0
-                            };
-                        }
-                        
-                        shiftGroups[shiftKey].total++;
-                        if (item.completed) {
-                            shiftGroups[shiftKey].completed++;
-                        }
-                    });
-
-                    // Sort shifts by timestamp ascending for the chart, descending for the list
-                    const sortedShiftsDesc = Object.values(shiftGroups).sort((a, b) => b.timestamp - a.timestamp);
-                    const sortedShiftsAsc = Object.values(shiftGroups).sort((a, b) => a.timestamp - b.timestamp);
-
-                    // Aggregate Stats
-                    sortedShiftsDesc.forEach(shift => {
-                        const shiftDate = shift.dateObj;
-                        const diffDays = Math.floor((todayTime - shift.timestamp) / oneDay);
-                        
-                        // Day (Today)
-                        if (shiftDate.getDate() === logicalToday.getDate() && shiftDate.getMonth() === logicalToday.getMonth() && shiftDate.getFullYear() === logicalToday.getFullYear()) {
-                            stats.day.total += shift.total;
-                            stats.day.completed += shift.completed;
-                        }
-                        // Week (Last 7 days)
-                        if (diffDays <= 7 && diffDays >= 0) {
-                            stats.week.total += shift.total;
-                            stats.week.completed += shift.completed;
-                        }
-                        // Month
-                        if (shiftDate.getMonth() === logicalToday.getMonth() && shiftDate.getFullYear() === logicalToday.getFullYear()) {
-                            stats.month.total += shift.total;
-                            stats.month.completed += shift.completed;
-                        }
-                        // Year
-                        if (shiftDate.getFullYear() === logicalToday.getFullYear()) {
-                            stats.year.total += shift.total;
-                            stats.year.completed += shift.completed;
-                        }
-                    });
-
-                    // Render Stats Cards
-                    const renderStatCard = (title, stat) => {
-                        const eff = stat.total > 0 ? Math.round((stat.completed / stat.total) * 100) : 0;
-                        const colorClass = eff >= 80 ? 'emerald' : (eff >= 50 ? 'indigo' : 'rose');
-                        return `
-                            <div class="bg-slate-50 dark:bg-gray-700/40 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-gray-600/50 shadow-sm">
-                                <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">${title}</p>
-                                <p class="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 font-mono">${stat.completed}</p>
-                                <div class="flex items-center gap-2 text-xs">
-                                    <span class="text-${colorClass}-500 font-bold bg-${colorClass}-500/10 px-2 py-0.5 rounded-md">${eff}% Eff</span>
-                                    <span class="text-slate-400">/ ${stat.total}</span>
-                                </div>
-                            </div>
-                        `;
-                    };
-
-                    statsContainer.innerHTML = 
-                        renderStatCard('Today', stats.day) +
-                        renderStatCard('Last 7 Days', stats.week) +
-                        renderStatCard('This Month', stats.month) +
-                        renderStatCard('This Year', stats.year);
-
-                    // Render Chart (Last 14 Shifts)
-                    const chartShifts = sortedShiftsAsc.slice(-14);
-                    const labels = chartShifts.map(s => s.dateLabel);
-                    const completedData = chartShifts.map(s => s.completed);
-                    const totalData = chartShifts.map(s => s.total);
-
-                    const ctx = document.getElementById('breach-trend-chart').getContext('2d');
-                    const isDark = document.documentElement.classList.contains('dark');
-                    const textColor = isDark ? '#94a3b8' : '#64748b';
-                    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-
-                    if (window.breachTrendChartInstance) {
-                        window.breachTrendChartInstance.destroy();
-                    }
-                    
-                    window.breachTrendChartInstance = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [
-                                {
-                                    label: 'Completed',
-                                    data: completedData,
-                                    borderColor: '#6366f1', // Indigo-500
-                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                                    borderWidth: 3,
-                                    fill: true,
-                                    tension: 0.4,
-                                    pointBackgroundColor: '#6366f1',
-                                    pointRadius: 4
-                                },
-                                {
-                                    label: 'Total Generated',
-                                    data: totalData,
-                                    borderColor: isDark ? '#475569' : '#cbd5e1', // Slate-600 / Slate-300
-                                    borderWidth: 2,
-                                    borderDash: [5, 5],
-                                    fill: false,
-                                    tension: 0.4,
-                                    pointRadius: 0
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            interaction: { mode: 'index', intersect: false },
-                            scales: {
-                                y: { 
-                                    beginAtZero: true, 
-                                    grid: { color: gridColor, drawBorder: false },
-                                    ticks: { color: textColor, precision: 0 }
-                                },
-                                x: { 
-                                    grid: { display: false, drawBorder: false },
-                                    ticks: { color: textColor }
-                                }
-                            },
-                            plugins: {
-                                legend: { display: true, position: 'top', labels: { color: textColor, usePointStyle: true, boxWidth: 8 } },
-                                tooltip: {
-                                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                                    titleColor: isDark ? '#f8fafc' : '#0f172a',
-                                    bodyColor: isDark ? '#cbd5e1' : '#475569',
-                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                    borderWidth: 1,
-                                    padding: 10,
-                                    cornerRadius: 8
-                                }
-                            }
-                        }
-                    });
-
-                    // Render Recent Shifts List
-                    if (sortedShiftsDesc.length === 0) {
-                        reportsContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50 pt-10"><div class="text-4xl mb-2">📊</div><p>No shift data available yet.</p></div>`;
-                        return;
-                    }
-
-                    sortedShiftsDesc.forEach(shift => {
-                        const efficiency = shift.total > 0 ? Math.round((shift.completed / shift.total) * 100) : 0;
-                        
-                        let badgeHtml = '';
-                        if (efficiency >= 90) badgeHtml = '<span class="px-3 py-1 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-widest font-bold rounded-full border border-emerald-500/20">Elite</span>';
-                        else if (efficiency >= 70) badgeHtml = '<span class="px-3 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] uppercase tracking-widest font-bold rounded-full border border-blue-500/20">Good</span>';
-                        else badgeHtml = '<span class="px-3 py-1 bg-rose-500/20 text-rose-700 dark:text-rose-500 text-[10px] uppercase tracking-widest font-bold rounded-full border border-rose-500/20">Needs Focus</span>';
-
-                        const card = document.createElement('div');
-                        card.className = "bg-white dark:bg-gray-800 rounded-3xl p-6 border border-slate-100 dark:border-gray-700 shadow-sm relative overflow-hidden group";
-                        card.innerHTML = `
-                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/10 transition-all"></div>
-                            <div class="relative z-10">
-                                <div class="flex justify-between items-start mb-6">
-                                    <div>
-                                        <p class="text-xs text-indigo-500 font-bold uppercase tracking-widest mb-1">Shift Log</p>
-                                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">${shift.dateLabel}</h3>
-                                    </div>
-                                    <div>${badgeHtml}</div>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4 mb-6">
-                                    <div class="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-2xl border border-slate-100 dark:border-gray-600/50 text-center">
-                                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Completed</p>
-                                        <p class="text-3xl font-mono font-extrabold text-slate-800 dark:text-white">${shift.completed}</p>
-                                        <p class="text-[10px] text-slate-400 mt-1">out of ${shift.total} generated</p>
-                                    </div>
-                                    <div class="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-2xl border border-slate-100 dark:border-gray-600/50 text-center">
-                                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Efficiency</p>
-                                        <p class="text-3xl font-mono font-extrabold text-${efficiency >= 80 ? 'emerald' : (efficiency >= 50 ? 'indigo' : 'rose')}-500">${efficiency}%</p>
-                                        <p class="text-[10px] text-slate-400 mt-1">completion rate</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                        <span>Progress</span>
-                                        <span>${efficiency}%</span>
-                                    </div>
-                                    <div class="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000" style="width: ${efficiency}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        reportsContainer.appendChild(card);
-                    });
-                }
-
-                // --- Actions ---
-
-                function addItem() {
-                    const text = elements.input.value.trim();
-                    if (!text) return;
-                    
-                    const newItem = {
-                        id: Date.now(),
-                        text: text,
-                        completed: false, // Default uncompleted
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    breachItems.push(newItem);
-                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
-                    elements.input.value = '';
-                    renderDashboard();
-                }
-
-                function toggleItem(id) {
-                    const item = breachItems.find(i => i.id === id);
-                    if (item) {
-                        item.completed = !item.completed;
-                        if (item.completed) item.completedAt = new Date().toISOString();
-                        else delete item.completedAt;
-                        localStorage.setItem('breachItems', JSON.stringify(breachItems));
-                        renderDashboard();
-                    }
-                }
-
-                function deleteItem(id) {
-                    breachItems = breachItems.filter(i => i.id !== id);
-                    localStorage.setItem('breachItems', JSON.stringify(breachItems));
-                    renderDashboard();
-                }
-
                 // --- Event Listeners ---
                 
-                elements.syncBtn.addEventListener('click', setHourlyTarget);
+                if(elements.syncBtn) elements.syncBtn.addEventListener('click', setHourlyTarget);
                 
-                // New Event Listener for Manual Target Input
-                elements.targetInput.addEventListener('change', (e) => {
-                    saveTarget(e.target.value);
-                });
-                
-                elements.addBtn.addEventListener('click', addItem);
-                elements.input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') addItem();
-                });
+                if(elements.targetInput) {
+                    elements.targetInput.addEventListener('change', (e) => {
+                        saveTarget(e.target.value);
+                    });
+                }
 
-                // Listen for multi-line pastes (like from Excel)
-                elements.input.addEventListener('paste', (e) => {
-                    const pasteData = (e.clipboardData || window.clipboardData).getData('text');
-                    // Check if there are newlines indicating multiple items
-                    if (pasteData.includes('\n')) {
-                        e.preventDefault(); // Stop standard single-line paste
-                        
-                        // Split by newline and filter out any empty rows
-                        const lines = pasteData.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-                        
-                        lines.forEach((text, idx) => {
-                            breachItems.push({
-                                id: Date.now() + idx + Math.random(), // Unique ID 
-                                text: text,
-                                completed: false,
-                                createdAt: new Date().toISOString()
-                            });
-                        });
-                        
-                        localStorage.setItem('breachItems', JSON.stringify(breachItems));
-                        elements.input.value = ''; // Clear input field
-                        renderDashboard();
-                    }
-                });
-
-                // Tabs & Navigation
                 function switchBreachTab(activeTab) {
-                    [elements.tabCurrent, elements.tabHistory, elements.tabReports].forEach(tab => {
+                    const tabs = [elements.tabCurrent, elements.tabHistory];
+                    tabs.forEach(tab => {
                         if(tab) {
-                            tab.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                            tab.classList.add('text-slate-500', 'dark:text-slate-400');
+                            tab.className = "flex-1 py-2.5 text-sm font-bold rounded-xl transition-all text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent";
                         }
                     });
-                    [elements.viewCurrent, elements.viewHistory, elements.viewReports].forEach(view => {
+                    [elements.viewCurrent, elements.viewHistory].forEach(view => {
                         if(view) view.classList.add('hidden');
                     });
 
                     if (activeTab === 'current') {
                         if(elements.tabCurrent) {
-                            elements.tabCurrent.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                            elements.tabCurrent.classList.remove('text-slate-500', 'dark:text-slate-400');
+                            elements.tabCurrent.className = "flex-1 py-2.5 text-sm font-bold rounded-xl transition-all shadow-md bg-white dark:bg-gray-700 text-indigo-600 dark:text-white";
                         }
                         if(elements.viewCurrent) elements.viewCurrent.classList.remove('hidden');
                     } else if (activeTab === 'history') {
                         if(elements.tabHistory) {
-                            elements.tabHistory.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                            elements.tabHistory.classList.remove('text-slate-500', 'dark:text-slate-400');
+                            elements.tabHistory.className = "flex-1 py-2.5 text-sm font-bold rounded-xl transition-all shadow-md bg-white dark:bg-gray-700 text-indigo-600 dark:text-white";
                         }
                         if(elements.viewHistory) elements.viewHistory.classList.remove('hidden');
                         renderHistory();
-                    } else if (activeTab === 'reports') {
-                        if(elements.tabReports) {
-                            elements.tabReports.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-b-2', 'border-indigo-600');
-                            elements.tabReports.classList.remove('text-slate-500', 'dark:text-slate-400');
-                        }
-                        if(elements.viewReports) elements.viewReports.classList.remove('hidden');
-                        renderReports();
                     }
                 }
 
                 if(elements.tabCurrent) elements.tabCurrent.addEventListener('click', () => switchBreachTab('current'));
                 if(elements.tabHistory) elements.tabHistory.addEventListener('click', () => switchBreachTab('history'));
-                if(elements.tabReports) elements.tabReports.addEventListener('click', () => switchBreachTab('reports'));
 
-                // Initial Render
+                if(elements.statusBtn) {
+                    elements.statusBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        elements.statusMenu.classList.toggle('hidden');
+                    });
+                }
+
+                document.addEventListener('click', () => {
+                    if (elements.statusMenu && !elements.statusMenu.classList.contains('hidden')) {
+                        elements.statusMenu.classList.add('hidden');
+                    }
+                });
+
+                if(elements.statusMenu) {
+                    const statusOptions = elements.statusMenu.querySelectorAll('button');
+                    statusOptions.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            currentShiftMode = btn.dataset.status;
+                            localStorage.setItem('currentShiftMode', currentShiftMode);
+                            updateStatusUI(currentShiftMode, true);
+                        });
+                    });
+                }
+
+                updateStatusUI(currentShiftMode, false);
                 renderDashboard();
                 
-                // Refresh dashboard every minute to keep time label accurate
                 setInterval(renderDashboard, 60000);
             }
 
