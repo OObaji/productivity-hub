@@ -1464,9 +1464,14 @@
                 
                 container.innerHTML = ''; 
 
-                // Filter for items completed TODAY
-                const today = new Date().toISOString().split('T')[0];
-                const todayItems = items.filter(item => item.completed && item.completedAt && item.completedAt.startsWith(today));
+                const now = new Date();
+                let shiftStart = new Date(now);
+                if (now.getHours() < 7) {
+                    shiftStart.setDate(shiftStart.getDate() - 1);
+                }
+                shiftStart.setHours(19, 0, 0, 0);
+
+                const todayItems = items.filter(item => item.completed && item.completedAt && new Date(item.completedAt) >= shiftStart);
 
                 if (todayItems.length === 0) {
                      container.innerHTML = `<p class="text-center p-4 text-slate-400 text-sm italic">No completed items today.</p>`;
@@ -1489,22 +1494,15 @@
 
             function renderBreachStats() {
                 const breachItems = JSON.parse(localStorage.getItem('breachItems')) || [];
-                
-                let currentShiftItems = [];
-                let isShiftActive = false;
-                
-                const storedStart = localStorage.getItem('shiftStartTime');
-                const storedEnd = localStorage.getItem('shiftEndTime');
                 const now = new Date();
                 
-                if (storedStart && storedEnd && now < new Date(storedEnd)) {
-                    isShiftActive = true;
-                    const shiftStart = new Date(storedStart);
-                    currentShiftItems = breachItems.filter(i => new Date(i.createdAt) >= shiftStart);
-                } else {
-                    const today = new Date().toISOString().split('T')[0];
-                    currentShiftItems = breachItems.filter(item => item.createdAt && item.createdAt.startsWith(today));
+                let shiftStart = new Date(now);
+                if (now.getHours() < 7) {
+                    shiftStart.setDate(shiftStart.getDate() - 1);
                 }
+                shiftStart.setHours(19, 0, 0, 0);
+                
+                const currentShiftItems = breachItems.filter(i => new Date(i.createdAt) >= shiftStart);
                 
                 const completedToday = currentShiftItems.filter(item => item.completed).length;
                 const dailyTarget = Math.max(10, currentShiftItems.length); // Dynamic target
@@ -1520,7 +1518,7 @@
                 // Update simple stats
                 if(els.completed) els.completed.textContent = completedToday;
                 if(els.total) els.total.textContent = dailyTarget;
-                if(els.badge) els.badge.textContent = isShiftActive ? 'Current Shift' : 'Today';
+                if(els.badge) els.badge.textContent = 'Current Shift';
                 
                 const percentage = Math.min(100, (completedToday / dailyTarget) * 100);
                 if(els.bar) els.bar.style.width = `${percentage}%`;
@@ -2065,22 +2063,31 @@
 
                 function getActiveHourKeys() {
                     let keys = [];
-                    const storedStart = localStorage.getItem('shiftStartTime');
-                    const storedEnd = localStorage.getItem('shiftEndTime');
                     const now = new Date();
                     
-                    let startCursor;
-                    if (storedStart && storedEnd && now < new Date(storedEnd)) {
-                        startCursor = new Date(storedStart);
-                        startCursor.setMinutes(0, 0, 0);
-                        startCursor = new Date(startCursor.getTime() - (2 * 60 * 60 * 1000));
+                    let shiftStart = new Date(now);
+                    let shiftEnd = new Date(now);
+
+                    if (now.getHours() < 7) {
+                        shiftStart.setDate(shiftStart.getDate() - 1);
+                        shiftStart.setHours(19, 0, 0, 0);
+                        shiftEnd.setHours(7, 0, 0, 0);
+                    } else if (now.getHours() >= 19) {
+                        shiftStart.setHours(19, 0, 0, 0);
+                        shiftEnd.setDate(shiftEnd.getDate() + 1);
+                        shiftEnd.setHours(7, 0, 0, 0);
                     } else {
-                        startCursor = new Date(now);
-                        startCursor.setHours(0, 0, 0, 0);
+                        // Outside shift hours, setup upcoming shift
+                        shiftStart.setHours(19, 0, 0, 0);
+                        shiftEnd.setDate(shiftEnd.getDate() + 1);
+                        shiftEnd.setHours(7, 0, 0, 0);
                     }
 
+                    let currentHourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
+                    let startCursor = new Date(Math.max(shiftStart.getTime(), currentHourStart.getTime()));
+
                     let cursor = new Date(startCursor);
-                    for (let i = 0; i < 24; i++) {
+                    while (cursor < shiftEnd) {
                         keys.push(`${cursor.getFullYear()}-${cursor.getMonth()+1}-${cursor.getDate()}-${cursor.getHours()}`);
                         cursor = new Date(cursor.getTime() + 60 * 60 * 1000);
                     }
@@ -2388,10 +2395,20 @@
                         groups[key].push(item);
                     });
 
-                    const keys = Object.keys(groups).sort().reverse();
+                    // Reliable sorting for keys
+                    const keys = Object.keys(groups).sort((a, b) => {
+                        const pa = a.split('-').map(Number);
+                        const pb = b.split('-').map(Number);
+                        const da = new Date(pa[0], pa[1]-1, pa[2], pa[3]);
+                        const db = new Date(pb[0], pb[1]-1, pb[2], pb[3]);
+                        return db - da; // reverse chronological
+                    });
+                    
+                    const activeKeys = getActiveHourKeys();
                     
                     keys.forEach(key => {
-                        if (key === getCurrentHourKey()) return; 
+                        // Skip keys that are part of the current active shift view
+                        if (activeKeys.includes(key)) return; 
 
                         const items = groups[key];
                         const completed = items.filter(i => i.completed).length;
@@ -2545,27 +2562,18 @@
                         }
                     }
 
-                    const storedStart = localStorage.getItem('shiftStartTime');
-                    const storedEnd = localStorage.getItem('shiftEndTime');
                     const now = new Date();
-                    let currentShiftItemsAll = [];
-                    let label = "Today Total";
-
-                    if (storedStart && storedEnd && now < new Date(storedEnd)) {
-                        const sTime = new Date(storedStart);
-                        currentShiftItemsAll = breachItems.filter(i => new Date(i.createdAt) >= sTime);
-                        label = "Shift Total";
-                    } else {
-                        const logicalNow = new Date();
-                        if (logicalNow.getHours() < 12) logicalNow.setDate(logicalNow.getDate() - 1);
-                        const todayDateStr = logicalNow.toISOString().split('T')[0];
-
-                        currentShiftItemsAll = breachItems.filter(i => {
-                            const itemLogical = new Date(i.createdAt);
-                            if (itemLogical.getHours() < 12) itemLogical.setDate(itemLogical.getDate() - 1);
-                            return itemLogical.toISOString().split('T')[0] === todayDateStr;
-                        });
+                    let shiftStart = new Date(now);
+                    if (now.getHours() < 7) {
+                        shiftStart.setDate(shiftStart.getDate() - 1);
                     }
+                    shiftStart.setHours(19, 0, 0, 0);
+
+                    let currentShiftItemsAll = breachItems.filter(i => {
+                        return new Date(i.createdAt) >= shiftStart;
+                    });
+                    
+                    let label = "Shift Total";
                     
                     const completedToday = currentShiftItemsAll.filter(i => i.completed);
 
