@@ -207,6 +207,25 @@
         </div>
     </div>
 
+    <!-- Shift Plan Edit Modal -->
+    <div id="shift-plan-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-[2rem] shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white tracking-tight">Edit Shift Plan Vibes</h2>
+                <button id="close-plan-modal-btn" class="text-gray-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="plan-inputs-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
+                <!-- Populated by JS -->
+            </div>
+            <div class="mt-6 pt-6 border-t border-white/10 flex justify-end gap-3 shrink-0">
+                <button id="reset-plan-btn" class="px-5 py-2.5 bg-rose-500/20 text-rose-300 font-bold rounded-xl hover:bg-rose-500/30 transition-colors text-sm">Reset Defaults</button>
+                <button id="save-plan-btn" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] text-sm">Save Plan</button>
+            </div>
+        </div>
+    </div>
+
     <section id="landing-page" class="landing-page h-screen w-full flex items-center justify-center text-center p-4">
         <canvas id="landing-canvas"></canvas>
         <div class="relative z-10 max-w-3xl">
@@ -521,12 +540,15 @@
                         <!-- SETUP VIEW -->
                         <div id="shift-setup" class="w-full max-w-lg glass-panel p-10 rounded-[2.5rem] shadow-2xl mx-auto my-auto border border-white/10 backdrop-blur-xl">
                             <h2 class="text-4xl font-extrabold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300 neon-text tracking-tight">Shift Setup</h2>
-                            <!-- Location Toggle -->
-                            <div class="flex justify-center mb-8">
+                            <!-- Location Toggle and Edit Plan -->
+                            <div class="flex justify-between items-center mb-8">
                                 <div class="bg-black/40 p-1.5 rounded-2xl flex border border-white/10 shadow-inner">
                                     <button id="loc-home-btn" class="px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]"><span>🏠</span> Home</button>
                                     <button id="loc-office-btn" class="px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent"><span>🏢</span> Office</button>
                                 </div>
+                                <button id="edit-plan-btn" class="text-[10px] uppercase font-bold tracking-wider px-4 py-3 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 rounded-xl border border-indigo-500/20 transition-all flex items-center gap-2 shadow-lg">
+                                    ✏️ Edit Vibes
+                                </button>
                             </div>
                              <div class="space-y-6">
                                 <div class="text-left">
@@ -673,6 +695,9 @@
                                                 <!-- SHUFFLE BUTTON ADDED HERE -->
                                                 <button id="shuffle-vibe-btn" class="p-1.5 bg-white/5 hover:bg-white/20 text-teal-200 hover:text-white rounded-md transition-colors border border-white/10 flex items-center justify-center cursor-pointer relative z-20" title="Shuffle Objective">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                                </button>
+                                                <button id="edit-active-plan-btn" class="p-1.5 bg-white/5 hover:bg-white/20 text-indigo-300 hover:text-white rounded-md transition-colors border border-white/10 flex items-center justify-center cursor-pointer relative z-20" title="Edit All Vibes">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                                 </button>
                                                 <p id="current-hour-theme" class="text-teal-400 text-sm font-mono uppercase tracking-widest">// Calm Initiation</p>
                                             </div>
@@ -2923,6 +2948,14 @@
                 const locOfficeBtn = document.getElementById('loc-office-btn');
                 let shiftLocation = localStorage.getItem('shiftLocation') || 'home';
 
+                const editPlanBtn = document.getElementById('edit-plan-btn');
+                const editActivePlanBtn = document.getElementById('edit-active-plan-btn');
+                const shiftPlanModal = document.getElementById('shift-plan-modal');
+                const closePlanModalBtn = document.getElementById('close-plan-modal-btn');
+                const planInputsContainer = document.getElementById('plan-inputs-container');
+                const savePlanBtn = document.getElementById('save-plan-btn');
+                const resetPlanBtn = document.getElementById('reset-plan-btn');
+
                 // Variables for tracking dynamic vibe state
                 let currentVibeData = null;
                 let lastBaseHourTitle = null;
@@ -2960,6 +2993,9 @@
                     { hour: 12, title: "Hour 12", theme: "Reflection", icon: "✨", effect: "constellation", task: "Break (Read something inspiring)" }
                 ];
 
+                let savedHomePlan = JSON.parse(localStorage.getItem('shiftPlanHome')) || JSON.parse(JSON.stringify(shiftPlanHome));
+                let savedOfficePlan = JSON.parse(localStorage.getItem('shiftPlanOffice')) || JSON.parse(JSON.stringify(shiftPlanOffice));
+
                 const extraVibesPool = [
                     { theme: "Tech Insights", icon: "💻", effect: "constellation", task: "Listen to a tech talk" },
                     { theme: "Inspiration", icon: "💡", effect: "bubbles", task: "Listen to a TED talk" },
@@ -2993,6 +3029,95 @@
                 let activeBreakObjects = []; let wasOnBreak = false;
                 let particles = []; let animationFrameId;
                 let totalShiftPhases = 0;
+
+                function renderPlanEditor() {
+                    const currentPlan = shiftLocation === 'home' ? savedHomePlan : savedOfficePlan;
+                    planInputsContainer.innerHTML = '';
+                    currentPlan.forEach((hourData, index) => {
+                        const el = document.createElement('div');
+                        el.className = 'bg-black/30 p-4 rounded-xl border border-white/5 flex flex-col gap-3';
+                        el.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Hour ${index + 1}</span>
+                                <div class="flex gap-3">
+                                    <div class="flex flex-col">
+                                        <label class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Theme</label>
+                                        <input type="text" class="plan-theme-input bg-transparent border-b border-white/20 text-sm font-medium text-white focus:outline-none focus:border-indigo-400 w-32" value="${hourData.theme}">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Icon</label>
+                                        <input type="text" class="plan-icon-input bg-transparent border-b border-white/20 text-sm font-medium text-white focus:outline-none focus:border-indigo-400 w-12 text-center" value="${hourData.icon}">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" class="plan-task-input w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-white/10 transition-colors" value="${hourData.task}" placeholder="Main Task / Objective">
+                        `;
+                        planInputsContainer.appendChild(el);
+                    });
+                }
+
+                editPlanBtn.addEventListener('click', () => {
+                    renderPlanEditor();
+                    shiftPlanModal.classList.remove('hidden');
+                    shiftPlanModal.classList.add('flex');
+                });
+
+                if (editActivePlanBtn) {
+                    editActivePlanBtn.addEventListener('click', () => {
+                        renderPlanEditor();
+                        shiftPlanModal.classList.remove('hidden');
+                        shiftPlanModal.classList.add('flex');
+                    });
+                }
+
+                closePlanModalBtn.addEventListener('click', () => {
+                    shiftPlanModal.classList.add('hidden');
+                    shiftPlanModal.classList.remove('flex');
+                });
+
+                savePlanBtn.addEventListener('click', () => {
+                    const rows = planInputsContainer.children;
+                    const newPlan = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        const theme = rows[i].querySelector('.plan-theme-input').value;
+                        const icon = rows[i].querySelector('.plan-icon-input').value;
+                        const task = rows[i].querySelector('.plan-task-input').value;
+                        newPlan.push({
+                            hour: i + 1,
+                            title: `Hour ${i + 1}`,
+                            theme: theme || 'Focus',
+                            icon: icon || '🎯',
+                            effect: 'constellation',
+                            task: task || 'Work'
+                        });
+                    }
+                    if (shiftLocation === 'home') {
+                        savedHomePlan = newPlan;
+                        localStorage.setItem('shiftPlanHome', JSON.stringify(savedHomePlan));
+                    } else {
+                        savedOfficePlan = newPlan;
+                        localStorage.setItem('shiftPlanOffice', JSON.stringify(savedOfficePlan));
+                    }
+                    shiftPlanModal.classList.add('hidden');
+                    shiftPlanModal.classList.remove('flex');
+                    lastBaseHourTitle = null; // force visual refresh
+                    updateShiftVisuals();
+                    showAlert("Shift vibes saved successfully!");
+                });
+
+                resetPlanBtn.addEventListener('click', () => {
+                    if (shiftLocation === 'home') {
+                        savedHomePlan = JSON.parse(JSON.stringify(shiftPlanHome));
+                        localStorage.removeItem('shiftPlanHome');
+                    } else {
+                        savedOfficePlan = JSON.parse(JSON.stringify(shiftPlanOffice));
+                        localStorage.removeItem('shiftPlanOffice');
+                    }
+                    renderPlanEditor();
+                    lastBaseHourTitle = null; // force visual refresh
+                    updateShiftVisuals();
+                    showAlert("Default vibes restored for this location.");
+                });
 
                 function updateLocButtons() {
                     if (shiftLocation === 'home') {
@@ -3414,7 +3539,7 @@
                         }
                     }
 
-                    const plan = shiftLocation === 'home' ? shiftPlanHome : shiftPlanOffice;
+                    const plan = shiftLocation === 'home' ? savedHomePlan : savedOfficePlan;
                     const safeIdx = Math.max(0, Math.min(currentHourIdx, plan.length - 1));
                     let activeData = plan[safeIdx] || plan[plan.length - 1];
 
