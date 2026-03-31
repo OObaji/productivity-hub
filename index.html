@@ -898,6 +898,43 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Breach Copilot -->
+                    <div id="breach-copilot-container" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
+                        <!-- Panel -->
+                        <div id="breach-copilot-panel" class="mb-4 bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 w-80 h-96 max-h-[60vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden">
+                            <div class="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 rounded-t-3xl flex justify-between items-center shrink-0">
+                                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-[15px]">
+                                    <span class="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center text-xs shadow-inner">🤖</span>
+                                    Quick Comments
+                                </h3>
+                                <button id="close-copilot-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-200/50 dark:bg-slate-700 rounded-full p-1.5 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-2" id="copilot-comments-list">
+                                <!-- JS Injected Buttons -->
+                            </div>
+                        </div>
+
+                        <!-- Chat Head & Bubble -->
+                        <div class="flex items-center gap-5 pointer-events-auto">
+                            <!-- Bubble -->
+                            <div id="copilot-speech-bubble" class="bg-white text-slate-700 px-5 py-4 rounded-2xl shadow-xl border border-slate-100 relative text-sm font-medium transition-all duration-500 max-w-[240px] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                                Hey there, I'm here to assist you with your breach comments.
+                                <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-800 border-r border-t border-slate-100 dark:border-slate-700 transform rotate-45 rounded-sm"></div>
+                            </div>
+                            
+                            <!-- Avatar -->
+                            <button id="breach-copilot-btn" class="relative w-16 h-16 rounded-full bg-slate-800 shadow-2xl flex items-center justify-center hover:scale-105 transition-transform border-[3px] border-slate-100 dark:border-slate-700 focus:outline-none cursor-pointer">
+                                <div class="w-10 h-10 rounded-full bg-[#fcd34d] flex items-center justify-center shadow-inner relative overflow-hidden">
+                                    <div class="w-6 h-6 border-b-[3px] border-slate-800 rounded-full absolute bottom-2"></div>
+                                </div>
+                                <!-- Badge -->
+                                <span id="copilot-badge" class="absolute -top-1 -left-1 w-6 h-6 bg-[#dc2626] border-2 border-white dark:border-slate-800 rounded-full text-[10px] font-bold text-white flex items-center justify-center shadow-sm">1</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Salary Calculator -->
@@ -2725,6 +2762,85 @@
                         });
                     });
                 }
+
+                // --- Copilot Logic ---
+                const copilotBtn = document.getElementById('breach-copilot-btn');
+                const copilotPanel = document.getElementById('breach-copilot-panel');
+                const closeCopilotBtn = document.getElementById('close-copilot-btn');
+                const copilotBubble = document.getElementById('copilot-speech-bubble');
+                const commentsList = document.getElementById('copilot-comments-list');
+                const copilotBadge = document.getElementById('copilot-badge');
+
+                const quickComments = [
+                    "Breach sent",
+                    "NFA - No Curfew",
+                    "NFA - Already Breached",
+                    "NFA - Last Visit Incomplete",
+                    "NFA - Battery dead",
+                    "NFA - Visit pending",
+                    "NFA - RIC",
+                    "NFA - Duplicate",
+                    "NFA - Visit no show",
+                    "Visit pending - subject to sensitivity condition",
+                    "NFA - Strap tamper",
+                    "NFA - DW In Prison",
+                    "DW showing at other address",
+                    "NFA - Order ended"
+                ];
+
+                function renderCopilotComments() {
+                    if (!commentsList) return;
+                    commentsList.innerHTML = '';
+                    quickComments.forEach(comment => {
+                        const btn = document.createElement('button');
+                        btn.className = "text-left w-full px-4 py-2.5 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-700/50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 transition-colors flex justify-between items-center group shrink-0";
+                        btn.innerHTML = `
+                            <span class="truncate pr-2">${comment}</span>
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                        `;
+                        btn.addEventListener('click', () => {
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(comment).catch(() => fallbackCopy(comment));
+                            } else {
+                                fallbackCopy(comment);
+                            }
+                            
+                            const originalHtml = btn.innerHTML;
+                            btn.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400 font-bold">Copied!</span><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                            btn.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                            setTimeout(() => {
+                                btn.innerHTML = originalHtml;
+                                btn.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                            }, 1000);
+                        });
+                        commentsList.appendChild(btn);
+                    });
+                }
+
+                function toggleCopilot() {
+                    const isHidden = copilotPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        copilotPanel.classList.remove('hidden');
+                        setTimeout(() => {
+                            copilotPanel.classList.remove('scale-95', 'opacity-0');
+                            copilotPanel.classList.add('scale-100', 'opacity-100');
+                        }, 10);
+                        copilotBubble.style.opacity = '0';
+                        setTimeout(() => copilotBubble.classList.add('hidden'), 300);
+                        if (copilotBadge) copilotBadge.classList.add('hidden');
+                    } else {
+                        copilotPanel.classList.remove('scale-100', 'opacity-100');
+                        copilotPanel.classList.add('scale-95', 'opacity-0');
+                        setTimeout(() => {
+                            copilotPanel.classList.add('hidden');
+                        }, 300);
+                    }
+                }
+
+                if (copilotBtn) copilotBtn.addEventListener('click', toggleCopilot);
+                if (closeCopilotBtn) closeCopilotBtn.addEventListener('click', toggleCopilot);
+
+                renderCopilotComments();
 
                 updateStatusUI(currentShiftMode, false);
                 renderDashboard();
