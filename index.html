@@ -3768,6 +3768,16 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                 });
             }
+
+            // Restore previous state on load
+            if (localStorage.getItem('appEntered') === 'true') {
+                landingPage.style.display = 'none';
+                appLayout.classList.remove('hidden-fade');
+                appLayout.classList.add('visible-fade');
+                initializeDashboard();
+                const lastView = localStorage.getItem('lastActiveView') || 'dashboard-home';
+                navigateToView(lastView);
+            }
         });
     </script>
 </body>
