@@ -433,6 +433,48 @@
                         </section>
                     </div>
 
+                    <!-- Active Shift Overview -->
+                    <div id="dashboard-active-shift-section" class="mb-12">
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 px-2">Active Shift</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <!-- Dashboard Timer -->
+                            <div class="bg-slate-900 dark:bg-slate-900/80 text-white p-8 rounded-[2rem] shadow-xl border border-slate-800 relative overflow-hidden ring-1 ring-white/10 lg:col-span-1 flex flex-col justify-center hover:shadow-2xl transition-shadow">
+                                <div class="flex justify-between items-center mb-6">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Shift Timer</span>
+                                    </div>
+                                    <span id="dash-mini-timer-end" class="text-xs text-slate-500 font-mono font-bold tracking-wider">END: --:--</span>
+                                </div>
+                                <div class="flex items-baseline justify-center gap-2 mb-6">
+                                    <div id="dash-mini-timer-h" class="text-5xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1 text-xl">:</span>
+                                    <div id="dash-mini-timer-m" class="text-5xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1 text-xl">:</span>
+                                    <div id="dash-mini-timer-s" class="text-5xl font-black font-mono tracking-tighter text-slate-400">00</div>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden shadow-inner border border-white/5">
+                                    <div id="dash-mini-timer-progress" class="bg-gradient-to-r from-teal-400 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Dashboard Vibe -->
+                            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden lg:col-span-2 flex flex-col justify-center group hover:shadow-md transition-shadow cursor-pointer" onclick="document.querySelector('.sidebar-link[data-view=\'shift-timer\']').click()">
+                                <div class="absolute -right-10 -top-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                                <div class="flex justify-between items-start mb-4 relative z-10">
+                                    <div>
+                                        <p id="dash-vibe-theme" class="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-[0.2em] mb-1">Current Vibe</p>
+                                        <h3 id="dash-vibe-title" class="text-3xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">Offline</h3>
+                                    </div>
+                                    <span id="dash-vibe-icon" class="text-4xl filter drop-shadow-md">💤</span>
+                                </div>
+                                <p id="dash-vibe-task" class="text-slate-600 dark:text-slate-400 font-medium relative z-10 text-lg">Start a shift to see your vibe.</p>
+                                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 relative z-10 flex justify-between items-center">
+                                    <span class="text-sm text-slate-500 dark:text-slate-400 font-medium">Keep up the momentum!</span>
+                                    <span class="text-sm text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">Go to Shift Station <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 px-2">Core Curriculum</h2>
                     <main id="curriculum-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                         <!-- Module Cards injected here -->
@@ -670,7 +712,7 @@
                                 </div>
                                 <div id="next-break-container" class="mt-8 transition-opacity duration-500 z-10">
                                     <div class="inline-flex items-center gap-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-full pl-6 pr-8 py-3 hover:bg-white/10 transition-colors">
-                                        <div class="flex flex-col text-right"><span class="text-gray-400 text-[10px] uppercase tracking-widest font-bold">Next Break</span><span id="next-break-time-label" class="text-teal-300 text-xs font-bold">at 22:00</span></div>
+                                        <div class="flex flex-col text-right"><span class="text-gray-400 text-[10px] uppercase tracking-widest font-bold">Next Break</span><span id="next-break-time-label" class="text-teal-300 text-xs font-bold">at --:--</span></div>
                                         <div class="h-8 w-px bg-white/10"></div>
                                         <span id="time-to-next-break" class="text-2xl font-bold text-white font-mono">00:00:00</span>
                                     </div>
@@ -680,7 +722,7 @@
                                     <div class="w-32 h-32 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 animate-bounce border border-emerald-500/20 shadow-[0_0_60px_rgba(16,185,129,0.2)]"><span class="text-6xl">☕</span></div>
                                     <h2 class="text-5xl font-bold text-white mb-2 neon-text tracking-tighter">Break Time</h2>
                                     <p class="text-xl text-emerald-300 mb-8 font-mono tracking-wide">Decompress. Hydrate. Move.</p>
-                                    <div class="text-7xl font-bold font-mono text-white leading-none drop-shadow-2xl" id="break-timer-large">10:00</div>
+                                    <div class="text-7xl font-bold font-mono text-white leading-none drop-shadow-2xl" id="break-timer-large">00:00</div>
                                     <p class="text-gray-500 mt-4 uppercase tracking-widest text-sm font-bold">Resuming Shortly</p>
                                 </div>
                             </div>
@@ -691,17 +733,16 @@
                                     <div class="flex flex-col md:flex-row md:items-start justify-between mb-8 relative z-10 gap-4">
                                         <div>
                                             <div class="flex items-center gap-3 mb-2">
-                                                <span id="current-hour-badge" class="px-3 py-1 bg-teal-500/20 text-teal-200 text-[10px] uppercase font-extrabold tracking-[0.2em] rounded-md border border-teal-500/30">Current Vibe</span>
-                                                <!-- SHUFFLE BUTTON ADDED HERE -->
+                                                <span id="current-hour-badge" class="px-3 py-1 bg-teal-500/20 text-teal-200 text-[10px] uppercase font-extrabold tracking-[0.2em] rounded-md border border-teal-500/30">Hourly Objective</span>
                                                 <button id="shuffle-vibe-btn" class="p-1.5 bg-white/5 hover:bg-white/20 text-teal-200 hover:text-white rounded-md transition-colors border border-white/10 flex items-center justify-center cursor-pointer relative z-20" title="Shuffle Objective">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                                                 </button>
                                                 <button id="edit-active-plan-btn" class="p-1.5 bg-white/5 hover:bg-white/20 text-indigo-300 hover:text-white rounded-md transition-colors border border-white/10 flex items-center justify-center cursor-pointer relative z-20" title="Edit All Vibes">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                                 </button>
-                                                <p id="current-hour-theme" class="text-teal-400 text-sm font-mono uppercase tracking-widest">// Calm Initiation</p>
+                                                <p id="current-hour-theme" class="text-teal-400 text-sm font-mono uppercase tracking-widest">// Vibe</p>
                                             </div>
-                                            <h3 id="current-hour-title" class="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight">The Launchpad</h3>
+                                            <h3 id="current-hour-title" class="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight">Phase</h3>
                                         </div>
                                         <div class="w-16 h-16 bg-white/5 rounded-2xl flex flex-shrink-0 items-center justify-center border border-white/10 shadow-inner self-start"><span id="current-hour-icon" class="text-4xl filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🚀</span></div>
                                     </div>
@@ -797,45 +838,47 @@
                         <!-- Left Panel: Hourly Control Center -->
                         <div class="lg:w-[380px] xl:w-[420px] shrink-0 flex flex-col gap-6">
                             
-                            <!-- Mini Shift Timer Card -->
-                            <div class="bg-slate-900 dark:bg-slate-900/80 text-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-800 relative overflow-hidden ring-1 ring-white/10">
-                                <div class="flex justify-between items-center mb-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Shift Timer</span>
+                            <!-- Active Shift Info (Timer, Vibe, Breaks) -->
+                            <div id="breach-active-shift-section" class="flex flex-col gap-6 w-full">
+                                <!-- Mini Shift Timer Card -->
+                                <div class="bg-slate-900 dark:bg-slate-900/80 text-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-800 relative overflow-hidden ring-1 ring-white/10">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Shift Timer</span>
+                                        </div>
+                                        <span id="breach-mini-timer-end" class="text-[10px] text-slate-500 font-mono font-bold tracking-wider">END: --:--</span>
                                     </div>
-                                    <span id="breach-mini-timer-end" class="text-[10px] text-slate-500 font-mono font-bold tracking-wider">END: --:--</span>
+                                    <div class="flex items-baseline justify-center gap-2 mb-5">
+                                        <div id="breach-mini-timer-h" class="text-4xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1">:</span>
+                                        <div id="breach-mini-timer-m" class="text-4xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1">:</span>
+                                        <div id="breach-mini-timer-s" class="text-4xl font-black font-mono tracking-tighter text-slate-400">00</div>
+                                    </div>
+                                    <div class="w-full bg-slate-800 rounded-full h-2 mb-4 overflow-hidden shadow-inner border border-white/5">
+                                        <div id="breach-mini-timer-progress" class="bg-gradient-to-r from-teal-400 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                                        <span class="text-slate-500">Next Break:</span>
+                                        <span id="breach-mini-timer-break" class="text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-md">--:--</span>
+                                    </div>
                                 </div>
-                                <div class="flex items-baseline justify-center gap-2 mb-5">
-                                    <div id="breach-mini-timer-h" class="text-4xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1">:</span>
-                                    <div id="breach-mini-timer-m" class="text-4xl font-black font-mono tracking-tighter">00</div><span class="text-slate-600 font-bold pb-1">:</span>
-                                    <div id="breach-mini-timer-s" class="text-4xl font-black font-mono tracking-tighter text-slate-400">00</div>
+                                
+                                <!-- Current Vibe Mini Card -->
+                                <div class="bg-teal-900/20 text-white p-5 rounded-[2rem] shadow-xl border border-teal-500/20 relative overflow-hidden ring-1 ring-teal-500/10">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <p id="breach-vibe-theme" class="text-teal-400 text-[10px] font-bold uppercase tracking-[0.2em]">Current Vibe</p>
+                                        <span id="breach-vibe-icon" class="text-xl filter drop-shadow-md">💤</span>
+                                    </div>
+                                    <h3 id="breach-vibe-title" class="text-lg font-bold text-white leading-tight tracking-tight mb-1">Offline</h3>
+                                    <p id="breach-vibe-task" class="text-xs text-teal-100/70 font-medium">Start a shift to begin.</p>
                                 </div>
-                                <div class="w-full bg-slate-800 rounded-full h-2 mb-4 overflow-hidden shadow-inner border border-white/5">
-                                    <div id="breach-mini-timer-progress" class="bg-gradient-to-r from-teal-400 to-emerald-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                                    <span class="text-slate-500">Next Break:</span>
-                                    <span id="breach-mini-timer-break" class="text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-md">--:--</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Current Vibe Mini Card -->
-                            <div class="bg-teal-900/20 text-white p-5 rounded-[2rem] shadow-xl border border-teal-500/20 relative overflow-hidden ring-1 ring-teal-500/10">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-teal-400 text-[10px] font-bold uppercase tracking-[0.2em]">Current Vibe</p>
-                                    <span id="breach-vibe-icon" class="text-xl filter drop-shadow-md">🚀</span>
-                                </div>
-                                <h3 id="breach-vibe-title" class="text-lg font-bold text-white leading-tight tracking-tight mb-1">The Launchpad</h3>
-                                <p id="breach-vibe-task" class="text-xs text-teal-100/70 font-medium">Deep work (Focus on work only)</p>
-                            </div>
 
-                            <!-- Break Schedule Mini Card -->
-                            <div class="bg-slate-900/80 text-white p-5 rounded-[2rem] shadow-xl border border-slate-700/50 relative overflow-hidden ring-1 ring-white/5">
-                                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Today's Breaks</p>
-                                <div id="breach-breaks-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
-                                    <!-- Populated by JS -->
-                                    <p class="text-xs text-slate-500 font-medium">No breaks scheduled.</p>
+                                <!-- Break Schedule Mini Card -->
+                                <div class="bg-slate-900/80 text-white p-5 rounded-[2rem] shadow-xl border border-slate-700/50 relative overflow-hidden ring-1 ring-white/5">
+                                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Today's Breaks</p>
+                                    <div id="breach-breaks-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                                        <p class="text-xs text-slate-500 font-medium">No breaks scheduled.</p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -928,7 +971,7 @@
 
                             <!-- Current Hour View -->
                             <div id="view-breach-current" class="flex-1 flex flex-col p-6 md:p-8 bg-slate-50/30 dark:bg-gray-900/10 rounded-b-[2.5rem] overflow-y-auto custom-scrollbar">
-                                <div id="breach-blocks-container" class="w-full grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 pb-8 items-start">
+                                <div id="breach-blocks-container" class="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8 items-start">
                                     <!-- Hourly blocks generated by JS -->
                                 </div>
                             </div>
@@ -1701,7 +1744,6 @@
                 setupPrincipleModals();
                 setupPomodoro();
                 setupMindfulness();
-                setupShiftTimer();
                 setupHourCalculator();
                 setupIdeaBoard();
                 setupSettings();
@@ -1709,6 +1751,7 @@
                 setupSalaryCalculator();
                 setupOvertimeTracker();
                 setupBallGame(); 
+                setupShiftTimer();
                 setupSoundscapes();
                 dashboardInitialized = true;
             }
@@ -2608,7 +2651,7 @@
                         const lowerLine = line.toLowerCase();
                         if (!existingTexts.has(lowerLine)) {
                             uniqueItemsToAdd.push(line);
-                            existingTexts.add(lowerLine); // Also prevents duplicates within the same batch
+                            existingTexts.add(lowerLine);
                         }
                     });
 
@@ -2745,7 +2788,6 @@
                 }
 
                 // --- Event Listeners ---
-                
                 if(elements.syncBtn) elements.syncBtn.addEventListener('click', setHourlyTarget);
                 
                 if(elements.targetInput) {
@@ -2815,20 +2857,10 @@
                 const copilotBadge = document.getElementById('copilot-badge');
 
                 const quickComments = [
-                    "Breach sent",
-                    "NFA - No Curfew",
-                    "NFA - Already Breached",
-                    "NFA - Last Visit Incomplete",
-                    "NFA - Battery dead",
-                    "NFA - Visit pending",
-                    "NFA - RIC",
-                    "NFA - Duplicate",
-                    "NFA - Visit no show",
-                    "Visit pending - subject to sensitivity condition",
-                    "NFA - Strap tamper",
-                    "NFA - DW In Prison",
-                    "NFA - DW showing at other address",
-                    "NFA - Order ended"
+                    "Breach sent", "NFA - No Curfew", "NFA - Already Breached", "NFA - Last Visit Incomplete",
+                    "NFA - Battery dead", "NFA - Visit pending", "NFA - RIC", "NFA - Duplicate",
+                    "NFA - Visit no show", "Visit pending - subject to sensitivity condition",
+                    "NFA - Strap tamper", "NFA - DW In Prison", "NFA - DW showing at other address", "NFA - Order ended"
                 ];
 
                 function renderCopilotComments() {
@@ -2837,17 +2869,13 @@
                     quickComments.forEach(comment => {
                         const btn = document.createElement('button');
                         btn.className = "text-left w-full px-4 py-2.5 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-700/50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 transition-colors flex justify-between items-center group shrink-0";
-                        btn.innerHTML = `
-                            <span class="truncate pr-2">${comment}</span>
-                            <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                        `;
+                        btn.innerHTML = `<span class="truncate pr-2">${comment}</span><svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>`;
                         btn.addEventListener('click', () => {
                             if (navigator.clipboard && navigator.clipboard.writeText) {
                                 navigator.clipboard.writeText(comment).catch(() => fallbackCopy(comment));
                             } else {
                                 fallbackCopy(comment);
                             }
-                            
                             const originalHtml = btn.innerHTML;
                             btn.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400 font-bold">Copied!</span><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
                             btn.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
@@ -2868,8 +2896,10 @@
                             copilotPanel.classList.remove('scale-95', 'opacity-0');
                             copilotPanel.classList.add('scale-100', 'opacity-100');
                         }, 10);
-                        copilotBubble.style.opacity = '0';
-                        setTimeout(() => copilotBubble.classList.add('hidden'), 300);
+                        if(copilotBubble) {
+                            copilotBubble.style.opacity = '0';
+                            setTimeout(() => copilotBubble.classList.add('hidden'), 300);
+                        }
                         if (copilotBadge) copilotBadge.classList.add('hidden');
                     } else {
                         copilotPanel.classList.remove('scale-100', 'opacity-100');
@@ -2894,6 +2924,7 @@
             function setupSalaryCalculator() {
                 const calculateBtn = document.getElementById('calculate-salary-btn'); const grossInput = document.getElementById('gross-income'); const taxInput = document.getElementById('tax-code'); const resultsDiv = document.getElementById('salary-results'); const breakdownContainer = document.getElementById('salary-breakdown-container');
                 const formatCurrency = (val) => `£${val.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+                if(!calculateBtn) return;
                 
                 calculateBtn.addEventListener('click', () => {
                     const gross = parseFloat(grossInput.value); const taxCode = taxInput.value.toUpperCase(); const type = document.querySelector('input[name="income-type"]:checked').value;
@@ -2948,289 +2979,427 @@
                 const themeToggleBtn = document.getElementById('theme-toggle');
                 const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
                 const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+                if (!themeToggleBtn) return;
+                
                 if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    if (themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+                    if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
                 } else {
-                    if (themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+                    if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
                 }
-
-                if (themeToggleBtn) {
-                    themeToggleBtn.addEventListener('click', function() {
-                        if (themeToggleDarkIcon) themeToggleDarkIcon.classList.toggle('hidden');
-                        if (themeToggleLightIcon) themeToggleLightIcon.classList.toggle('hidden');
-
-                        if (localStorage.getItem('color-theme')) {
-                            if (localStorage.getItem('color-theme') === 'light') {
-                                document.documentElement.classList.add('dark');
-                                localStorage.setItem('color-theme', 'dark');
-                            } else {
-                                document.documentElement.classList.remove('dark');
-                                localStorage.setItem('color-theme', 'light');
-                            }
+                themeToggleBtn.addEventListener('click', function() {
+                    if(themeToggleDarkIcon) themeToggleDarkIcon.classList.toggle('hidden');
+                    if(themeToggleLightIcon) themeToggleLightIcon.classList.toggle('hidden');
+                    if (localStorage.getItem('color-theme')) {
+                        if (localStorage.getItem('color-theme') === 'light') {
+                            document.documentElement.classList.add('dark');
+                            localStorage.setItem('color-theme', 'dark');
                         } else {
-                            if (document.documentElement.classList.contains('dark')) {
-                                document.documentElement.classList.remove('dark');
-                                localStorage.setItem('color-theme', 'light');
-                            } else {
-                                document.documentElement.classList.add('dark');
-                                localStorage.setItem('color-theme', 'dark');
-                            }
+                            document.documentElement.classList.remove('dark');
+                            localStorage.setItem('color-theme', 'light');
                         }
-                    });
-                }
+                    } else {
+                        if (document.documentElement.classList.contains('dark')) {
+                            document.documentElement.classList.remove('dark');
+                            localStorage.setItem('color-theme', 'light');
+                        } else {
+                            document.documentElement.classList.add('dark');
+                            localStorage.setItem('color-theme', 'dark');
+                        }
+                    }
+                });
             }
 
-            // Restore placeholder functions for missing implementations to prevent ReferenceErrors
             function setupDailyQuote() {
-                const quoteText = document.getElementById('quote-text');
-                const quoteAuthor = document.getElementById('quote-author');
-                if (quoteText && quoteAuthor) {
-                    quoteText.textContent = '"Focus on being productive instead of busy."';
-                    quoteAuthor.textContent = '— Tim Ferriss';
-                }
-            }
-
-            function setupHourCalculator() {
-                const addRowBtn = document.getElementById('add-time-row');
-                const calcBtn = document.getElementById('calculate-time-btn');
-                const clearBtn = document.getElementById('clear-time-btn');
-                const entriesDiv = document.getElementById('time-entries');
-                const totalHms = document.getElementById('total-time-hms');
-                const totalDec = document.getElementById('total-time-decimal');
-
-                function createRow() {
-                    const row = document.createElement('div');
-                    row.className = "flex gap-2 items-center";
-                    row.innerHTML = `
-                        <input type="time" class="flex-1 px-3 py-2 rounded-lg border-gray-200 dark:bg-gray-700 dark:border-gray-600 focus:ring-indigo-500">
-                        <span class="text-gray-400 font-bold">to</span>
-                        <input type="time" class="flex-1 px-3 py-2 rounded-lg border-gray-200 dark:bg-gray-700 dark:border-gray-600 focus:ring-indigo-500">
-                        <button class="text-rose-500 hover:text-rose-700 font-bold p-2" onclick="this.parentElement.remove()">✕</button>
-                    `;
-                    return row;
-                }
-
-                if (entriesDiv) {
-                    entriesDiv.appendChild(createRow());
-                    entriesDiv.appendChild(createRow());
-                }
-
-                if (addRowBtn) addRowBtn.addEventListener('click', () => {
-                    if (entriesDiv) entriesDiv.appendChild(createRow());
-                });
-
-                if (calcBtn) calcBtn.addEventListener('click', () => {
-                    let totalMs = 0;
-                    if (!entriesDiv) return;
-                    const rows = entriesDiv.children;
-                    for (let row of rows) {
-                        const inputs = row.querySelectorAll('input[type="time"]');
-                        if (inputs.length === 2 && inputs[0].value && inputs[1].value) {
-                            const [h1, m1] = inputs[0].value.split(':').map(Number);
-                            const [h2, m2] = inputs[1].value.split(':').map(Number);
-                            let start = new Date(0,0,0, h1, m1);
-                            let end = new Date(0,0,0, h2, m2);
-                            if (end < start) end.setDate(end.getDate() + 1);
-                            totalMs += (end - start);
-                        }
+                const quoteTextEl = document.getElementById('quote-text');
+                const quoteAuthorEl = document.getElementById('quote-author');
+                const quotes = [
+                    { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+                    { text: "The best way to predict the future is to create it.", author: "Peter Drucker" },
+                    { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+                    { text: "Focus on being productive instead of busy.", author: "Tim Ferriss" },
+                    { text: "Amateurs sit and wait for inspiration, the rest of us just get up and go to work.", author: "Stephen King" }
+                ];
+                function getDailyQuote() {
+                    const today = new Date().toISOString().split('T')[0];
+                    const storedQuoteData = JSON.parse(localStorage.getItem('dailyQuote'));
+                    if (storedQuoteData && storedQuoteData.date === today) {
+                        if(quoteTextEl) quoteTextEl.textContent = `"${storedQuoteData.quote.text}"`;
+                        if(quoteAuthorEl) quoteAuthorEl.textContent = `- ${storedQuoteData.quote.author}`;
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * quotes.length);
+                        const newQuote = quotes[randomIndex];
+                        localStorage.setItem('dailyQuote', JSON.stringify({ date: today, quote: newQuote }));
+                        if(quoteTextEl) quoteTextEl.textContent = `"${newQuote.text}"`;
+                        if(quoteAuthorEl) quoteAuthorEl.textContent = `- ${newQuote.author}`;
                     }
-                    const totalH = Math.floor(totalMs / 3600000);
-                    const totalM = Math.floor((totalMs % 3600000) / 60000);
-                    if (totalHms) totalHms.textContent = `${totalH.toString().padStart(2,'0')}:${totalM.toString().padStart(2,'0')}:00`;
-                    if (totalDec) totalDec.textContent = (totalMs / 3600000).toFixed(2);
-                });
-
-                if (clearBtn) clearBtn.addEventListener('click', () => {
-                    if (entriesDiv) {
-                        entriesDiv.innerHTML = '';
-                        entriesDiv.appendChild(createRow());
-                        entriesDiv.appendChild(createRow());
-                    }
-                    if (totalHms) totalHms.textContent = '00:00:00';
-                    if (totalDec) totalDec.textContent = '0.00';
-                });
+                }
+                getDailyQuote();
             }
 
             function setupIdeaBoard() {
+                const ideaBoard = document.getElementById('idea-board');
                 const addNoteBtn = document.getElementById('add-note-btn');
-                const container = document.getElementById('idea-board-container');
+                const ideaBoardContainer = document.getElementById('idea-board-container');
+                if(!addNoteBtn || !ideaBoardContainer) return;
                 
-                if (addNoteBtn && container) {
-                    addNoteBtn.addEventListener('click', () => {
-                        const note = document.createElement('div');
-                        note.className = 'sticky-note absolute w-64 h-64 bg-yellow-200 p-4 flex flex-col shadow-lg z-10';
-                        note.style.left = '100px';
-                        note.style.top = '100px';
-                        note.innerHTML = `
-                            <div class="flex justify-between items-center mb-2 drag-handle cursor-grab active:cursor-grabbing border-b border-yellow-300/50 pb-2">
-                                <span class="text-xs font-bold text-yellow-800/50 uppercase tracking-widest">Note</span>
-                                <button class="text-yellow-800/50 hover:text-yellow-900 font-bold" onclick="this.closest('.sticky-note').remove()">✕</button>
-                            </div>
-                            <textarea class="flex-1 bg-transparent border-none resize-none focus:ring-0 text-yellow-900 font-medium placeholder-yellow-800/30" placeholder="Type here..."></textarea>
-                        `;
-                        container.appendChild(note);
-                        
-                        let isDragging = false;
-                        let startX, startY;
-                        const handle = note.querySelector('.drag-handle');
-                        
-                        handle.addEventListener('mousedown', (e) => {
-                            isDragging = true;
-                            note.classList.add('dragging');
-                            note.style.zIndex = 50;
-                            startX = e.clientX - note.offsetLeft;
-                            startY = e.clientY - note.offsetTop;
-                        });
-                        
-                        document.addEventListener('mousemove', (e) => {
-                            if (!isDragging) return;
-                            note.style.left = `${e.clientX - startX}px`;
-                            note.style.top = `${e.clientY - startY}px`;
-                        });
-                        
-                        document.addEventListener('mouseup', () => {
-                            isDragging = false;
-                            note.classList.remove('dragging');
-                            note.style.zIndex = 10;
-                        });
+                let notes = JSON.parse(localStorage.getItem('sticky-notes')) || [];
+                let activeNote = null; let offsetX, offsetY;
+                const colors = ['bg-yellow-200', 'bg-green-200', 'bg-pink-200', 'bg-blue-200', 'bg-purple-200'];
+                
+                function saveNotes() { localStorage.setItem('sticky-notes', JSON.stringify(notes)); }
+                
+                function createNoteElement(note) {
+                    const noteEl = document.createElement('div');
+                    noteEl.id = note.id;
+                    noteEl.className = `sticky-note absolute w-60 h-60 p-4 flex flex-col ${note.color}`;
+                    noteEl.style.left = `${note.x}px`; noteEl.style.top = `${note.y}px`;
+                    noteEl.innerHTML = `
+                        <div class="flex-grow overflow-auto"><textarea class="w-full h-full bg-transparent resize-none focus:outline-none text-gray-800">${note.content}</textarea></div>
+                        <div class="flex justify-end items-center mt-2 space-x-2">
+                            <button class="copy-note-btn text-gray-600 hover:text-black">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                            <button class="delete-note-btn text-gray-600 hover:text-red-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>`;
+                    
+                    ideaBoardContainer.appendChild(noteEl);
+                    
+                    noteEl.addEventListener('mousedown', (e) => { 
+                        if (e.target.tagName.toLowerCase() === 'textarea' || e.target.tagName.toLowerCase() === 'button' || e.target.closest('button')) return; 
+                        activeNote = noteEl; activeNote.classList.add('dragging'); 
+                        offsetX = e.clientX - noteEl.offsetLeft; offsetY = e.clientY - noteEl.offsetTop; 
+                    });
+                    
+                    const textarea = noteEl.querySelector('textarea');
+                    textarea.addEventListener('input', () => { 
+                        const noteToUpdate = notes.find(n => n.id === note.id); 
+                        if(noteToUpdate) {noteToUpdate.content = textarea.value; saveNotes();} 
+                    });
+                    
+                    noteEl.querySelector('.delete-note-btn').addEventListener('click', () => { 
+                        notes = notes.filter(n => n.id !== note.id); saveNotes(); noteEl.remove(); 
+                    });
+                    
+                    noteEl.querySelector('.copy-note-btn').addEventListener('click', (e) => { 
+                        const button = e.currentTarget; const originalIcon = button.innerHTML; 
+                        const tempInput = document.createElement('textarea'); tempInput.value = textarea.value; 
+                        document.body.appendChild(tempInput); tempInput.select(); document.execCommand('copy'); 
+                        document.body.removeChild(tempInput); 
+                        button.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`; 
+                        setTimeout(() => { button.innerHTML = originalIcon; }, 1500) 
                     });
                 }
+
+                document.addEventListener('mousemove', (e) => { 
+                    if (!activeNote) return; 
+                    activeNote.style.left = `${e.clientX - offsetX}px`; activeNote.style.top = `${e.clientY - offsetY}px`; 
+                });
+                
+                document.addEventListener('mouseup', () => { 
+                    if (activeNote) { 
+                        const noteToUpdate = notes.find(n => n.id === activeNote.id); 
+                        if(noteToUpdate){ noteToUpdate.x = activeNote.offsetLeft; noteToUpdate.y = activeNote.offsetTop; saveNotes(); } 
+                        activeNote.classList.remove('dragging'); 
+                    } 
+                    activeNote = null; 
+                });
+                
+                addNoteBtn.addEventListener('click', () => { 
+                    const newNote = { id: `note-${Date.now()}`, content: '', color: colors[Math.floor(Math.random() * colors.length)], x: Math.random() * (ideaBoard.offsetWidth - 240), y: Math.random() * (ideaBoard.offsetHeight - 240) }; 
+                    notes.push(newNote); createNoteElement(newNote); saveNotes(); 
+                });
+                
+                notes.forEach(createNoteElement);
+            }
+
+            function setupHourCalculator() {
+                const timeEntriesContainer = document.getElementById('time-entries'); const addRowBtn = document.getElementById('add-time-row'); const calculateBtn = document.getElementById('calculate-time-btn'); const clearBtn = document.getElementById('clear-time-btn'); const printBtn = document.getElementById('print-time-btn'); const totalHms = document.getElementById('total-time-hms'); const totalDecimal = document.getElementById('total-time-decimal');
+                if(!timeEntriesContainer) return;
+                
+                function createTimeRow() { 
+                    const row = document.createElement('div'); row.className = 'flex items-center space-x-2'; 
+                    row.innerHTML = `<input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0"><span class="font-bold">:</span><input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0" max="59"><span class="font-bold">:</span><input type="number" class="time-input w-16 p-2 border rounded-md text-center dark:bg-gray-700 dark:text-white" placeholder="00" min="0" max="59">`; 
+                    timeEntriesContainer.appendChild(row); 
+                }
+                
+                if (addRowBtn) addRowBtn.addEventListener('click', createTimeRow);
+                
+                if (calculateBtn) calculateBtn.addEventListener('click', () => { 
+                    let totalSeconds = 0; const rows = timeEntriesContainer.querySelectorAll('.flex'); 
+                    rows.forEach(row => { 
+                        const inputs = row.querySelectorAll('.time-input'); 
+                        const hours = parseInt(inputs[0].value) || 0; const minutes = parseInt(inputs[1].value) || 0; const seconds = parseInt(inputs[2].value) || 0; 
+                        totalSeconds += (hours * 3600) + (minutes * 60) + seconds; 
+                    }); 
+                    const totalHours = Math.floor(totalSeconds / 3600); const totalMinutes = Math.floor((totalSeconds % 3600) / 60); const remainingSeconds = totalSeconds % 60; 
+                    totalHms.textContent = `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`; 
+                    totalDecimal.textContent = (totalSeconds / 3600).toFixed(2); 
+                });
+                
+                if (clearBtn) clearBtn.addEventListener('click', () => { 
+                    timeEntriesContainer.innerHTML = ''; for(let i=0; i<5; i++) createTimeRow(); 
+                    totalHms.textContent = '00:00:00'; totalDecimal.textContent = '0.00'; 
+                });
+                
+                if (printBtn) printBtn.addEventListener('click', () => { window.print(); });
+                for(let i=0; i<5; i++) createTimeRow();
             }
 
             function setupOvertimeTracker() {
-                const addBtn = document.getElementById('add-overtime-btn');
-                const dateInput = document.getElementById('overtime-date');
-                const hoursInput = document.getElementById('overtime-hours');
-                const rateInput = document.getElementById('overtime-rate');
-                const allocSelect = document.getElementById('overtime-allocation');
-                const list = document.getElementById('overtime-list');
-                
-                if (addBtn && list) {
-                    addBtn.addEventListener('click', () => {
-                        if (!dateInput.value || !hoursInput.value || !rateInput.value) return;
-                        const val = parseFloat(hoursInput.value) * parseFloat(rateInput.value);
-                        const entry = document.createElement('div');
-                        entry.className = "flex justify-between items-center bg-slate-50 dark:bg-slate-700/30 p-4 rounded-xl border border-slate-100 dark:border-slate-600 shadow-sm";
-                        entry.innerHTML = `
-                            <div>
-                                <p class="font-bold text-slate-800 dark:text-white">${dateInput.value}</p>
-                                <p class="text-xs text-slate-500">${hoursInput.value} hrs @ £${rateInput.value}/hr (${allocSelect.value})</p>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <span class="font-bold font-mono text-emerald-600 dark:text-emerald-400">+£${val.toFixed(2)}</span>
-                                <button class="text-rose-400 hover:text-rose-600 font-bold p-1" onclick="this.closest('.flex').parentElement.remove()">✕</button>
-                            </div>
-                        `;
-                        list.prepend(entry);
-                        dateInput.value = '';
-                        hoursInput.value = '';
-                    });
-                }
-            }
+                const addBtn = document.getElementById('add-overtime-btn'); const listContainer = document.getElementById('overtime-list'); const totalsContainer = document.getElementById('overtime-fund-totals'); const allocationSelect = document.getElementById('overtime-allocation'); const customAllocationInput = document.getElementById('overtime-allocation-custom');
+                const editModal = document.getElementById('overtime-edit-modal'); const cancelEditBtn = document.getElementById('cancel-edit-overtime-btn'); const saveEditBtn = document.getElementById('save-edit-overtime-btn'); const editAllocationSelect = document.getElementById('edit-overtime-allocation'); const editCustomAllocationInput = document.getElementById('edit-overtime-allocation-custom');
+                if(!addBtn) return;
 
-            function setupBallGame() {
-                const canvas = document.getElementById('game-canvas');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                const startBtn = document.getElementById('start-game-btn');
-                const resetBtn = document.getElementById('reset-game-btn');
-                const scoreDisplay = document.getElementById('game-score');
+                let overtimeEntries = JSON.parse(localStorage.getItem('overtimeEntries')) || [];
+                const formatCurrency = (value) => `£${value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
                 
-                let x = canvas.width / 2; let y = canvas.height - 30;
-                let dx = 3; let dy = -3;
-                let ballRadius = 8;
-                let paddleHeight = 12; let paddleWidth = 80;
-                let paddleX = (canvas.width - paddleWidth) / 2;
-                let rightPressed = false; let leftPressed = false;
-                let score = 0; let isPlaying = false; let animationId;
+                function saveEntries() { localStorage.setItem('overtimeEntries', JSON.stringify(overtimeEntries)); }
                 
-                document.addEventListener("keydown", (e) => {
-                    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-                    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
-                });
-                
-                document.addEventListener("keyup", (e) => {
-                    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-                    else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-                });
-                
-                function draw() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    ctx.beginPath();
-                    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = "#818cf8";
-                    ctx.fill();
-                    ctx.closePath();
-                    
-                    ctx.beginPath();
-                    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-                    ctx.fillStyle = "#2dd4bf";
-                    ctx.fill();
-                    ctx.closePath();
-                    
-                    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
-                    if (y + dy < ballRadius) dy = -dy;
-                    else if (y + dy > canvas.height - ballRadius) {
-                        if (x > paddleX && x < paddleX + paddleWidth) {
-                            dy = -dy; dy -= 0.15; dx += (dx > 0 ? 0.15 : -0.15);
-                            score += 10;
-                            if (scoreDisplay) scoreDisplay.textContent = `Score: ${score}`;
-                        } else {
-                            isPlaying = false;
-                            cancelAnimationFrame(animationId);
-                            ctx.font = "bold 28px Inter"; ctx.fillStyle = "#f43f5e"; ctx.textAlign = "center";
-                            ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
-                            return;
-                        }
-                    }
-                    
-                    if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 6;
-                    else if (leftPressed && paddleX > 0) paddleX -= 6;
-                    
-                    x += dx; y += dy;
-                    if (isPlaying) animationId = requestAnimationFrame(draw);
+                function updateTotals() { 
+                    totalsContainer.innerHTML = ''; 
+                    const totals = overtimeEntries.reduce((acc, entry) => { 
+                        const allocation = entry.allocation; acc[allocation] = (acc[allocation] || 0) + entry.amount; return acc; 
+                    }, {}); 
+                    const fundColors = { 'Holiday': 'blue', 'Savings': 'purple' }; 
+                    Object.keys(totals).sort().forEach(key => { 
+                        const color = fundColors[key] || 'gray'; 
+                        const totalEl = document.createElement('div'); totalEl.className = `bg-${color}-100 dark:bg-${color}-900/50 p-4 rounded-lg text-center`; 
+                        totalEl.innerHTML = `<p class="text-sm text-${color}-800 dark:text-${color}-300">${key} Fund</p><p class="text-2xl font-bold text-${color}-900 dark:text-${color}-200">${formatCurrency(totals[key])}</p>`; 
+                        totalsContainer.appendChild(totalEl); 
+                    }); 
                 }
+
+                function renderEntries() { 
+                    listContainer.innerHTML = ''; 
+                    const groupedByMonth = overtimeEntries.reduce((acc, entry) => { 
+                        const month = new Date(entry.date).toLocaleString('default', { month: 'long', year: 'numeric' }); 
+                        if (!acc[month]) { acc[month] = []; } acc[month].push(entry); return acc; 
+                    }, {}); 
+                    const sortedMonths = Object.keys(groupedByMonth).sort((a, b) => new Date(b) - new Date(a)); 
+                    if (sortedMonths.length === 0) { 
+                        listContainer.innerHTML = `<p class="text-center text-slate-500 dark:text-slate-400">No overtime logged yet.</p>`; updateTotals(); return; 
+                    } 
+                    sortedMonths.forEach(month => { 
+                        const monthContainer = document.createElement('div'); monthContainer.innerHTML = `<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">${month}</h3>`; 
+                        const groupedByAllocation = groupedByMonth[month].reduce((acc, entry) => { if (!acc[entry.allocation]) { acc[entry.allocation] = []; } acc[entry.allocation].push(entry); return acc; }, {}); 
+                        Object.keys(groupedByAllocation).sort().forEach(allocation => { 
+                            const allocationTotal = groupedByAllocation[allocation].reduce((sum, item) => sum + item.amount, 0); 
+                            const allocationContainer = document.createElement('div'); allocationContainer.className = 'mb-4'; 
+                            allocationContainer.innerHTML = `<div class="flex justify-between items-center bg-slate-100 dark:bg-gray-700/60 p-2 rounded-t-lg"><h4 class="font-semibold text-slate-800 dark:text-slate-200">${allocation}</h4><span class="font-bold text-slate-800 dark:text-slate-200">${formatCurrency(allocationTotal)}</span></div>`; 
+                            const entriesList = document.createElement('div'); entriesList.className = 'border border-t-0 dark:border-gray-700 rounded-b-lg'; 
+                            groupedByAllocation[allocation].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(entry => { 
+                                const entryEl = document.createElement('div'); entryEl.className = 'grid grid-cols-4 gap-4 items-center p-3 border-b dark:border-gray-700 last:border-b-0'; entryEl.dataset.id = entry.id; 
+                                entryEl.innerHTML = `<div class="text-slate-800 dark:text-slate-200">${new Date(entry.date).toLocaleDateString()}</div><div class="text-sm text-slate-600 dark:text-slate-400">${entry.hours} hrs @ ${formatCurrency(entry.rate)}/hr</div><div class="font-semibold text-slate-900 dark:text-white">${formatCurrency(entry.amount)}</div><div class="flex justify-end gap-2"><button class="edit-overtime-btn p-1 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button><button class="delete-overtime-btn p-1 text-slate-500 hover:text-red-600 dark:hover:text-red-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>`; 
+                                entriesList.appendChild(entryEl); 
+                            }); 
+                            allocationContainer.appendChild(entriesList); monthContainer.appendChild(allocationContainer); 
+                        }); 
+                        listContainer.appendChild(monthContainer); 
+                    }); 
+                    updateTotals(); 
+                }
+
+                allocationSelect.addEventListener('change', () => { customAllocationInput.classList.toggle('hidden', allocationSelect.value !== 'Other'); }); 
+                editAllocationSelect.addEventListener('change', () => { editCustomAllocationInput.classList.toggle('hidden', editAllocationSelect.value !== 'Other'); });
                 
-                if (startBtn) startBtn.addEventListener('click', () => {
-                    if (!isPlaying) {
-                        isPlaying = true; x = canvas.width / 2; y = canvas.height - 30;
-                        dx = 3; dy = -3; score = 0; if (scoreDisplay) scoreDisplay.textContent = `Score: 0`;
-                        draw();
-                    }
+                addBtn.addEventListener('click', () => { 
+                    const date = document.getElementById('overtime-date').value; const hours = parseFloat(document.getElementById('overtime-hours').value); const rate = parseFloat(document.getElementById('overtime-rate').value); 
+                    let allocation = allocationSelect.value; 
+                    if (allocation === 'Other') { allocation = customAllocationInput.value.trim(); if (!allocation) { showAlert("Please enter a name for your custom allocation."); return; } } 
+                    if (!date || isNaN(hours) || hours <= 0 || isNaN(rate) || rate <= 0) { showAlert("Please enter a valid date, hours, and rate."); return; } 
+                    const amount = hours * rate; overtimeEntries.push({ id: Date.now(), date, hours, rate, amount, allocation }); saveEntries(); renderEntries(); 
+                    document.getElementById('overtime-date').value = ''; document.getElementById('overtime-hours').value = ''; document.getElementById('overtime-rate').value = ''; 
+                    customAllocationInput.value = ''; allocationSelect.value = 'Savings'; customAllocationInput.classList.add('hidden'); 
                 });
                 
-                if (resetBtn) resetBtn.addEventListener('click', () => {
-                    isPlaying = false; cancelAnimationFrame(animationId);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    x = canvas.width / 2; y = canvas.height - 30; paddleX = (canvas.width - paddleWidth) / 2;
-                    ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath();
-                    ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath();
+                listContainer.addEventListener('click', (e) => { 
+                    const editBtn = e.target.closest('.edit-overtime-btn'); const deleteBtn = e.target.closest('.delete-overtime-btn'); 
+                    if (editBtn) { 
+                        const entryEl = editBtn.closest('.grid'); const entryId = parseInt(entryEl.dataset.id); const entry = overtimeEntries.find(item => item.id === entryId); 
+                        document.getElementById('edit-overtime-id').value = entry.id; document.getElementById('edit-overtime-date').value = entry.date; document.getElementById('edit-overtime-hours').value = entry.hours; document.getElementById('edit-overtime-rate').value = entry.rate; 
+                        const standardOptions = ["Savings", "Holiday"]; 
+                        if (standardOptions.includes(entry.allocation)) { editAllocationSelect.value = entry.allocation; editCustomAllocationInput.classList.add('hidden'); editCustomAllocationInput.value = ''; } 
+                        else { editAllocationSelect.value = 'Other'; editCustomAllocationInput.classList.remove('hidden'); editCustomAllocationInput.value = entry.allocation; } 
+                        editModal.classList.remove('hidden'); editModal.classList.add('flex'); 
+                    } 
+                    if (deleteBtn) { 
+                        const entryEl = deleteBtn.closest('.grid'); const entryId = parseInt(entryEl.dataset.id); 
+                        overtimeEntries = overtimeEntries.filter(item => item.id !== entryId); saveEntries(); renderEntries(); 
+                    } 
                 });
                 
-                ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath();
-                ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath();
+                function closeEditModal() { editModal.classList.add('hidden'); editModal.classList.remove('flex'); } 
+                cancelEditBtn.addEventListener('click', closeEditModal);
+                
+                saveEditBtn.addEventListener('click', () => { 
+                    const id = parseInt(document.getElementById('edit-overtime-id').value); const date = document.getElementById('edit-overtime-date').value; const hours = parseFloat(document.getElementById('edit-overtime-hours').value); const rate = parseFloat(document.getElementById('edit-overtime-rate').value); 
+                    let allocation = editAllocationSelect.value; 
+                    if (allocation === 'Other') { allocation = editCustomAllocationInput.value.trim(); if (!allocation) { showAlert("Please enter a name for your custom allocation."); return; } } 
+                    if (!date || isNaN(hours) || hours <= 0 || isNaN(rate) || rate <= 0) { showAlert("Please enter valid details."); return; } 
+                    const amount = hours * rate; const entryIndex = overtimeEntries.findIndex(item => item.id === id); 
+                    if (entryIndex > -1) { overtimeEntries[entryIndex] = { id, date, hours, rate, amount, allocation }; saveEntries(); renderEntries(); closeEditModal(); } 
+                });
+                renderEntries();
             }
 
             function setupShiftTimer() {
+                const shiftTimerPage = document.getElementById('shift-timer');
                 const setupView = document.getElementById('shift-setup');
                 const countdownView = document.getElementById('shift-countdown-display');
-                const endMessage = document.getElementById('shift-end-message');
-                
-                const startTimeInput = document.getElementById('shift-start-time-input');
-                const endTimeInput = document.getElementById('shift-end-time-input');
-                
+                const endView = document.getElementById('shift-end-message');
                 const startBtn = document.getElementById('start-shift-btn');
                 const resetBtn = document.getElementById('reset-shift-btn');
                 const newShiftBtn = document.getElementById('new-shift-btn');
+                const startTimeInput = document.getElementById('shift-start-time-input');
+                const endTimeInput = document.getElementById('shift-end-time-input');
+                const endTimeLabel = document.getElementById('shift-end-time-label');
+                const startTimeLabel = document.getElementById('shift-start-time-label');
+                const shiftBlocksContainer = document.getElementById('shift-blocks-container');
+                const shiftPhasesContainer = document.getElementById('shift-phases-container');
+                const presetNormalBtn = document.getElementById('preset-normal-btn');
+                const presetOvertimeBtn = document.getElementById('preset-overtime-btn');
+                const shiftTitleInput = document.getElementById('shift-title-input');
+                const motivationQuote = document.getElementById('shift-motivation-quote');
                 
-                const presetNormal = document.getElementById('preset-normal-btn');
-                const presetEarly = document.getElementById('preset-overtime-btn');
+                // Mode Toggle Elements
+                const shiftModeCallBtn = document.getElementById('shift-mode-call');
+                const shiftModeBreachBtn = document.getElementById('shift-mode-breach');
+                const shiftModeLabel = document.getElementById('shift-mode-label');
+                const paceWarning = document.getElementById('breach-pace-warning');
+                const paceDisplayVal = document.getElementById('pace-display-val');
+                const paceMissedVal = document.getElementById('pace-missed-val');
                 
-                let shiftTimerInterval;
-                let shiftStart;
-                let shiftEnd;
-                let totalDuration;
+                if(!setupView) return; // Safety check
+
+                let currentShiftMode = localStorage.getItem('currentShiftMode') || 'breach'; 
+                let accumulatedBreachMs = parseInt(localStorage.getItem('shiftBreachTotalMs')) || 0;
+                let lastBreachStart = localStorage.getItem('shiftBreachSessionStart') ? new Date(localStorage.getItem('shiftBreachSessionStart')) : null;
+
+                const shareShiftBtn = document.getElementById('share-shift-btn');
+                const qrModal = document.getElementById('qr-modal');
+                const qrContainer = document.getElementById('qrcode-container');
+                const closeQrBtn = document.getElementById('close-qr-btn');
+                const copyLinkFallbackBtn = document.getElementById('copy-link-fallback-btn');
+                let currentShareUrl = '';
+
+                const addBreakBtn = document.getElementById('add-break-btn');
+                const loadMyBreaksBtn = document.getElementById('load-my-breaks-btn');
+                const breakTimesContainer = document.getElementById('break-times-container');
+                const healthBreaksToggle = document.getElementById('health-breaks-toggle');
+                const resetBreachesToggle = document.getElementById('reset-breaches-toggle');
+                
+                const breakActiveDisplay = document.getElementById('break-active-display');
+                const breakTimerLarge = document.getElementById('break-timer-large');
+                const breakAlertBanner = document.getElementById('break-alert-banner');
+                const nextBreakContainer = document.getElementById('next-break-container');
+                const timeToNextBreakEl = document.getElementById('time-to-next-break');
+                const nextBreakTimeLabel = document.getElementById('next-break-time-label');
+
+                const guideContainer = document.getElementById('current-hour-guide');
+                const guideTitle = document.getElementById('current-hour-title');
+                const guideContent = document.getElementById('current-hour-content');
+                const guideBadge = document.getElementById('current-hour-badge');
+                const guideIcon = document.getElementById('current-hour-icon');
+                const guideTheme = document.getElementById('current-hour-theme');
+                const shuffleVibeBtn = document.getElementById('shuffle-vibe-btn');
+                
+                const bonusTaskInput = document.getElementById('bonus-task-input');
+                const bonusTaskDuration = document.getElementById('bonus-task-duration');
+                
+                const locHomeBtn = document.getElementById('loc-home-btn');
+                const locOfficeBtn = document.getElementById('loc-office-btn');
+                let shiftLocation = localStorage.getItem('shiftLocation') || 'home';
+
+                const editPlanBtn = document.getElementById('edit-plan-btn');
+                const editActivePlanBtn = document.getElementById('edit-active-plan-btn');
+                const shiftPlanModal = document.getElementById('shift-plan-modal');
+                const closePlanModalBtn = document.getElementById('close-plan-modal-btn');
+                const planInputsContainer = document.getElementById('plan-inputs-container');
+                const savePlanBtn = document.getElementById('save-plan-btn');
+                const resetPlanBtn = document.getElementById('reset-plan-btn');
+
+                const dashSection = document.getElementById('dashboard-active-shift-section');
+                const breachShiftSection = document.getElementById('breach-active-shift-section');
+                const dashEnd = document.getElementById('dash-mini-timer-end');
+                const dashProg = document.getElementById('dash-mini-timer-progress');
+                const dashTitle = document.getElementById('dash-vibe-title');
+                const dashTask = document.getElementById('dash-vibe-task');
+                const dashIcon = document.getElementById('dash-vibe-icon');
+
+                let currentVibeData = null;
+                let lastBaseHourTitle = null;
+                let customMission = null;
+                let currentVibeCompleted = false;
+                let lastRenderedCompletionState = null;
+
+                const shiftPlanHome = [
+                    { hour: 1, title: "Hour 1", theme: "Laser Focus", icon: "🎯", effect: "constellation", task: "Deep work (Focus on work only)" },
+                    { hour: 2, title: "Hour 2", theme: "Non-Negotiable", icon: "📅", effect: "bubbles", task: "Plan for the next day on Calendar" },
+                    { hour: 3, title: "Hour 3", theme: "Physical Activation", icon: "💪", effect: "embers", task: "Do push ups" },
+                    { hour: 4, title: "Hour 4", theme: "Growth Mindset", icon: "📝", effect: "rain", task: "Listen to personal development content (take notes)" },
+                    { hour: 5, title: "Hour 5", theme: "Curiosity", icon: "🔍", effect: "constellation", task: "Find a new niche / interest" },
+                    { hour: 6, title: "Hour 6", theme: "Wealth Building", icon: "💰", effect: "bubbles", task: "Learn something new about finance" },
+                    { hour: 7, title: "Hour 7", theme: "Playtime", icon: "⚽", effect: "embers", task: "Play a football match" },
+                    { hour: 8, title: "Hour 8", theme: "Digital Detox", icon: "📱", effect: "snow", task: "Do one thing to fix your algorithm feed" },
+                    { hour: 9, title: "Hour 9", theme: "Spirit", icon: "🙏", effect: "bubbles", task: "Pray" },
+                    { hour: 10, title: "Hour 10", theme: "Faith & Focus", icon: "🕊️", effect: "constellation", task: "Listen to a Sermon or Worship songs" },
+                    { hour: 11, title: "Hour 11", theme: "Health Planning", icon: "🏋️", effect: "rain", task: "Plan your next gym session" },
+                    { hour: 12, title: "Hour 12", theme: "Reflection", icon: "📖", effect: "snow", task: "Read the bible & Document latest thoughts in your journal" }
+                ];
+                
+                const shiftPlanOffice = [
+                    { hour: 1, title: "Hour 1", theme: "Environment Prep", icon: "🧹", effect: "constellation", task: "Clean your workspace" },
+                    { hour: 2, title: "Hour 2", theme: "Non-Negotiable", icon: "📅", effect: "bubbles", task: "Plan for the next day on Calendar" },
+                    { hour: 3, title: "Hour 3", theme: "Passive Learning", icon: "🎙️", effect: "rain", task: "Listen to a podcast" },
+                    { hour: 4, title: "Hour 4", theme: "Physical Reset", icon: "🪟", effect: "snow", task: "Break (Stretch & Look out the window)" },
+                    { hour: 5, title: "Hour 5", theme: "Curiosity", icon: "🧠", effect: "embers", task: "Explore a new topic you've never heard about" },
+                    { hour: 6, title: "Hour 6", theme: "Move", icon: "🚶", effect: "constellation", task: "Take a walk" },
+                    { hour: 7, title: "Hour 7", theme: "Vibe Shift", icon: "🎵", effect: "bubbles", task: "Listen to Music" },
+                    { hour: 8, title: "Hour 8", theme: "Wealth Building", icon: "📈", effect: "rain", task: "Do one thing to improve your finance" },
+                    { hour: 9, title: "Hour 9", theme: "Spirit", icon: "🙏", effect: "bubbles", task: "Pray" },
+                    { hour: 10, title: "Hour 10", theme: "Career Growth", icon: "💼", effect: "snow", task: "Work on a Job application" },
+                    { hour: 11, title: "Hour 11", theme: "Inspiration", icon: "📌", effect: "bubbles", task: "Get a new idea from Pinterest" },
+                    { hour: 12, title: "Hour 12", theme: "Reflection", icon: "✨", effect: "constellation", task: "Break (Read something inspiring)" }
+                ];
+
+                let savedHomePlan = JSON.parse(localStorage.getItem('shiftPlanHome')) || JSON.parse(JSON.stringify(shiftPlanHome));
+                let savedOfficePlan = JSON.parse(localStorage.getItem('shiftPlanOffice')) || JSON.parse(JSON.stringify(shiftPlanOffice));
+
+                const extraVibesPool = [
+                    { theme: "Tech Insights", icon: "💻", effect: "constellation", task: "Listen to a tech talk" },
+                    { theme: "Inspiration", icon: "💡", effect: "bubbles", task: "Listen to a TED talk" },
+                    { theme: "Fire Up", icon: "🔥", effect: "embers", task: "Listen to a motivational speech" },
+                    { theme: "Business Mind", icon: "🚀", effect: "constellation", task: "Listen to an entrepreneurial podcast" },
+                    { theme: "Visual Learning", icon: "📺", effect: "snow", task: "Watch educational YouTube" },
+                    { theme: "Deep Dive", icon: "🎞️", effect: "rain", task: "Watch a documentary" },
+                    { theme: "Brain Break", icon: "🍿", effect: "bubbles", task: "Watch a TV show episode" },
+                    { theme: "DJ Mode", icon: "🎧", effect: "embers", task: "Create a new playlist" },
+                    { theme: "Introspection", icon: "🤔", effect: "snow", task: "Reflect a bit about your life" },
+                    { theme: "Mental Clear", icon: "🧠", effect: "rain", task: "Brain dump" },
+                    { theme: "Idea Capture", icon: "✍️", effect: "constellation", task: "Journal an idea" },
+                    { theme: "Caffeine Hit", icon: "☕", effect: "embers", task: "Get a coffee" },
+                    { theme: "Zen Moment", icon: "🍵", effect: "bubbles", task: "You deserve a green tea" }
+                ];
+
+                const shiftMotivations = [
+                    "The world is sleeping, but your dreams are waking up. Keep grinding.",
+                    "Night shifts build the foundation for daytime freedom. You've got this.",
+                    "Every hour you push through right now is an investment in your future.",
+                    "It's quiet. It's peaceful. It's your time to dominate.",
+                    "Tired? Drink some water, stretch, and remember why you started.",
+                    "You are outworking everyone who is resting right now. Stay focused.",
+                    "The hardest shifts create the strongest work ethic. Keep pushing.",
+                    "One task at a time. The morning light will be here before you know it.",
+                    "Discipline is doing what needs to be done, even when the rest of the world is asleep.",
+                    "Embrace the quiet of the night. This is where the real progress happens."
+                ];
+
+                let shiftTimerInterval; let shiftStartTime; let shiftEndTime; let totalShiftDuration;
+                let activeBreakObjects = []; let wasOnBreak = false;
+                let scheduledBreaks = [];
+                let totalShiftPhases = 0;
 
                 function formatTimeDate(date) {
                     const d = new Date(date);
@@ -3238,130 +3407,342 @@
                     return d.toISOString().slice(0,16);
                 }
 
-                function setPreset(startH, endH) {
+                function setDefaultShiftTimes() {
                     const now = new Date();
                     const start = new Date(now);
-                    start.setHours(startH, 0, 0, 0);
-                    
-                    const end = new Date(now);
-                    end.setHours(endH, 0, 0, 0);
-                    if (endH < startH) {
-                        end.setDate(end.getDate() + 1);
-                    }
-                    
-                    if (now > end) {
-                        start.setDate(start.getDate() + 1);
-                        end.setDate(end.getDate() + 1);
-                    }
-
+                    if (now.getHours() < 7) { start.setDate(start.getDate() - 1); }
+                    start.setHours(19, 0, 0, 0);
+                    const end = new Date(start);
+                    end.setDate(end.getDate() + 1);
+                    end.setHours(7, 0, 0, 0);
                     if(startTimeInput) startTimeInput.value = formatTimeDate(start);
                     if(endTimeInput) endTimeInput.value = formatTimeDate(end);
                 }
 
-                if (presetNormal) presetNormal.addEventListener('click', () => setPreset(19, 7));
-                if (presetEarly) presetEarly.addEventListener('click', () => setPreset(17, 5));
-
-                if (startTimeInput && !startTimeInput.value) {
-                    setPreset(19, 7); 
-                }
-
-                const homeBtn = document.getElementById('loc-home-btn');
-                const officeBtn = document.getElementById('loc-office-btn');
-                
-                if (homeBtn && officeBtn) {
-                    homeBtn.addEventListener('click', () => {
-                        homeBtn.classList.replace('text-gray-400', 'text-teal-300');
-                        homeBtn.classList.replace('border-transparent', 'border-teal-500/50');
-                        homeBtn.classList.add('bg-teal-500/20', 'shadow-[0_0_15px_rgba(45,212,191,0.15)]');
-                        officeBtn.classList.replace('text-teal-300', 'text-gray-400');
-                        officeBtn.classList.replace('border-teal-500/50', 'border-transparent');
-                        officeBtn.classList.remove('bg-teal-500/20', 'shadow-[0_0_15px_rgba(45,212,191,0.15)]');
-                    });
-                    officeBtn.addEventListener('click', () => {
-                        officeBtn.classList.replace('text-gray-400', 'text-teal-300');
-                        officeBtn.classList.replace('border-transparent', 'border-teal-500/50');
-                        officeBtn.classList.add('bg-teal-500/20', 'shadow-[0_0_15px_rgba(45,212,191,0.15)]');
-                        homeBtn.classList.replace('text-teal-300', 'text-gray-400');
-                        homeBtn.classList.replace('border-teal-500/50', 'border-transparent');
-                        homeBtn.classList.remove('bg-teal-500/20', 'shadow-[0_0_15px_rgba(45,212,191,0.15)]');
+                function renderPlanEditor() {
+                    const currentPlan = shiftLocation === 'home' ? savedHomePlan : savedOfficePlan;
+                    if(!planInputsContainer) return;
+                    planInputsContainer.innerHTML = '';
+                    currentPlan.forEach((hourData, index) => {
+                        const el = document.createElement('div');
+                        el.className = 'bg-black/30 p-4 rounded-xl border border-white/5 flex flex-col gap-3';
+                        el.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Hour ${index + 1}</span>
+                                <div class="flex gap-3">
+                                    <div class="flex flex-col">
+                                        <label class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Theme</label>
+                                        <input type="text" class="plan-theme-input bg-transparent border-b border-white/20 text-sm font-medium text-white focus:outline-none focus:border-indigo-400 w-32" value="${hourData.theme}">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-[9px] text-gray-500 uppercase tracking-wider mb-1">Icon</label>
+                                        <input type="text" class="plan-icon-input bg-transparent border-b border-white/20 text-sm font-medium text-white focus:outline-none focus:border-indigo-400 w-12 text-center" value="${hourData.icon}">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" class="plan-task-input w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-white/10 transition-colors" value="${hourData.task}" placeholder="Main Task / Objective">
+                        `;
+                        planInputsContainer.appendChild(el);
                     });
                 }
 
-                const loadBreaksBtn = document.getElementById('load-my-breaks-btn');
-                const addBreakBtn = document.getElementById('add-break-btn');
-                const breaksContainer = document.getElementById('break-times-container');
+                if(editPlanBtn) editPlanBtn.addEventListener('click', () => { renderPlanEditor(); shiftPlanModal.classList.remove('hidden'); shiftPlanModal.classList.add('flex'); });
+                if(editActivePlanBtn) editActivePlanBtn.addEventListener('click', () => { renderPlanEditor(); shiftPlanModal.classList.remove('hidden'); shiftPlanModal.classList.add('flex'); });
+                if(closePlanModalBtn) closePlanModalBtn.addEventListener('click', () => { shiftPlanModal.classList.add('hidden'); shiftPlanModal.classList.remove('flex'); });
                 
-                if(loadBreaksBtn) loadBreaksBtn.addEventListener('click', () => {
-                    if(breaksContainer) breaksContainer.innerHTML = '<div class="text-xs text-emerald-400 font-medium bg-white/5 p-3 rounded-xl border border-white/10">Defaults Loaded: 22:00, 02:00, 04:00</div>';
-                });
-                
-                if(addBreakBtn) addBreakBtn.addEventListener('click', () => {
-                    if(breaksContainer) {
-                        const div = document.createElement('div');
-                        div.className = "text-sm text-gray-300 bg-white/5 p-3 rounded-xl border border-white/10 mt-2 flex justify-between items-center";
-                        div.innerHTML = `<span>New Break</span> <span class="font-mono text-teal-300">--:--</span>`;
-                        breaksContainer.appendChild(div);
+                if(savePlanBtn) savePlanBtn.addEventListener('click', () => {
+                    const rows = planInputsContainer.children;
+                    const newPlan = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        const theme = rows[i].querySelector('.plan-theme-input').value;
+                        const icon = rows[i].querySelector('.plan-icon-input').value;
+                        const task = rows[i].querySelector('.plan-task-input').value;
+                        newPlan.push({ hour: i + 1, title: `Hour ${i + 1}`, theme: theme || 'Focus', icon: icon || '🎯', effect: 'constellation', task: task || 'Work' });
                     }
+                    if (shiftLocation === 'home') { savedHomePlan = newPlan; localStorage.setItem('shiftPlanHome', JSON.stringify(savedHomePlan)); } else { savedOfficePlan = newPlan; localStorage.setItem('shiftPlanOffice', JSON.stringify(savedOfficePlan)); }
+                    shiftPlanModal.classList.add('hidden'); shiftPlanModal.classList.remove('flex');
+                    lastBaseHourTitle = null; updateShiftVisuals(); showAlert("Shift vibes saved successfully!");
                 });
+                
+                if(resetPlanBtn) resetPlanBtn.addEventListener('click', () => {
+                    if (shiftLocation === 'home') { savedHomePlan = JSON.parse(JSON.stringify(shiftPlanHome)); localStorage.removeItem('shiftPlanHome'); } else { savedOfficePlan = JSON.parse(JSON.stringify(shiftPlanOffice)); localStorage.removeItem('shiftPlanOffice'); }
+                    renderPlanEditor(); lastBaseHourTitle = null; updateShiftVisuals(); showAlert("Default vibes restored for this location.");
+                });
+
+                function updateLocButtons() {
+                    if(!locHomeBtn || !locOfficeBtn) return;
+                    if (shiftLocation === 'home') {
+                        locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]";
+                        locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
+                    } else {
+                        locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]";
+                        locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
+                    }
+                }
+
+                if(locHomeBtn) locHomeBtn.addEventListener('click', () => { shiftLocation = 'home'; localStorage.setItem('shiftLocation', 'home'); updateLocButtons(); });
+                if(locOfficeBtn) locOfficeBtn.addEventListener('click', () => { shiftLocation = 'office'; localStorage.setItem('shiftLocation', 'office'); updateLocButtons(); });
+                updateLocButtons();
+
+                let setupBreakList = JSON.parse(localStorage.getItem('shiftBreakTimes')) || [];
+                function renderSetupBreaks() {
+                    if(!breakTimesContainer) return;
+                    breakTimesContainer.innerHTML = '';
+                    setupBreakList.forEach((b, idx) => {
+                        const el = document.createElement('div');
+                        el.className = "flex justify-between items-center bg-black/20 p-3 rounded-xl border border-white/5 break-item";
+                        el.dataset.time = b.time;
+                        el.innerHTML = `<div class="flex items-center gap-3"><span class="text-gray-400 font-mono text-sm">${b.time}</span><span class="text-white font-bold text-xs uppercase tracking-wider">${b.type}</span><span class="text-gray-500 text-xs">${b.duration}m</span></div><button class="remove-setup-break text-gray-500 hover:text-red-400 transition-colors" data-idx="${idx}">✕</button>`;
+                        breakTimesContainer.appendChild(el);
+                    });
+                    document.querySelectorAll('.remove-setup-break').forEach(btn => {
+                        btn.addEventListener('click', (e) => { const i = e.target.dataset.idx; setupBreakList.splice(i, 1); localStorage.setItem('shiftBreakTimes', JSON.stringify(setupBreakList)); renderSetupBreaks(); });
+                    });
+                }
+
+                if(addBreakBtn) addBreakBtn.addEventListener('click', () => {
+                    const time = prompt("Enter break start time (HH:MM, 24h format):", "02:00");
+                    if (!time) return;
+                    const duration = prompt("Enter duration in minutes:", "30");
+                    if (!duration) return;
+                    setupBreakList.push({ time, duration: parseInt(duration), type: "Break" });
+                    setupBreakList.sort((a,b) => a.time.localeCompare(b.time));
+                    localStorage.setItem('shiftBreakTimes', JSON.stringify(setupBreakList));
+                    renderSetupBreaks();
+                });
+                
+                if(loadMyBreaksBtn) loadMyBreaksBtn.addEventListener('click', () => {
+                    setupBreakList = [{ time: "22:00", duration: 10, type: "Break" }, { time: "00:00", duration: 10, type: "Break" }, { time: "03:15", duration: 30, type: "Break" }, { time: "05:00", duration: 10, type: "Break" }];
+                    localStorage.setItem('shiftBreakTimes', JSON.stringify(setupBreakList));
+                    renderSetupBreaks();
+                });
+                renderSetupBreaks();
+
+                function calculateBreaks() {
+                    scheduledBreaks = [];
+                    const breakItems = document.querySelectorAll('.break-item');
+                    let defaultTimes = ["22:00", "02:00", "04:00"];
+                    if (breakItems.length > 0) {
+                        defaultTimes = [];
+                        breakItems.forEach(item => {
+                            let time = item.dataset.time;
+                            if (!time) { const input = item.querySelector('input[type="time"]'); if (input && input.value) time = input.value; }
+                            if (time) defaultTimes.push(time);
+                        });
+                    }
+
+                    defaultTimes.forEach(timeStr => {
+                         let [h, m] = timeStr.split(':').map(Number);
+                         let bTime = new Date(shiftStart);
+                         bTime.setHours(h, m, 0, 0);
+                         if (shiftStart.getHours() > shiftEnd.getHours() && h < shiftStart.getHours()) { bTime.setDate(bTime.getDate() + 1); }
+                         if (bTime >= shiftStart && bTime <= shiftEnd) { scheduledBreaks.push({ start: bTime, end: new Date(bTime.getTime() + 15 * 60000), label: timeStr }); }
+                    });
+                    scheduledBreaks.sort((a,b) => a.start - b.start);
+                    
+                    const miniBreaksList = document.getElementById('breach-breaks-list');
+                    if (miniBreaksList) {
+                        miniBreaksList.innerHTML = scheduledBreaks.length ? scheduledBreaks.map(b => `<div class="flex justify-between items-center bg-slate-800/50 p-2 rounded-lg border border-slate-700"><span class="text-xs text-slate-300 font-medium">Break</span><span class="text-xs font-mono text-emerald-400">${b.label}</span></div>`).join('') : '<p class="text-xs text-slate-500 font-medium">No breaks scheduled.</p>';
+                    }
+                }
+
+                function generateShiftBlocks() {
+                    if (!shiftBlocksContainer) return;
+                    shiftBlocksContainer.innerHTML = '<div id="shift-progress-fill" class="absolute top-0 left-0 h-full bg-gradient-to-r from-teal-500/20 to-indigo-500/30 z-0 transition-all duration-1000 border-r-2 border-teal-400 shadow-[2px_0_15px_rgba(45,212,191,0.6)]" style="width: 0%;"></div>';
+                    if (shiftPhasesContainer) shiftPhasesContainer.innerHTML = '';
+                    
+                    const plan = shiftLocation === 'home' ? savedHomePlan : savedOfficePlan;
+                    totalShiftPhases = plan.length;
+                    
+                    plan.forEach(block => {
+                        const blockPct = (1 / totalShiftPhases) * 100;
+                        const div = document.createElement('div');
+                        div.className = `h-full relative z-10 border-r border-white/10 last:border-0 flex items-center justify-center overflow-hidden group`;
+                        div.style.width = `${blockPct}%`;
+                        div.innerHTML = `<span class="opacity-40 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-white uppercase tracking-widest truncate px-2 mix-blend-overlay pointer-events-none">${block.title}</span>`;
+                        shiftBlocksContainer.appendChild(div);
+                    });
+
+                    if (startTimeLabel && shiftStart && !isNaN(shiftStart)) startTimeLabel.textContent = shiftStart.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    if (endTimeLabel && shiftEnd && !isNaN(shiftEnd)) endTimeLabel.textContent = shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    const marker = document.createElement('div');
+                    marker.id = 'shift-progress-marker';
+                    marker.className = "absolute top-0 bottom-0 w-0.5 bg-red-500 z-40 shadow-[0_0_10px_rgba(239,68,68,1)] transition-all duration-1000 pointer-events-none";
+                    marker.style.left = '0%';
+                    marker.innerHTML = '<div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-red-500 filter drop-shadow-md"></div><div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[6px] border-b-red-500 filter drop-shadow-md"></div>';
+                    shiftBlocksContainer.appendChild(marker);
+                }
+
+                function updateShiftVisuals() {
+                    if (!shiftStart || isNaN(shiftStart)) return;
+                    const now = new Date();
+                    const elapsedMs = now - shiftStart;
+                    const currentHourIdx = Math.floor(elapsedMs / (1000 * 60 * 60));
+                    const plan = shiftLocation === 'home' ? savedHomePlan : savedOfficePlan;
+                    const safeIdx = Math.max(0, Math.min(currentHourIdx, plan.length - 1));
+                    let activeData = plan[safeIdx] || plan[plan.length - 1];
+
+                    if (customMission && now >= new Date(customMission.start) && now < new Date(customMission.end)) {
+                        activeData = { title: "Bonus Mission", theme: "Priority Override", icon: "🔥", effect: "embers", task: customMission.task };
+                    }
+
+                    if (lastBaseHourTitle !== activeData.title) {
+                        lastBaseHourTitle = activeData.title;
+                        currentVibeData = activeData;
+                        currentVibeCompleted = false; 
+                        
+                        if(motivationQuote) {
+                            const randomMotivation = shiftMotivations[Math.floor(Math.random() * shiftMotivations.length)];
+                            motivationQuote.style.opacity = 0;
+                            setTimeout(() => { motivationQuote.textContent = `"${randomMotivation}"`; motivationQuote.style.opacity = 1; }, 500);
+                        }
+                    }
+
+                    if(!guideTitle || !guideContent) return;
+                    const currentDisplayedTask = guideContent.querySelector('p.text-2xl')?.textContent;
+
+                    if (guideTitle.textContent !== currentVibeData.title || currentDisplayedTask !== currentVibeData.task || lastRenderedCompletionState !== currentVibeCompleted) {
+                        lastRenderedCompletionState = currentVibeCompleted;
+                        if(guideBadge) guideBadge.textContent = "Hourly Objective";
+                        if(guideTheme) guideTheme.textContent = `// ${currentVibeData.theme}`;
+                        if(guideTitle) guideTitle.textContent = currentVibeData.title;
+                        if(guideIcon) guideIcon.textContent = currentVibeData.icon;
+                        
+                        // Update Dashboard Vibe
+                        const dashTheme = document.getElementById('dash-vibe-theme');
+                        if(dashTitle) dashTitle.textContent = currentVibeData.title;
+                        if(dashTheme) dashTheme.textContent = currentVibeData.theme;
+                        if(dashTask) dashTask.textContent = currentVibeData.task; 
+                        if(dashIcon) dashIcon.textContent = currentVibeData.icon;
+                        
+                        // Update Breach List Vibe
+                        const bTitle = document.getElementById('breach-vibe-title');
+                        const bTheme = document.getElementById('breach-vibe-theme');
+                        const bTask = document.getElementById('breach-vibe-task');
+                        const bIcon = document.getElementById('breach-vibe-icon');
+                        if (bTitle) bTitle.textContent = currentVibeData.title;
+                        if (bTheme) bTheme.textContent = currentVibeData.theme;
+                        if (bTask) bTask.textContent = currentVibeData.task; 
+                        if (bIcon) bIcon.textContent = currentVibeData.icon;
+                        
+                        guideContent.innerHTML = `
+                            <div class="col-span-full border p-6 md:p-8 rounded-2xl flex items-center gap-6 shadow-inner w-full transition-all duration-500 ${currentVibeCompleted ? 'bg-teal-900/10 border-teal-500/10 opacity-60' : 'bg-teal-500/10 border-teal-500/20'}">
+                                <div class="flex-grow transition-all duration-500">
+                                    <p class="text-xs text-teal-300 uppercase tracking-widest font-bold mb-2">Primary Task</p>
+                                    <p class="text-2xl md:text-3xl font-semibold text-white tracking-wide leading-snug transition-all duration-500 ${currentVibeCompleted ? 'line-through text-gray-500' : ''}">${currentVibeData.task}</p>
+                                </div>
+                                <button id="complete-vibe-btn" class="w-14 h-14 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 focus:outline-none hover:scale-105 ${currentVibeCompleted ? 'bg-teal-500 border-teal-500 text-white shadow-[0_0_20px_rgba(20,184,166,0.5)]' : 'border-teal-500/30 text-teal-400 hover:bg-teal-500/20 hover:border-teal-400'}" title="${currentVibeCompleted ? 'Uncheck Task' : 'Mark as Complete'}">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </button>
+                            </div>
+                        `;
+                        const completeBtn = document.getElementById('complete-vibe-btn');
+                        if (completeBtn) {
+                            completeBtn.addEventListener('click', () => { currentVibeCompleted = !currentVibeCompleted; updateShiftVisuals(); });
+                        }
+                    }
+                }
 
                 function updateDisplay() {
                     const now = new Date();
                     let remaining = shiftEnd - now;
+                    let elapsed = now - shiftStart;
                     
                     if (remaining <= 0) {
                         clearInterval(shiftTimerInterval);
-                        remaining = 0;
+                        remaining = 0; elapsed = totalDuration;
                         if(countdownView) countdownView.classList.add('hidden');
-                        if(endMessage) endMessage.classList.remove('hidden');
+                        if(endView) endView.classList.remove('hidden');
                     }
 
                     const h = Math.floor(remaining / (1000 * 60 * 60));
                     const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
                     const s = Math.floor((remaining % (1000 * 60)) / 1000);
 
-                    const hStr = h.toString().padStart(2, '0');
-                    const mStr = m.toString().padStart(2, '0');
-                    const sStr = s.toString().padStart(2, '0');
+                    const hStr = h.toString().padStart(2, '0'); const mStr = m.toString().padStart(2, '0'); const sStr = s.toString().padStart(2, '0');
+                    ['shift-hours-display', 'breach-mini-timer-h', 'dash-mini-timer-h'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = hStr; });
+                    ['shift-minutes-display', 'breach-mini-timer-m', 'dash-mini-timer-m'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = mStr; });
+                    ['shift-seconds-display', 'breach-mini-timer-s', 'dash-mini-timer-s'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = sStr; });
 
-                    const displays = ['shift-hours-display', 'breach-mini-timer-h'];
-                    displays.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = hStr; });
-                    
-                    const mins = ['shift-minutes-display', 'breach-mini-timer-m'];
-                    mins.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = mStr; });
-                    
-                    const secs = ['shift-seconds-display', 'breach-mini-timer-s'];
-                    secs.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = sStr; });
+                    if (totalDuration > 0 && !isNaN(totalDuration)) {
+                        let pct = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+                        if (isNaN(pct)) pct = 0;
+                        const miniProg = document.getElementById('breach-mini-timer-progress');
+                        const progFill = document.getElementById('shift-progress-fill');
+                        const marker = document.getElementById('shift-progress-marker');
+                        if (miniProg) miniProg.style.width = `${pct}%`;
+                        if (progFill) progFill.style.width = `${pct}%`;
+                        if (marker) marker.style.left = `${pct}%`;
+                        if (dashProg) dashProg.style.width = `${pct}%`;
+                        updateShiftVisuals();
+                    }
 
-                    const miniProg = document.getElementById('breach-mini-timer-progress');
-                    if (totalDuration > 0 && miniProg) {
-                        const elapsed = totalDuration - remaining;
-                        const pct = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                        miniProg.style.width = `${pct}%`;
+                    let activeBreak = null; let nextBreak = null;
+                    for (let b of scheduledBreaks) {
+                        if (now >= b.start && now < b.end) { activeBreak = b; break; }
+                        if (now < b.start && !nextBreak) { nextBreak = b; }
+                    }
+                    
+                    const miniBreak = document.getElementById('breach-mini-timer-break');
+                    
+                    if (activeBreak) {
+                        if (breakActiveDisplay) breakActiveDisplay.classList.remove('hidden');
+                        if (breakAlertBanner) breakAlertBanner.classList.remove('hidden');
+                        if (nextBreakContainer) nextBreakContainer.classList.add('opacity-0');
+                        
+                        let bRem = activeBreak.end - now;
+                        let bm = Math.floor(bRem / 60000); let bs = Math.floor((bRem % 60000) / 1000);
+                        if(breakTimerLarge) breakTimerLarge.textContent = `${bm.toString().padStart(2,'0')}:${bs.toString().padStart(2,'0')}`;
+                        
+                        if(miniBreak) { miniBreak.textContent = "ON BREAK"; miniBreak.classList.add('text-rose-400', 'animate-pulse', 'bg-rose-500/10'); miniBreak.classList.remove('text-emerald-400', 'bg-emerald-500/10'); }
+                    } else {
+                        if (breakActiveDisplay) breakActiveDisplay.classList.add('hidden');
+                        if (breakAlertBanner) breakAlertBanner.classList.add('hidden');
+                        if (nextBreakContainer) nextBreakContainer.classList.remove('opacity-0');
+                        
+                        if (miniBreak) { miniBreak.classList.remove('text-rose-400', 'animate-pulse', 'bg-rose-500/10'); miniBreak.classList.add('text-emerald-400', 'bg-emerald-500/10'); }
+
+                        if (nextBreak) {
+                            let nRem = nextBreak.start - now;
+                            let nh = Math.floor(nRem / 3600000); let nm = Math.floor((nRem % 3600000) / 60000); let ns = Math.floor((nRem % 60000) / 1000);
+                            if (timeToNextBreakEl) timeToNextBreakEl.textContent = `${nh.toString().padStart(2,'0')}:${nm.toString().padStart(2,'0')}:${ns.toString().padStart(2,'0')}`;
+                            if (nextBreakTimeLabel) nextBreakTimeLabel.textContent = `at ${nextBreak.label}`;
+                            if (miniBreak) miniBreak.textContent = nextBreak.label;
+                        } else {
+                            if (timeToNextBreakEl) timeToNextBreakEl.textContent = `--:--:--`;
+                            if (nextBreakTimeLabel) nextBreakTimeLabel.textContent = `No breaks left`;
+                            if (miniBreak) miniBreak.textContent = "None";
+                        }
                     }
                 }
 
+                if (presetNormalBtn) presetNormalBtn.addEventListener('click', () => {
+                    const now = new Date(); const start = new Date(now); start.setHours(19,0,0,0); const end = new Date(now); end.setDate(end.getDate() + 1); end.setHours(7,0,0,0);
+                    startTimeInput.value = formatTimeDate(start); endTimeInput.value = formatTimeDate(end);
+                });
+                
+                if (presetOvertimeBtn) presetOvertimeBtn.addEventListener('click', () => {
+                    const now = new Date(); const start = new Date(now); start.setHours(17,0,0,0); const end = new Date(now); end.setDate(end.getDate() + 1); end.setHours(5,0,0,0);
+                    startTimeInput.value = formatTimeDate(start); endTimeInput.value = formatTimeDate(end);
+                });
+
                 function startShift() {
                     if (!startTimeInput || !endTimeInput || !startTimeInput.value || !endTimeInput.value) return;
-                    
                     shiftStart = new Date(startTimeInput.value);
                     shiftEnd = new Date(endTimeInput.value);
+                    if (shiftEnd <= shiftStart) { shiftEnd.setDate(shiftEnd.getDate() + 1); }
                     totalDuration = shiftEnd - shiftStart;
-
                     localStorage.setItem('shiftStartTime', shiftStart.toISOString());
                     localStorage.setItem('shiftEndTime', shiftEnd.toISOString());
-
                     const miniEnd = document.getElementById('breach-mini-timer-end');
-                    if (miniEnd) {
-                        miniEnd.textContent = `END: ${shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                    }
-
+                    if (miniEnd) { miniEnd.textContent = `END: ${shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; }
+                    if (dashEnd) { dashEnd.textContent = `END: ${shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; }
                     if(setupView) setupView.classList.add('hidden');
-                    if(endMessage) endMessage.classList.add('hidden');
+                    if(endView) endView.classList.add('hidden');
                     if(countdownView) countdownView.classList.remove('hidden');
-
-                    updateDisplay();
-                    clearInterval(shiftTimerInterval);
-                    shiftTimerInterval = setInterval(updateDisplay, 1000);
+                    calculateBreaks(); generateShiftBlocks(); currentRenderedVibeTitle = null; updateDisplay();
+                    clearInterval(shiftTimerInterval); shiftTimerInterval = setInterval(updateDisplay, 1000);
                 }
 
                 if (startBtn) startBtn.addEventListener('click', startShift);
@@ -3370,46 +3751,102 @@
                     clearInterval(shiftTimerInterval);
                     localStorage.removeItem('shiftStartTime');
                     localStorage.removeItem('shiftEndTime');
-                    
+                    currentRenderedVibeTitle = null;
                     if(countdownView) countdownView.classList.add('hidden');
-                    if(endMessage) endMessage.classList.add('hidden');
+                    if(endView) endView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
-                    
-                    const resets = ['shift-hours-display', 'breach-mini-timer-h', 'shift-minutes-display', 'breach-mini-timer-m', 'shift-seconds-display', 'breach-mini-timer-s'];
-                    resets.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = "00"; });
-                    
+                    ['shift-hours-display', 'breach-mini-timer-h', 'dash-mini-timer-h', 'shift-minutes-display', 'breach-mini-timer-m', 'dash-mini-timer-m', 'shift-seconds-display', 'breach-mini-timer-s', 'dash-mini-timer-s'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = "00"; });
                     const miniEnd = document.getElementById('breach-mini-timer-end');
                     if (miniEnd) miniEnd.textContent = "END: --:--";
-                    
+                    if (dashEnd) dashEnd.textContent = "END: --:--";
                     const miniProg = document.getElementById('breach-mini-timer-progress');
                     if (miniProg) miniProg.style.width = "0%";
+                    if (dashProg) dashProg.style.width = "0%";
+                    const progFill = document.getElementById('shift-progress-fill');
+                    if (progFill) progFill.style.width = "0%";
+                    
+                    const dashTheme = document.getElementById('dash-vibe-theme');
+                    if (dashTitle) dashTitle.textContent = "Offline";
+                    if (dashTheme) dashTheme.textContent = "Current Vibe";
+                    if (dashTask) dashTask.textContent = "Start a shift to begin.";
+                    if (dashIcon) dashIcon.textContent = "💤";
+                    
+                    const bTitle = document.getElementById('breach-vibe-title');
+                    const bTheme = document.getElementById('breach-vibe-theme');
+                    const bTask = document.getElementById('breach-vibe-task');
+                    const bIcon = document.getElementById('breach-vibe-icon');
+                    if (bTitle) bTitle.textContent = "Offline";
+                    if (bTheme) bTheme.textContent = "Current Vibe";
+                    if (bTask) bTask.textContent = "Start a shift to begin.";
+                    if (bIcon) bIcon.textContent = "💤";
+                    
+                    setDefaultShiftTimes();
                 }
 
                 if (resetBtn) resetBtn.addEventListener('click', resetShift);
                 if (newShiftBtn) newShiftBtn.addEventListener('click', resetShift);
 
-                // Initialize from storage if exists
+                if(shuffleVibeBtn) {
+                    shuffleVibeBtn.addEventListener('click', () => {
+                        const newVibe = extraVibesPool[Math.floor(Math.random() * extraVibesPool.length)];
+                        currentVibeData = { ...currentVibeData, theme: newVibe.theme, icon: newVibe.icon, effect: newVibe.effect, task: newVibe.task };
+                        currentVibeCompleted = false; lastRenderedCompletionState = null; lastBaseHourTitle = null;
+                        updateShiftVisuals();
+                    });
+                }
+
                 const storedStart = localStorage.getItem('shiftStartTime');
                 const storedEnd = localStorage.getItem('shiftEndTime');
                 if (storedStart && storedEnd) {
                     shiftStart = new Date(storedStart);
                     shiftEnd = new Date(storedEnd);
+                    if (isNaN(shiftStart) || isNaN(shiftEnd)) { resetShift(); return; }
                     totalDuration = shiftEnd - shiftStart;
-                    
                     if (new Date() < shiftEnd) {
                         const miniEnd = document.getElementById('breach-mini-timer-end');
                         if (miniEnd) miniEnd.textContent = `END: ${shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                        
+                        if (dashEnd) dashEnd.textContent = `END: ${shiftEnd.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                         if(setupView) setupView.classList.add('hidden');
-                        if(endMessage) endMessage.classList.add('hidden');
+                        if(endView) endView.classList.add('hidden');
                         if(countdownView) countdownView.classList.remove('hidden');
-                        
-                        updateDisplay();
+                        calculateBreaks(); generateShiftBlocks(); currentRenderedVibeTitle = null; updateDisplay();
                         shiftTimerInterval = setInterval(updateDisplay, 1000);
-                    } else {
-                        resetShift();
+                    } else { resetShift(); }
+                } else { setDefaultShiftTimes(); resetShift(); }
+            }
+
+            function setupBallGame() {
+                const canvas = document.getElementById('game-canvas');
+                if(!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const startBtn = document.getElementById('start-game-btn');
+                const resetBtn = document.getElementById('reset-game-btn');
+                const scoreDisplay = document.getElementById('game-score');
+                let x = canvas.width / 2; let y = canvas.height - 30; let dx = 3; let dy = -3;
+                let ballRadius = 8; let paddleHeight = 12; let paddleWidth = 80;
+                let paddleX = (canvas.width - paddleWidth) / 2; let rightPressed = false; let leftPressed = false;
+                let score = 0; let isPlaying = false; let animationId;
+                
+                document.addEventListener("keydown", (e) => { if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true; else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true; });
+                document.addEventListener("keyup", (e) => { if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false; else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false; });
+                
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath();
+                    ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath();
+                    
+                    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
+                    if (y + dy < ballRadius) dy = -dy;
+                    else if (y + dy > canvas.height - ballRadius) {
+                        if (x > paddleX && x < paddleX + paddleWidth) { dy = -dy; dy -= 0.15; dx += (dx > 0 ? 0.15 : -0.15); score += 10; if (scoreDisplay) scoreDisplay.textContent = `Score: ${score}`; } else { isPlaying = false; cancelAnimationFrame(animationId); ctx.font = "bold 28px Inter"; ctx.fillStyle = "#f43f5e"; ctx.textAlign = "center"; ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2); return; }
                     }
+                    if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 6; else if (leftPressed && paddleX > 0) paddleX -= 6;
+                    x += dx; y += dy; if (isPlaying) animationId = requestAnimationFrame(draw);
                 }
+                
+                if (startBtn) startBtn.addEventListener('click', () => { if (!isPlaying) { isPlaying = true; x = canvas.width / 2; y = canvas.height - 30; dx = 3; dy = -3; score = 0; if (scoreDisplay) scoreDisplay.textContent = `Score: 0`; draw(); } });
+                if (resetBtn) resetBtn.addEventListener('click', () => { isPlaying = false; cancelAnimationFrame(animationId); ctx.clearRect(0, 0, canvas.width, canvas.height); x = canvas.width / 2; y = canvas.height - 30; paddleX = (canvas.width - paddleWidth) / 2; ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath(); ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath(); });
+                ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath(); ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath();
             }
 
             // Restore previous state on load
