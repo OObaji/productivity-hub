@@ -1918,6 +1918,7 @@
                 setupSoundscapes();
                 setupCallLog();
                 setupVisitRequest();
+                setupBreachCopilot();
                 dashboardInitialized = true;
             }
             
@@ -2471,6 +2472,25 @@
                 const hourlyCount = document.getElementById('breach-hourly-count');
                 const todayTotal = document.getElementById('breach-today-total');
                 
+                function updateCurrentSessionHour() {
+                    const labelEl = document.getElementById('breach-current-hour-label');
+                    if(labelEl) {
+                        const now = new Date();
+                        const startHour = now.getHours();
+                        const endHour = (startHour + 1) % 24;
+                        const formatHour = (h) => {
+                            const ampm = h >= 12 ? 'pm' : 'am';
+                            const hr12 = h % 12 || 12;
+                            return `${String(hr12).padStart(2, '0')}:00${ampm}`;
+                        };
+                        labelEl.textContent = `${formatHour(startHour)} - ${formatHour(endHour)}`;
+                    }
+                }
+                
+                // Initialize and continuously update the current hour session
+                updateCurrentSessionHour();
+                setInterval(updateCurrentSessionHour, 60000); 
+
                 function renderList() {
                     const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                     if(blocksContainer) {
@@ -2864,6 +2884,7 @@
                     if (!container) return;
                     container.innerHTML = '';
                     
+                    // Render Hours with time labels
                     for (let i = 0; i < segments; i++) {
                         const blockTime = new Date(startMs + i * 60 * 60 * 1000);
                         const pad = (n) => String(n).padStart(2, '0');
@@ -2881,6 +2902,7 @@
                         container.appendChild(block);
                     }
 
+                    // Render Break Highlights
                     const durationMs = endMs - startMs;
                     shiftBreaks.forEach((brk, index) => {
                         if(brk.startMs >= startMs && brk.endMs <= endMs) {
@@ -2897,7 +2919,9 @@
                             marker.style.left = `${startPct}%`;
                             marker.style.width = `${widthPct}%`;
                             marker.title = `Break: ${breakTimeStr}`;
-                            marker.innerHTML = `<span class="text-xs filter drop-shadow-md opacity-90 hidden sm:inline-block pointer-events-none">☕</span>`;
+                            marker.innerHTML = `
+                                <span class="text-xs filter drop-shadow-md opacity-90 hidden sm:inline-block pointer-events-none">☕</span>
+                            `;
                             container.appendChild(marker);
                         }
                     });
@@ -2906,6 +2930,7 @@
                 function updateVibeUI(index) {
                     const vibe = shiftVibes[index % shiftVibes.length];
 
+                    // Main View Vibe
                     const mTitle = document.getElementById('current-hour-title');
                     const mIcon = document.getElementById('current-hour-icon');
                     const mDesc = document.getElementById('current-hour-content');
@@ -2913,6 +2938,7 @@
                     if(mIcon) mIcon.textContent = vibe.icon;
                     if(mDesc) mDesc.innerHTML = `<p>${vibe.desc}</p>`;
 
+                    // Dashboard Vibe
                     const dTitle = document.getElementById('dash-vibe-title');
                     const dIcon = document.getElementById('dash-vibe-icon');
                     const dTask = document.getElementById('dash-vibe-task');
@@ -2920,6 +2946,7 @@
                     if(dIcon) dIcon.textContent = vibe.icon;
                     if(dTask) dTask.textContent = vibe.desc;
 
+                    // Breach List Vibe
                     const bTitle = document.getElementById('breach-vibe-title');
                     const bIcon = document.getElementById('breach-vibe-icon');
                     const bTask = document.getElementById('breach-vibe-task');
@@ -2927,6 +2954,7 @@
                     if(bIcon) bIcon.textContent = vibe.icon;
                     if(bTask) bTask.textContent = vibe.desc;
 
+                    // Update Timeline Blocks
                     for (let i = 0; i < totalSegments; i++) {
                         const block = document.getElementById(`timeline-block-${i}`);
                         if (!block) continue;
@@ -2990,6 +3018,7 @@
 
                     updateDisplays(h, m, s, progress);
 
+                    // Update Vibe and Timeline
                     let newIndex = Math.floor(progress * totalSegments);
                     if (newIndex >= totalSegments) newIndex = totalSegments - 1;
                     if (newIndex < 0) newIndex = 0;
@@ -3023,6 +3052,7 @@
                         return;
                     }
 
+                    // Parse Breaks
                     shiftBreaks = [];
                     if(breaksContainer) {
                         const rows = breaksContainer.querySelectorAll('.break-row');
@@ -3039,9 +3069,10 @@
                         });
                     }
 
+                    // Setup segments (1 segment per hour rounded up)
                     totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
                     renderTimeline(totalSegments, startTimeValue, endTime);
-                    currentVibeIndex = -1;
+                    currentVibeIndex = -1; // Reset to force UI update on first tick
 
                     if(setupView) setupView.classList.add('hidden');
                     if(countdownView) countdownView.classList.remove('hidden');
@@ -3213,6 +3244,83 @@
                 };
                 document.getElementById('vr-copy-title-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-title-output'), this); });
                 document.getElementById('vr-copy-log-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-log-output'), this); });
+            }
+
+            function setupBreachCopilot() {
+                const copilotBtn = document.getElementById('breach-copilot-btn');
+                const copilotPanel = document.getElementById('breach-copilot-panel');
+                const closeBtn = document.getElementById('close-copilot-btn');
+                const badge = document.getElementById('copilot-badge');
+                const bubble = document.getElementById('copilot-speech-bubble');
+                const commentsList = document.getElementById('copilot-comments-list');
+
+                if (!copilotBtn || !copilotPanel) return;
+
+                const quickComments = [
+                    "Breach sent",
+                    "NFA - Battery dead",
+                    "NFA - DW in custody",
+                    "NFA - Order ended",
+                    "NFA - Visit pending",
+                    "NFA - PID IN TAMPER",
+                    "NFA - No recent PW",
+                    "NFA - Duplicate",
+                    "NFA - Field Breached",
+                    "NFA - DW in Hospital"
+                ];
+
+                if (commentsList) {
+                    commentsList.innerHTML = '';
+                    quickComments.forEach(comment => {
+                        const btn = document.createElement('button');
+                        btn.className = 'w-full text-left p-3.5 bg-white dark:bg-slate-700/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-100 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm group relative overflow-hidden';
+                        btn.innerHTML = `<span class="relative z-10">${comment}</span>`;
+                        
+                        btn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(comment).catch(() => {
+                                const temp = document.createElement('textarea');
+                                temp.value = comment;
+                                document.body.appendChild(temp);
+                                temp.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(temp);
+                            });
+                            
+                            const originalHtml = btn.innerHTML;
+                            btn.innerHTML = `<span class="relative z-10 flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Copied!</span>`;
+                            btn.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                            
+                            setTimeout(() => {
+                                btn.innerHTML = originalHtml;
+                                btn.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                            }, 1500);
+                        });
+                        commentsList.appendChild(btn);
+                    });
+                }
+
+                function togglePanel() {
+                    const isHidden = copilotPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        copilotPanel.classList.remove('hidden');
+                        setTimeout(() => {
+                            copilotPanel.classList.remove('scale-95', 'opacity-0');
+                            copilotPanel.classList.add('scale-100', 'opacity-100');
+                        }, 10);
+                        
+                        if (badge) badge.classList.add('hidden');
+                        if (bubble) bubble.classList.add('opacity-0', 'pointer-events-none');
+                    } else {
+                        copilotPanel.classList.remove('scale-100', 'opacity-100');
+                        copilotPanel.classList.add('scale-95', 'opacity-0');
+                        setTimeout(() => {
+                            copilotPanel.classList.add('hidden');
+                        }, 300);
+                    }
+                }
+
+                copilotBtn.addEventListener('click', togglePanel);
+                if (closeBtn) closeBtn.addEventListener('click', togglePanel);
             }
 
             // Restore previous state on load
