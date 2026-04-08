@@ -2560,14 +2560,356 @@
 
             function setupShiftTimer() {
                 const startBtn = document.getElementById('start-shift-btn');
+                const resetBtn = document.getElementById('reset-shift-btn');
+                const newShiftBtn = document.getElementById('new-shift-btn');
+                const setupView = document.getElementById('shift-setup');
+                const countdownView = document.getElementById('shift-countdown-display');
+                const endMessage = document.getElementById('shift-end-message');
+                
+                const startInput = document.getElementById('shift-start-time-input');
+                const endInput = document.getElementById('shift-end-time-input');
+                
+                const presetNormal = document.getElementById('preset-normal-btn');
+                const presetOvertime = document.getElementById('preset-overtime-btn');
+
+                let shiftInterval;
+                let startTimeValue;
+                let endTime;
+                let totalDuration;
+                let totalSegments = 0;
+                let currentVibeIndex = -1;
+                let shiftBreaks = []; // Holds absolute break times
+
+                // Productivity Vibes to cycle through during the shift
+                const shiftVibes = [
+                    { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
+                    { title: "Deep Dive", icon: "🧠", desc: "Total focus. Tackle the most complex tasks now." },
+                    { title: "Momentum", icon: "⚡", desc: "Keep the energy high. Handle quick wins and comms." },
+                    { title: "The Grind", icon: "🧗", desc: "Push through the mid-shift wall. Hydrate and focus." },
+                    { title: "Admin Hour", icon: "📊", desc: "Process paperwork, update logs, and routine tasks." },
+                    { title: "Wrap Up", icon: "🌅", desc: "Tie up loose ends. Prepare handover and disconnect." }
+                ];
+
+                // Break Config Logic
+                const breaksContainer = document.getElementById('break-times-container');
+                const addBreakBtn = document.getElementById('add-break-btn');
+                const loadBreaksBtn = document.getElementById('load-my-breaks-btn');
+
+                if(addBreakBtn) {
+                    addBreakBtn.addEventListener('click', () => {
+                        const div = document.createElement('div');
+                        div.className = 'flex gap-2 items-center break-row animate-[fadeIn_0.3s_ease-out]';
+                        div.innerHTML = `
+                            <input type="time" class="break-start w-full p-2.5 rounded-lg bg-black/40 text-white border border-white/10 text-sm font-mono focus:ring-2 focus:ring-emerald-500/50">
+                            <span class="text-white/50">-</span>
+                            <input type="time" class="break-end w-full p-2.5 rounded-lg bg-black/40 text-white border border-white/10 text-sm font-mono focus:ring-2 focus:ring-emerald-500/50">
+                            <button class="remove-break text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 p-2 rounded-lg transition-colors">✕</button>
+                        `;
+                        div.querySelector('.remove-break').addEventListener('click', () => div.remove());
+                        breaksContainer.appendChild(div);
+                    });
+                }
+
+                if(loadBreaksBtn) {
+                    loadBreaksBtn.addEventListener('click', () => {
+                        if(breaksContainer) breaksContainer.innerHTML = '';
+                        // Standard breaks
+                        const defaults = [['22:00', '22:10'], ['00:00', '00:10'], ['03:30', '04:00'], ['05:00', '05:10']];
+                        defaults.forEach(times => {
+                            if(addBreakBtn) addBreakBtn.click();
+                            const rows = breaksContainer.querySelectorAll('.break-row');
+                            const lastRow = rows[rows.length - 1];
+                            if(lastRow) {
+                                lastRow.querySelector('.break-start').value = times[0];
+                                lastRow.querySelector('.break-end').value = times[1];
+                            }
+                        });
+                    });
+                }
+
+                function getAbsoluteTime(timeStr, baseDateMs) {
+                    if(!timeStr) return 0;
+                    const [h, m] = timeStr.split(':').map(Number);
+                    let date = new Date(baseDateMs);
+                    date.setHours(h, m, 0, 0);
+                    // If break appears to be the next morning (e.g. 03:00) relative to a 19:00 start
+                    if (date.getTime() < baseDateMs - 4*60*60*1000) { 
+                        date.setDate(date.getDate() + 1);
+                    }
+                    return date.getTime();
+                }
+
+                // Set default presets (Helper)
+                function setTimes(startHour, endHour) {
+                    const now = new Date();
+                    const end = new Date(now);
+                    end.setHours(endHour, 0, 0, 0);
+                    
+                    // Find the *next* occurrence of the end time
+                    if (end.getTime() <= now.getTime()) {
+                        end.setDate(end.getDate() + 1);
+                    }
+                    
+                    // Calculate start time based on duration
+                    let durationHours = endHour - startHour;
+                    if (durationHours <= 0) durationHours += 24;
+                    
+                    const start = new Date(end);
+                    start.setHours(end.getHours() - durationHours);
+
+                    const toLocalISO = (d) => {
+                        const pad = (n) => String(n).padStart(2, '0');
+                        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                    };
+
+                    if(startInput) startInput.value = toLocalISO(start);
+                    if(endInput) endInput.value = toLocalISO(end);
+                }
+
+                if(startInput && !startInput.value) {
+                    setTimes(19, 7);
+                }
+
+                if(presetNormal) presetNormal.addEventListener('click', () => setTimes(19, 7));
+                if(presetOvertime) presetOvertime.addEventListener('click', () => setTimes(17, 5));
+
+                function renderTimeline(segments, startMs, endMs) {
+                    const container = document.getElementById('shift-blocks-container');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    
+                    // Render Hours with time labels
+                    for (let i = 0; i < segments; i++) {
+                        const blockTime = new Date(startMs + i * 60 * 60 * 1000);
+                        const pad = (n) => String(n).padStart(2, '0');
+                        const timeStr = `${pad(blockTime.getHours())}:00`;
+                        
+                        const block = document.createElement('div');
+                        block.className = 'flex-1 border-r border-white/5 bg-transparent transition-all duration-500 relative flex items-center justify-center overflow-hidden';
+                        block.id = `timeline-block-${i}`;
+                        
+                        const label = document.createElement('span');
+                        label.className = 'text-[10px] sm:text-xs font-mono font-bold text-white/60 z-20 pointer-events-none drop-shadow-md select-none transition-colors duration-500';
+                        label.textContent = timeStr;
+                        
+                        block.appendChild(label);
+                        container.appendChild(block);
+                    }
+
+                    // Render Break Highlights
+                    const durationMs = endMs - startMs;
+                    shiftBreaks.forEach((brk, index) => {
+                        if(brk.startMs >= startMs && brk.endMs <= endMs) {
+                            const startPct = ((brk.startMs - startMs) / durationMs) * 100;
+                            const widthPct = ((brk.endMs - brk.startMs) / durationMs) * 100;
+                            
+                            const pad = (n) => String(n).padStart(2, '0');
+                            const sDate = new Date(brk.startMs);
+                            const eDate = new Date(brk.endMs);
+                            const breakTimeStr = `${pad(sDate.getHours())}:${pad(sDate.getMinutes())} - ${pad(eDate.getHours())}:${pad(eDate.getMinutes())}`;
+                            
+                            const marker = document.createElement('div');
+                            marker.className = 'break-marker absolute top-0 bottom-0 bg-yellow-400/30 hover:bg-yellow-400/50 border-x border-yellow-400/50 z-30 flex items-center justify-center overflow-hidden backdrop-blur-sm transition-colors cursor-help';
+                            marker.style.left = `${startPct}%`;
+                            marker.style.width = `${widthPct}%`;
+                            marker.title = `Break: ${breakTimeStr}`;
+                            marker.innerHTML = `
+                                <span class="text-xs filter drop-shadow-md opacity-90 hidden sm:inline-block pointer-events-none">☕</span>
+                            `;
+                            container.appendChild(marker);
+                        }
+                    });
+                }
+
+                function updateVibeUI(index) {
+                    const vibe = shiftVibes[index % shiftVibes.length];
+
+                    // Main View Vibe
+                    const mTitle = document.getElementById('current-hour-title');
+                    const mIcon = document.getElementById('current-hour-icon');
+                    const mDesc = document.getElementById('current-hour-content');
+                    if(mTitle) mTitle.textContent = vibe.title;
+                    if(mIcon) mIcon.textContent = vibe.icon;
+                    if(mDesc) mDesc.innerHTML = `<p>${vibe.desc}</p>`;
+
+                    // Dashboard Vibe
+                    const dTitle = document.getElementById('dash-vibe-title');
+                    const dIcon = document.getElementById('dash-vibe-icon');
+                    const dTask = document.getElementById('dash-vibe-task');
+                    if(dTitle) dTitle.textContent = vibe.title;
+                    if(dIcon) dIcon.textContent = vibe.icon;
+                    if(dTask) dTask.textContent = vibe.desc;
+
+                    // Breach List Vibe
+                    const bTitle = document.getElementById('breach-vibe-title');
+                    const bIcon = document.getElementById('breach-vibe-icon');
+                    const bTask = document.getElementById('breach-vibe-task');
+                    if(bTitle) bTitle.textContent = vibe.title;
+                    if(bIcon) bIcon.textContent = vibe.icon;
+                    if(bTask) bTask.textContent = vibe.desc;
+
+                    // Update Timeline Blocks
+                    for (let i = 0; i < totalSegments; i++) {
+                        const block = document.getElementById(`timeline-block-${i}`);
+                        if (!block) continue;
+                        const label = block.querySelector('span');
+                        
+                        if (i < index) {
+                            block.className = 'flex-1 border-r border-white/5 bg-teal-500/20 transition-all duration-500 relative flex items-center justify-center overflow-hidden'; 
+                            if(label) label.className = 'text-[10px] sm:text-xs font-mono font-bold text-teal-200/50 z-20 pointer-events-none drop-shadow-md select-none transition-colors';
+                        } else if (i === index) {
+                            block.className = 'flex-1 border-r border-teal-400/50 bg-teal-400/50 shadow-[0_0_15px_rgba(45,212,191,0.5)] z-10 transition-all duration-500 relative flex items-center justify-center overflow-hidden'; 
+                            if(label) label.className = 'text-[10px] sm:text-xs font-mono font-black text-white z-20 pointer-events-none drop-shadow-lg scale-110 transition-all select-none';
+                        } else {
+                            block.className = 'flex-1 border-r border-white/5 bg-transparent transition-all duration-500 relative flex items-center justify-center overflow-hidden';
+                            if(label) label.className = 'text-[10px] sm:text-xs font-mono font-bold text-white/60 z-20 pointer-events-none drop-shadow-md select-none transition-colors';
+                        }
+                    }
+                }
+
+                function updateDisplays(h, m, s, progress) {
+                    const pad = (n) => String(n).padStart(2, '0');
+                    
+                    const displays = [
+                        ['shift-hours-display', 'shift-minutes-display', 'shift-seconds-display'],
+                        ['dash-mini-timer-h', 'dash-mini-timer-m', 'dash-mini-timer-s'],
+                        ['breach-mini-timer-h', 'breach-mini-timer-m', 'breach-mini-timer-s']
+                    ];
+
+                    displays.forEach(ids => {
+                        const hEl = document.getElementById(ids[0]);
+                        const mEl = document.getElementById(ids[1]);
+                        const sEl = document.getElementById(ids[2]);
+                        if(hEl) hEl.textContent = pad(h);
+                        if(mEl) mEl.textContent = pad(m);
+                        if(sEl) sEl.textContent = pad(s);
+                    });
+
+                    const progPercent = `${Math.min(100, Math.max(0, progress * 100))}%`;
+                    ['dash-mini-timer-progress', 'breach-mini-timer-progress'].forEach(id => {
+                        const progEl = document.getElementById(id);
+                        if(progEl) progEl.style.width = progPercent;
+                    });
+                }
+
+                function tick() {
+                    const now = new Date().getTime();
+                    const remaining = endTime - now;
+
+                    if (remaining <= 0) {
+                        clearInterval(shiftInterval);
+                        updateDisplays(0, 0, 0, 1);
+                        if(endMessage) endMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((remaining % (1000 * 60)) / 1000);
+                    
+                    const elapsed = now - startTimeValue;
+                    const progress = elapsed / totalDuration;
+
+                    updateDisplays(h, m, s, progress);
+
+                    // Update Vibe and Timeline
+                    let newIndex = Math.floor(progress * totalSegments);
+                    if (newIndex >= totalSegments) newIndex = totalSegments - 1;
+                    if (newIndex < 0) newIndex = 0;
+
+                    if (newIndex !== currentVibeIndex) {
+                        currentVibeIndex = newIndex;
+                        updateVibeUI(currentVibeIndex);
+                    }
+                }
+
                 if(!startBtn) return;
+                
                 startBtn.addEventListener('click', () => {
-                    document.getElementById('shift-setup').classList.add('hidden');
-                    document.getElementById('shift-countdown-display').classList.remove('hidden');
+                    const startVal = startInput.value;
+                    const endVal = endInput.value;
+                    
+                    if(!startVal || !endVal) {
+                        if(typeof showAlert === 'function') showAlert("Please set shift start and end times.");
+                        else alert("Please set shift start and end times.");
+                        return;
+                    }
+
+                    startTimeValue = new Date(startVal).getTime();
+                    endTime = new Date(endVal).getTime();
+                    
+                    totalDuration = endTime - startTimeValue;
+                    
+                    if(totalDuration <= 0) {
+                        if(typeof showAlert === 'function') showAlert("End time must be after start time.");
+                        else alert("End time must be after start time.");
+                        return;
+                    }
+
+                    // Parse Breaks
+                    shiftBreaks = [];
+                    if(breaksContainer) {
+                        const rows = breaksContainer.querySelectorAll('.break-row');
+                        rows.forEach(row => {
+                            const sStr = row.querySelector('.break-start').value;
+                            const eStr = row.querySelector('.break-end').value;
+                            if(sStr && eStr) {
+                                const startMs = getAbsoluteTime(sStr, startTimeValue);
+                                const endMs = getAbsoluteTime(eStr, startTimeValue);
+                                if (endMs > startMs) {
+                                    shiftBreaks.push({ startMs, endMs });
+                                }
+                            }
+                        });
+                    }
+
+                    // Setup segments (1 segment per hour rounded up)
+                    totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
+                    renderTimeline(totalSegments, startTimeValue, endTime);
+                    currentVibeIndex = -1; // Reset to force UI update on first tick
+
+                    if(setupView) setupView.classList.add('hidden');
+                    if(countdownView) countdownView.classList.remove('hidden');
+                    if(endMessage) endMessage.classList.add('hidden');
+                    
+                    const endDateObj = new Date(endTime);
+                    const pad = (n) => String(n).padStart(2, '0');
+                    const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                    const dashEnd = document.getElementById('dash-mini-timer-end');
+                    const breachEnd = document.getElementById('breach-mini-timer-end');
+                    if(dashEnd) dashEnd.textContent = endStr;
+                    if(breachEnd) breachEnd.textContent = endStr;
+
+                    tick(); 
+                    clearInterval(shiftInterval);
+                    shiftInterval = setInterval(tick, 1000);
                 });
-                document.getElementById('reset-shift-btn')?.addEventListener('click', () => {
-                    document.getElementById('shift-countdown-display').classList.add('hidden');
-                    document.getElementById('shift-setup').classList.remove('hidden');
+
+                if(resetBtn) resetBtn.addEventListener('click', () => {
+                    clearInterval(shiftInterval);
+                    if(countdownView) countdownView.classList.add('hidden');
+                    if(setupView) setupView.classList.remove('hidden');
+                    updateDisplays(0, 0, 0, 0);
+                    
+                    const resets = [
+                        { t: 'dash-vibe-title', i: 'dash-vibe-icon', m: 'dash-vibe-task', sub: 'Start a shift to see your vibe.' },
+                        { t: 'breach-vibe-title', i: 'breach-vibe-icon', m: 'breach-vibe-task', sub: 'Start a shift to begin.' }
+                    ];
+
+                    resets.forEach(r => {
+                        const tEl = document.getElementById(r.t);
+                        const iEl = document.getElementById(r.i);
+                        const mEl = document.getElementById(r.m);
+                        if(tEl) tEl.textContent = "Offline";
+                        if(iEl) iEl.textContent = "💤";
+                        if(mEl) mEl.textContent = r.sub;
+                    });
+                });
+                
+                if(newShiftBtn) newShiftBtn.addEventListener('click', () => {
+                    if(endMessage) endMessage.classList.add('hidden');
+                    if(countdownView) countdownView.classList.add('hidden');
+                    if(setupView) setupView.classList.remove('hidden');
                 });
             }
 
