@@ -310,6 +310,8 @@
                         <a href="#" class="nav-link block text-xs p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" data-view="salary-calculator">Salary Calc</a>
                         <a href="#" class="nav-link block text-xs p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" data-view="overtime-tracker">Overtime</a>
                         <a href="#" class="nav-link block text-xs p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" data-view="ball-game">Break Game</a>
+                        <a href="#" class="nav-link block text-xs p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" data-view="call-log">Call Log</a>
+                        <a href="#" class="nav-link block text-xs p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" data-view="visit-request">Visit Request</a>
                     </div>
                 </div>
 
@@ -1145,6 +1147,143 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Call Log Generator -->
+                <div id="call-log" class="page-view container mx-auto px-6 py-10 max-w-7xl">
+                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Call Log Generator</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        
+                        <!-- LEFT: Command Deck -->
+                        <div class="lg:col-span-3 flex flex-col gap-6">
+                            <!-- Type Toggle -->
+                            <div class="bg-white dark:bg-gray-800 p-2 rounded-2xl flex gap-2 shadow-sm border border-slate-100 dark:border-slate-700">
+                                <button id="btn-type-inbound" class="flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.4)]"></span> INCOMING
+                                </button>
+                                <button id="btn-type-pd" class="flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all active bg-cyan-600 text-white shadow-lg">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.4)]"></span> PD CALL
+                                </button>
+                            </div>
+
+                            <!-- Main Controls -->
+                            <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl flex-1 flex flex-col shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div class="flex justify-between items-end mb-6">
+                                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2.5">
+                                        <span class="w-1 h-4 bg-cyan-500 rounded-full"></span> Select Scenario
+                                    </label>
+                                </div>
+                                
+                                <div id="scenario-buttons" class="grid grid-cols-2 gap-3 overflow-y-auto custom-scrollbar pr-2 pb-4">
+                                    <!-- Injected via JS -->
+                                </div>
+
+                                <div class="mt-4 pt-6 border-t border-slate-100 dark:border-slate-700">
+                                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2.5">
+                                        <span class="w-1 h-4 bg-indigo-500 rounded-full"></span> Additional Context
+                                    </label>
+                                    <textarea id="call-log-custom-details" class="w-full h-24 rounded-xl p-4 font-mono text-sm leading-relaxed border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-all" placeholder="Type details here to update log instantly..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Data Stream -->
+                        <div class="lg:col-span-2 flex flex-col h-full gap-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl flex-1 flex flex-col shadow-sm border border-slate-100 dark:border-slate-700 border-t-4 border-t-cyan-500">
+                                <div class="mb-8">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <label class="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest">Log Title</label>
+                                        <button id="copy-title-btn" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-cyan-100 hover:text-cyan-700 dark:hover:bg-cyan-900/50 dark:hover:text-cyan-400 transition-colors shadow-sm">Copy Title</button>
+                                    </div>
+                                    <input type="text" id="call-title-output" class="w-full rounded-xl p-4 font-mono text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 focus:outline-none" readonly placeholder="waiting_for_input...">
+                                </div>
+                                <div class="flex-1 flex flex-col min-h-[250px]">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <label class="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest">Log Contents</label>
+                                        <button id="copy-log-btn" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg shadow-cyan-500/20 transition-all flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg> Copy Log
+                                        </button>
+                                    </div>
+                                    <textarea id="log-output" class="w-full flex-1 rounded-xl p-4 font-mono text-sm leading-relaxed resize-none bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-300 focus:outline-none" placeholder="// Log will be generated here automatically..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Visit Request Generator -->
+                <div id="visit-request" class="page-view container mx-auto px-6 py-10 max-w-6xl">
+                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Visit Request</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- LEFT: Input Panel -->
+                        <div class="bg-white dark:bg-gray-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700">
+                            
+                            <!-- Equipment Type -->
+                            <div class="mb-8">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2.5">
+                                    <span class="w-1 h-4 bg-indigo-500 rounded-full"></span> Equipment Type
+                                </label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button id="vr-equip-rf" data-equip="RF" class="w-full py-4 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all">RF Unit</button>
+                                    <button id="vr-equip-gps" data-equip="GPS" class="w-full py-4 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all">GPS Tag</button>
+                                </div>
+                            </div>
+
+                            <!-- Curfew Settings -->
+                            <div class="mb-8">
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2.5">
+                                        <span class="w-1 h-4 bg-teal-500 rounded-full"></span> Curfew Settings
+                                    </label>
+                                    <div id="vr-no-curfew-container" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                        <input type="checkbox" id="vr-no-curfew" class="w-4 h-4 rounded text-teal-500 focus:ring-teal-500 cursor-pointer">
+                                        <label for="vr-no-curfew" class="text-xs font-bold text-slate-600 dark:text-slate-300 select-none uppercase cursor-pointer">No Curfew</label>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input type="time" id="vr-curfew-start" value="19:00" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 font-mono text-base focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all">
+                                    <input type="time" id="vr-curfew-end" value="07:00" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 font-mono text-base focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all">
+                                </div>
+                            </div>
+
+                            <!-- Reason for Visit -->
+                            <div class="mb-8 border-t border-slate-100 dark:border-slate-700 pt-6">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2.5">
+                                    <span class="w-1 h-4 bg-cyan-500 rounded-full"></span> Reason for Visit
+                                </label>
+                                <div id="vr-scenario-buttons" class="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-2 pb-2">
+                                    <!-- JS Injected -->
+                                </div>
+                            </div>
+
+                            <textarea id="vr-custom-details" class="w-full h-24 rounded-xl p-4 mb-6 text-sm font-mono border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="Additional notes for field officer..."></textarea>
+                            
+                            <button id="vr-generate-log-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 uppercase tracking-wide text-sm hover:bg-indigo-700 transition-all hover:scale-[1.01]">Generate Visit Log</button>
+                        </div>
+
+                        <!-- RIGHT: Output Panel -->
+                        <div class="bg-white dark:bg-gray-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col border-t-4 border-t-indigo-500">
+                            <div class="mb-8">
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Title Output</label>
+                                    <button id="vr-copy-title-btn" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-900/50 dark:hover:text-indigo-400 transition-colors shadow-sm">Copy</button>
+                                </div>
+                                <input type="text" id="vr-title-output" class="w-full rounded-xl p-4 font-mono text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 focus:outline-none" readonly placeholder="...">
+                            </div>
+                            <div class="flex-1 flex flex-col min-h-[250px]">
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Log Body</label>
+                                    <button id="vr-copy-log-btn" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 01-2-2V5"></path></svg> Copy Log
+                                    </button>
+                                </div>
+                                <textarea id="vr-log-output" class="w-full flex-1 rounded-xl p-4 font-mono text-sm leading-relaxed resize-none bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-300 focus:outline-none" placeholder="Generated log will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -1753,6 +1892,8 @@
                 setupBallGame(); 
                 setupShiftTimer();
                 setupSoundscapes();
+                setupCallLog();
+                setupVisitRequest();
                 dashboardInitialized = true;
             }
             
@@ -3847,6 +3988,373 @@
                 if (startBtn) startBtn.addEventListener('click', () => { if (!isPlaying) { isPlaying = true; x = canvas.width / 2; y = canvas.height - 30; dx = 3; dy = -3; score = 0; if (scoreDisplay) scoreDisplay.textContent = `Score: 0`; draw(); } });
                 if (resetBtn) resetBtn.addEventListener('click', () => { isPlaying = false; cancelAnimationFrame(animationId); ctx.clearRect(0, 0, canvas.width, canvas.height); x = canvas.width / 2; y = canvas.height - 30; paddleX = (canvas.width - paddleWidth) / 2; ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath(); ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath(); });
                 ctx.beginPath(); ctx.arc(x, y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#818cf8"; ctx.fill(); ctx.closePath(); ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#2dd4bf"; ctx.fill(); ctx.closePath();
+            }
+
+            function setupCallLog() {
+                const scenarios = {
+                    "Incoming Call": [
+                        "Out past curfew", 
+                        "Left home during curfew", 
+                        "DW called", 
+                        "Police called", 
+                        "Other called", 
+                        "Battery status", 
+                        "Equipment charger fault", 
+                        "Hospital", 
+                        "Visit enquiry", 
+                        "Other incident"
+                    ],
+                    "PD Call": [
+                        "Left home during the curfew", 
+                        "Out past curfew",             
+                        "Denied absence during curfew",
+                        "Denied Lateness for curfew",  
+                        "Other Answered",
+                        "Equipment tamper",
+                        "Equipment power off",
+                        "Other incident"
+                    ]
+                };
+                
+                const clContainer = document.getElementById('scenario-buttons');
+                let clState = { type: 'PD Call', event: null };
+                
+                function renderScenarioButtons() {
+                    if(!clContainer) return;
+                    clContainer.innerHTML = '';
+                    const events = scenarios[clState.type] || [];
+                    events.forEach((evt) => {
+                        const btn = document.createElement('button');
+                        const isSelected = clState.event === evt;
+                        
+                        btn.className = `w-full h-14 rounded-xl text-xs sm:text-sm font-bold transition-all uppercase tracking-wide flex items-center px-4 border ${
+                            isSelected 
+                            ? 'bg-cyan-50 dark:bg-cyan-900/30 border-cyan-400 text-cyan-700 dark:text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.2)] border-l-4' 
+                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-cyan-300 dark:hover:border-cyan-600 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10'
+                        }`;
+                        
+                        btn.textContent = evt;
+                        btn.addEventListener('click', () => {
+                            clState.event = evt;
+                            renderScenarioButtons(); 
+                            updateLogOutput();
+                        });
+                        clContainer.appendChild(btn);
+                    });
+                }
+
+                const btnInbound = document.getElementById('btn-type-inbound');
+                const btnPd = document.getElementById('btn-type-pd');
+
+                function updateCallTypeUI() {
+                    if (clState.type === "PD Call") {
+                        btnPd.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all active bg-cyan-600 text-white shadow-lg";
+                        btnInbound.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 bg-transparent";
+                    } else {
+                        btnInbound.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all active bg-emerald-500 text-white shadow-lg";
+                        btnPd.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 bg-transparent";
+                    }
+                }
+
+                if(btnInbound && btnPd) {
+                    btnInbound.addEventListener('click', () => {
+                        clState.type = "Incoming Call";
+                        clState.event = null;
+                        updateCallTypeUI();
+                        renderScenarioButtons();
+                        updateLogOutput();
+                    });
+                    btnPd.addEventListener('click', () => {
+                        clState.type = "PD Call";
+                        clState.event = null;
+                        updateCallTypeUI();
+                        renderScenarioButtons();
+                        updateLogOutput();
+                    });
+                }
+
+                const clCustomInput = document.getElementById('call-log-custom-details');
+                if(clCustomInput) clCustomInput.addEventListener('input', updateLogOutput);
+
+                function updateLogOutput() {
+                    const titleOut = document.getElementById('call-title-output');
+                    const logOut = document.getElementById('log-output');
+                    const customText = clCustomInput ? clCustomInput.value : '';
+
+                    if (!clState.event) {
+                        titleOut.value = '';
+                        logOut.value = '';
+                        return;
+                    }
+
+                    if (clState.event === 'Other incident') {
+                        titleOut.value = `${clState.type} - `;
+                    } else {
+                        titleOut.value = `${clState.type} - ${clState.event}`;
+                    }
+
+                    const pdCallTemplates = {
+                        "Equipment low battery": `Caller details: Device wearer\nRV's confirmed: Name, DOB, Address, Curfew hours\nAgent's statement: I advised that equipment is less than 10% and needs to be put on charge.\nCall Statement: DW advised that he'll put the tag on charge\nFollow up action: Call logged`,
+                        "Equipment power off": `Caller details: Device wearer \nRv's confirmed: Name, DOB, Address, Curfew hours\nAgents statement: I advised that the HMU was turned off and provided the time of the incident.\nCall Statement: DW advised about power loss in the property but it is now restored\nFollow up action: Call logged`,
+                        "Equipment charger fault": `Caller details: Device wearer\nRv's confirmed: Name, DOB, Address, Curfew hours\nCall Statement: DW advised that the equipment charger isn't working and needs a replacement\nAgent's statement: I advised that a charger replacement will be requested\nFollow up action: Call logged`,
+                        "Left home during the curfew": `Caller details: Device wearer\nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent's statement: I advised about the absence during curfew and incident time.\nCall Statement: DW advised that ${customText || ""}\nFollow up action: Call logged`,
+                        "Out past curfew": `Caller details: Device wearer\nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent's statement: I advised about the absence and absence time.\nCall statement: DW advised that ${customText || ""}\nFollow up action: Call logged`,
+                        "Other Answered": `Caller details: Other person\nRelationship to DW: \nCall Statement: Other person stated that ${customText || ""}\nAgent statement: I advised that the call will be documented\nFollow up action: Call logged`,
+                        "Denied absence during curfew": `Caller details: Device wearer \nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent statement: I advised about the absence during curfew and absence time.\nCall Statement: DW advised that he did not leave the property during curfew and was in the property.\nFollow up action: Call logged`,
+                        "Denied Lateness for curfew": `Caller details: Device wearer \nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent's statement: I advised about lateness for curfew and time.\nCall Statement: DW advised coming in on time for curfew and not late.\nFollow up action: Call logged`,
+                        "Equipment tamper": `Caller details: Device wearer\nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent's statement: I advised about Equipment tamper and time of the incident.\nCall Statement: DW advised that ${customText || ""}\nFollow up action: Call logged & Visit requested`,
+                        "Other incident": `Caller details: Device wearer \nRv's confirmed: Name, DOB, Address, Curfew hours\nAgent Statement: I advised \nCall Statement: DW stated that ${customText || ""}\nFollow up action: Call logged`
+                    };
+
+                    const incomingSpecificTemplates = {
+                        "Out past curfew": `Caller details: Device wearer called\nRv's confirmed: Name, DOB, Address, Curfew hours\nCall Statement: DW advised that ${customText || ""}\nAgent's statement: I advised that \nFollow up action: Call logged`,
+                        "Left home during curfew": `Caller details: Device wearer called\nRv's confirmed: Name, DOB, Address, Curfew hours\nCall Statement: DW advised that ${customText || ""}\nAgent's statement:  I advised that \nFollow up action: Call logged`,
+                        "Other incident": `Caller details: Device wearer called\nRv's confirmed: Name, DOB, Address, Curfew hours\nCaller Statement: DW advised that ${customText || ""}\nAgent's statement: I advised that the call will be documented\nFollow up action: Call logged`,
+                        "Other called": `Caller details: Other person called\nIdentity verification: Name, Address\nStatement: Other person stated that ${customText || ""}\nAgent's statement: I advised that the call will be documented\nFollow up action: Call logged`,
+                        "Battery status": `Caller details: Device wearer called\nRv's confirmed: Name, DOB, Address, Curfew hours\nCaller Statement: DW advised that he wanted to check the battery percentage\nAgent's statement: I advised about battery percentage and call will be documented \nFollow up action: Call logged`
+                    };
+
+                    const incomingTemplates = {
+                        "boilerplate": "Caller details: Device wearer called\nRv's confirmed: Name, DOB, Address, Curfew hours\nCaller Statement: {statement}\nAgent's statement: I advised that {advise}\nFollow up action: Call logged",
+                        "mappings": {
+                            "Returning call": { s: "DW advised that he is returning a call and has not left home during the curfew", a: "about the absence and the call will be documented" },
+                            "Equipment charger fault": { s: "DW advised that his equipment charger isn't working and he needs a replacement", a: "a new charger will be requested" },
+                            "Hospital": { s: "DW advised that he will be going to the hospital", a: "DW to get PW whilst at the hospital" },
+                            "Visit enquiry": { s: "DW advised that he wanted an update on his visit", a: "about the pending visit and the call will be documented" },
+                        }
+                    };
+
+                    const pdFallbackMappings = {
+                        "Equipment tamper": { s: "DW advised that the equipment has been tampered with", a: "the issue needs to be investigated" },
+                        "Denied absence during curfew": { s: "DW advised that he did not leave the property during curfew", a: "the absence will be documented" },
+                        "Denied Lateness for curfew": { s: "DW advised that he was not late for curfew", a: "the absence will be documented" },
+                        "Other incident": { s: `DW advised that ${customText || ""}`, a: "the call will be documented" }
+                    };
+
+                    // Selection Logic
+                    if (clState.type === "PD Call") {
+                        if (pdCallTemplates[clState.event]) {
+                            logOut.value = pdCallTemplates[clState.event];
+                        } else if (clState.event === "Other Answered") {
+                            logOut.value = `Caller details: Other person\nRelationship to DW: \nCall Statement: Other person stated that ${customText || ""}\nAgent statement: I advised that the call will be documented\nFollow up action: Call logged`;
+                        } else {
+                            const map = pdFallbackMappings[clState.event] || pdFallbackMappings["Other incident"];
+                            logOut.value = `Caller details: Device wearer answered\nRv's confirmed: Name, DOB, Address, Curfew hours\nCaller Statement: ${map.s}\nAgent's statement: I advised that ${map.a}\nFollow up action: Call logged`;
+                        }
+                    } else if (clState.type === "Incoming Call") {
+                        if (incomingSpecificTemplates[clState.event]) {
+                            logOut.value = incomingSpecificTemplates[clState.event];
+                        } else if (clState.event === "Police called") {
+                            logOut.value = `Caller details: Police officer called\nBadge Number: \nPolice station: \nRv's confirmed: Police Password confirmed\nCaller Statement: Police stated that ${customText || "[DETAILS]"}\nAgent's statement: I advised that the call will be documented\nFollow up action: Call logged`;
+                        } else {
+                            const map = incomingTemplates.mappings[clState.event] || incomingTemplates.mappings["Other incident"];
+                            logOut.value = incomingTemplates.boilerplate.replace('{statement}', map.s).replace('{advise}', map.a);
+                        }
+                    }
+                }
+
+                const copyCallTitleBtn = document.getElementById('copy-title-btn');
+                const copyCallLogBtn = document.getElementById('copy-log-btn');
+                
+                function copyData(inputEl, btnEl) {
+                    const text = inputEl.value;
+                    if(!text) return;
+                    
+                    const handleSuccess = () => {
+                        const originalHtml = btnEl.innerHTML;
+                        btnEl.innerHTML = '<span class="text-emerald-500 font-bold flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!</span>';
+                        setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
+                    };
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(handleSuccess).catch(() => {
+                            const temp = document.createElement('textarea');
+                            temp.value = text;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(temp);
+                            handleSuccess();
+                        });
+                    } else {
+                        const temp = document.createElement('textarea');
+                        temp.value = text;
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                        handleSuccess();
+                    }
+                }
+
+                if(copyCallTitleBtn) copyCallTitleBtn.addEventListener('click', () => copyData(document.getElementById('call-title-output'), copyCallTitleBtn));
+                if(copyCallLogBtn) copyCallLogBtn.addEventListener('click', () => copyData(document.getElementById('log-output'), copyCallLogBtn));
+
+                renderScenarioButtons();
+            }
+
+            function setupVisitRequest() {
+                const vrContainer = document.getElementById('vr-scenario-buttons');
+                const vrScenarios = ["Equipment Tamper", "Equipment Charger request", "Equipment Check", "Equipment Re-Range", "HMU replacement", "Strap too big", "Strap too small", "Consent Withdrawn", "Decom", "Install", "Equipment retrieval"];
+                let vrState = { equip: null, scenario: null };
+
+                // Render Scenario Buttons
+                if(vrContainer) {
+                    vrScenarios.forEach(sc => {
+                        const btn = document.createElement('button');
+                        btn.className = `w-full h-12 rounded-xl text-xs font-bold transition-all uppercase tracking-wide flex items-center justify-center px-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-cyan-300 dark:hover:border-cyan-600 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10 text-center`;
+                        btn.textContent = sc;
+                        btn.addEventListener('click', () => {
+                            // Reset other buttons
+                            Array.from(vrContainer.children).forEach(b => {
+                                b.classList.remove('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4');
+                                b.classList.add('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400');
+                            });
+                            // Select this button
+                            btn.classList.add('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4');
+                            btn.classList.remove('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400');
+                            
+                            vrState.scenario = sc;
+                        });
+                        vrContainer.appendChild(btn);
+                    });
+                }
+
+                // Equip Toggle
+                const btnRf = document.getElementById('vr-equip-rf');
+                const btnGps = document.getElementById('vr-equip-gps');
+
+                function updateEquipUI() {
+                    const activeClasses = ['bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-400', 'text-indigo-700', 'dark:text-indigo-300', 'border-l-4'];
+                    const inactiveClasses = ['border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-300'];
+
+                    if (vrState.equip === 'RF') {
+                        btnRf.classList.add(...activeClasses); btnRf.classList.remove(...inactiveClasses);
+                        btnGps.classList.remove(...activeClasses); btnGps.classList.add(...inactiveClasses);
+                    } else if (vrState.equip === 'GPS') {
+                        btnGps.classList.add(...activeClasses); btnGps.classList.remove(...inactiveClasses);
+                        btnRf.classList.remove(...activeClasses); btnRf.classList.add(...inactiveClasses);
+                    }
+
+                    const isGps = vrState.equip === 'GPS';
+                    document.getElementById('vr-curfew-start').disabled = !isGps;
+                    document.getElementById('vr-curfew-end').disabled = !isGps;
+                    
+                    const noCurfewContainer = document.getElementById('vr-no-curfew-container');
+                    if (noCurfewContainer) {
+                        if (isGps) {
+                            noCurfewContainer.classList.remove('hidden');
+                            noCurfewContainer.classList.add('flex');
+                        } else {
+                            noCurfewContainer.classList.add('hidden');
+                            noCurfewContainer.classList.remove('flex');
+                        }
+                    }
+                }
+
+                if(btnRf && btnGps) {
+                    btnRf.addEventListener('click', () => { vrState.equip = 'RF'; updateEquipUI(); });
+                    btnGps.addEventListener('click', () => { vrState.equip = 'GPS'; updateEquipUI(); });
+                }
+
+                document.getElementById('vr-no-curfew')?.addEventListener('change', (e) => {
+                    const disabled = e.target.checked;
+                    const startInput = document.getElementById('vr-curfew-start');
+                    const endInput = document.getElementById('vr-curfew-end');
+                    startInput.disabled = disabled;
+                    endInput.disabled = disabled;
+                    
+                    if (disabled) {
+                        startInput.classList.add('opacity-50', 'cursor-not-allowed');
+                        endInput.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        startInput.classList.remove('opacity-50', 'cursor-not-allowed');
+                        endInput.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                });
+
+                document.getElementById('vr-generate-log-btn')?.addEventListener('click', () => {
+                    if(!vrState.equip || !vrState.scenario) {
+                        // Using the built-in generic alert modal from MyndArc
+                        const alertModal = document.getElementById('alert-modal');
+                        const alertMessage = document.getElementById('alert-message');
+                        if(alertModal && alertMessage) {
+                            alertMessage.textContent = "Please select Equipment Type and Reason";
+                            alertModal.classList.remove('hidden');
+                            alertModal.classList.add('flex');
+                        } else {
+                            alert("Please select Equipment Type and Reason");
+                        }
+                        return;
+                    }
+
+                    let curfewText = 'NC';
+                    if (vrState.equip === 'GPS' && !document.getElementById('vr-no-curfew').checked) {
+                        curfewText = `${document.getElementById('vr-curfew-start').value}-${document.getElementById('vr-curfew-end').value}`;
+                    } else if (vrState.equip === 'RF') {
+                        curfewText = `${document.getElementById('vr-curfew-start').value}-${document.getElementById('vr-curfew-end').value}`;
+                    }
+
+                    const customDetails = document.getElementById('vr-custom-details').value;
+
+                    // Statements mapped
+                    const statements = {
+                        "Equipment Tamper": "DW advised a tamper on the equipment and the issue needs to be investigated.",
+                        "Equipment Charger request": "DW advised that the equipment charger is faulty and requires a replacement.",
+                        "Equipment Check": "DW advised that the tag keeps picking up as absence whilst in the property.",
+                        "Equipment Re-Range": "DW advised that the equipment keeps loosing signal whilst in the property.",
+                        "HMU replacement": "DW advised that his HMU is faulty and needs to be checked/replaced.",
+                        "Strap too big": "DW advised that equipment strap is too big and needs to be adjusted",
+                        "Strap too small": "DW advised that equipment strap is too small and needs to be adjusted",
+                        "Consent Withdrawn": "Consent withdrawn by Home owner, Equipment needs to be collected from the address.",
+                        "Decom": "Order ended, Equipment needs to be collected.",
+                        "Install": "New installation required for the device wearer.",
+                        "Equipment retrieval": "DW Order had ended and the equipment needs to be collected."
+                    };
+
+                    const title = `${vrState.scenario} - ${vrState.equip} - ${curfewText}`;
+                    const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: ${statements[vrState.scenario] || ""}${customDetails ? '\n\nNotes: ' + customDetails : ''}`;
+
+                    document.getElementById('vr-title-output').value = title;
+                    document.getElementById('vr-log-output').value = body;
+                });
+
+                // Reuse the same copy mechanism pattern
+                function copyVrData(inputEl, btnEl) {
+                    const text = inputEl.value;
+                    if(!text) return;
+                    
+                    const handleSuccess = () => {
+                        const originalHtml = btnEl.innerHTML;
+                        btnEl.innerHTML = '<span class="text-emerald-500 font-bold flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!</span>';
+                        setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
+                    };
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(handleSuccess).catch(() => {
+                            const temp = document.createElement('textarea');
+                            temp.value = text;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(temp);
+                            handleSuccess();
+                        });
+                    } else {
+                        const temp = document.createElement('textarea');
+                        temp.value = text;
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                        handleSuccess();
+                    }
+                }
+
+                const vrCopyTitle = document.getElementById('vr-copy-title-btn');
+                const vrCopyLog = document.getElementById('vr-copy-log-btn');
+                if(vrCopyTitle) vrCopyTitle.addEventListener('click', () => copyVrData(document.getElementById('vr-title-output'), vrCopyTitle));
+                if(vrCopyLog) vrCopyLog.addEventListener('click', () => copyVrData(document.getElementById('vr-log-output'), vrCopyLog));
             }
 
             // Restore previous state on load
