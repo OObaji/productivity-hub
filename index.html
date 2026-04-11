@@ -2569,7 +2569,16 @@
                         const blockItems = currentItems.filter(item => {
                             if (item.targetHour) return item.targetHour === hourKey;
                             return pad(new Date(item.createdAt).getHours()) === hourKey;
-                        }).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        }).sort((a,b) => {
+                            // Sort chronologically (oldest first) so they appear in the order added
+                            const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                            if (timeDiff !== 0) return timeDiff;
+                            
+                            // If they were pasted in the same batch (same millisecond), sort by their batch index
+                            const idxA = parseInt(a.id.split('-')[1] || 0);
+                            const idxB = parseInt(b.id.split('-')[1] || 0);
+                            return idxA - idxB;
+                        });
 
                         const blockDiv = document.createElement('div');
                         blockDiv.className = 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden transition-all duration-300 hover:shadow-md';
