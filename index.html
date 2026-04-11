@@ -2622,14 +2622,14 @@
                         
                         const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                         
-                        // Extract MON numbers if pasted together (e.g. MON10141353MON10118851)
-                        const monMatches = text.match(/MON\d+/gi);
+                        // Extract MON or EMS numbers if pasted together (e.g. EMS15169731EMS15169732)
+                        const matches = text.match(/(MON|EMS)\d+/gi);
                         
-                        if (monMatches && monMatches.length > 0) {
-                            monMatches.forEach((mon, index) => {
+                        if (matches && matches.length > 0) {
+                            matches.forEach((match, index) => {
                                 items.push({
                                     id: Date.now().toString() + '-' + index,
-                                    text: mon.toUpperCase(),
+                                    text: match.toUpperCase(),
                                     completed: false,
                                     createdAt: new Date().toISOString(),
                                     completedAt: null
