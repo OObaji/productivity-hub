@@ -2456,6 +2456,8 @@
             }
             
             function setupBreachList() {
+                const input = document.getElementById('new-breach-input');
+                const addBtn = document.getElementById('add-breach-btn');
                 const blocksContainer = document.getElementById('breach-blocks-container');
                 const hourlyCount = document.getElementById('breach-hourly-count');
                 const todayTotal = document.getElementById('breach-today-total');
@@ -2476,7 +2478,10 @@
                 }
                 
                 updateCurrentSessionHour();
-                setInterval(updateCurrentSessionHour, 60000); 
+                setInterval(() => {
+                    updateCurrentSessionHour();
+                    renderList(); // Automatically re-evaluate and shift blocks every minute
+                }, 60000); 
 
                 function renderList() {
                     const items = JSON.parse(localStorage.getItem('breachItems')) || [];
@@ -2497,6 +2502,7 @@
                     }
 
                     const now = new Date();
+                    const nowMs = now.getTime();
                     const actualShiftStart = new Date(now);
                     actualShiftStart.setHours(shiftStartHour, 0, 0, 0);
                     if (now.getHours() < shiftStartHour && shiftStartHour >= 12) {
@@ -2505,16 +2511,63 @@
 
                     const currentItems = items.filter(i => new Date(i.createdAt) >= actualShiftStart);
 
+                    // Pre-calculate block timestamps and determine current block
+                    let currentBlockIndex = -1;
+                    const blocksInfo = [];
                     for (let i = 0; i < shiftSegments; i++) {
-                        const hourVal = (shiftStartHour + i) % 24;
-                        const nextHourVal = (shiftStartHour + i + 1) % 24;
+                        const bStart = actualShiftStart.getTime() + i * 3600000;
+                        const bEnd = actualShiftStart.getTime() + (i + 1) * 3600000;
+                        const hVal = new Date(bStart).getHours();
+                        const hourKey = String(hVal).padStart(2, '0');
+                        blocksInfo.push({ i, bStart, bEnd, hourKey });
+                        
+                        if (nowMs >= bStart && nowMs < bEnd) {
+                            currentBlockIndex = i;
+                        }
+                    }
+
+                    // Clamp if outside of active hours
+                    if (currentBlockIndex === -1) {
+                        if (nowMs >= actualShiftStart.getTime() + shiftSegments * 3600000) {
+                            currentBlockIndex = shiftSegments - 1;
+                        } else {
+                            currentBlockIndex = 0;
+                        }
+                    }
+
+                    const activeHourKey = blocksInfo[currentBlockIndex].hourKey;
+                    let needsSave = false;
+
+                    // Migrate uncompleted past items
+                    currentItems.forEach(item => {
+                        if (!item.completed) {
+                            const itemHour = item.targetHour || String(new Date(item.createdAt).getHours()).padStart(2, '0');
+                            const itemBlockIndex = blocksInfo.findIndex(b => b.hourKey === itemHour);
+                            
+                            // If item is assigned to a block strictly in the past, move it forward
+                            if (itemBlockIndex !== -1 && itemBlockIndex < currentBlockIndex) {
+                                item.targetHour = activeHourKey;
+                                item.passedOn = true;
+                                needsSave = true;
+                            }
+                        }
+                    });
+
+                    if (needsSave) {
+                        localStorage.setItem('breachItems', JSON.stringify(items));
+                    }
+
+                    // Render only from current active hour to end of shift
+                    for (let i = currentBlockIndex; i < shiftSegments; i++) {
+                        const blockInfo = blocksInfo[i];
+                        const hourVal = new Date(blockInfo.bStart).getHours();
+                        const nextHourVal = new Date(blockInfo.bEnd).getHours();
                         const pad = n => String(n).padStart(2, '0');
                         const hourLabel = `${pad(hourVal)}:00 - ${pad(nextHourVal)}:00`;
-                        const hourKey = pad(hourVal);
+                        const hourKey = blockInfo.hourKey;
 
                         const blockItems = currentItems.filter(item => {
                             if (item.targetHour) return item.targetHour === hourKey;
-                            // Fallback for older items before hourKey was implemented
                             return pad(new Date(item.createdAt).getHours()) === hourKey;
                         }).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -2532,7 +2585,10 @@
                                             ${item.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
                                         </button>
                                         <div class="flex flex-col truncate flex-1 cursor-pointer copy-and-complete" data-id="${item.id}" data-text="${item.text}" title="Click to copy & mark as done">
-                                            <span class="text-[13px] font-bold ${item.completed ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} truncate transition-colors">${item.text}</span>
+                                            <div class="flex items-center gap-2 truncate">
+                                                ${item.passedOn && !item.completed ? '<span class="shrink-0 text-[9px] uppercase tracking-wider bg-rose-500/10 text-rose-500 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20 font-bold">Passed On</span>' : ''}
+                                                <span class="text-[13px] font-bold ${item.completed ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} truncate transition-colors">${item.text}</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -2550,7 +2606,7 @@
                         blockDiv.innerHTML = `
                             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/80 dark:bg-slate-800/80 flex justify-between items-center">
                                 <h4 class="font-bold text-slate-800 dark:text-slate-200 text-[13px] flex items-center gap-2.5">
-                                    <span class="w-2.5 h-2.5 rounded-full ${pad(now.getHours()) === hourKey ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-indigo-500'}"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full ${i === currentBlockIndex ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-indigo-500'}"></span>
                                     ${hourLabel}
                                 </h4>
                                 <span class="text-[11px] font-bold ${blockItems.length > 0 ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-900/40' : 'text-slate-400 bg-slate-200 dark:bg-slate-700'} px-2.5 py-1 rounded-md">${blockItems.length} items</span>
@@ -2605,7 +2661,7 @@
                                 renderBreachCompletionTable();
                                 renderBreachStats();
                             } else {
-                                const span = e.currentTarget.querySelector('span:first-child');
+                                const span = e.currentTarget.querySelector('.text-\\[13px\\]');
                                 if(span) {
                                     const originalText = span.textContent;
                                     span.textContent = 'Copied!';
@@ -2708,6 +2764,46 @@
                     }
                 }
 
+                if(addBtn && input) {
+                    addBtn.addEventListener('click', () => {
+                        const text = input.value.trim();
+                        if (!text) return;
+                        
+                        const items = JSON.parse(localStorage.getItem('breachItems')) || [];
+                        const matches = text.match(/(MON|EMS)\d+/gi);
+                        
+                        if (matches && matches.length > 0) {
+                            matches.forEach((match, index) => {
+                                items.push({
+                                    id: Date.now().toString() + '-' + index,
+                                    text: match.toUpperCase(),
+                                    completed: false,
+                                    createdAt: new Date().toISOString(),
+                                    completedAt: null
+                                });
+                            });
+                        } else {
+                            items.push({
+                                id: Date.now().toString(),
+                                text: text,
+                                completed: false,
+                                createdAt: new Date().toISOString(),
+                                completedAt: null
+                            });
+                        }
+
+                        localStorage.setItem('breachItems', JSON.stringify(items));
+                        input.value = '';
+                        
+                        renderList();
+                        renderBreachStats();
+                    });
+
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') addBtn.click();
+                    });
+                }
+
                 renderList();
             }
 
@@ -2719,7 +2815,6 @@
                     const isMonthly = document.querySelector('input[name="income-type"]:checked').value === 'monthly';
                     const annualGross = isMonthly ? gross * 12 : gross;
                     
-                    // Simple UK tax 2024/25 estimations
                     const allowance = 12570;
                     const taxable = Math.max(0, annualGross - allowance);
                     let tax = 0;
