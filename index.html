@@ -2570,6 +2570,11 @@
                             if (item.targetHour) return item.targetHour === hourKey;
                             return pad(new Date(item.createdAt).getHours()) === hourKey;
                         }).sort((a,b) => {
+                            // Sort uncompleted items to the top
+                            if (a.completed !== b.completed) {
+                                return a.completed ? 1 : -1;
+                            }
+                            
                             // Sort chronologically (oldest first) so they appear in the order added
                             const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                             if (timeDiff !== 0) return timeDiff;
@@ -2588,7 +2593,7 @@
                             itemsHtml = '<p class="text-xs text-center text-slate-400 py-8 italic">No breaches logged for this hour.</p>';
                         } else {
                             itemsHtml = blockItems.map(item => `
-                                <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 group transition-colors hover:border-indigo-200 dark:hover:border-indigo-800/50 hover:bg-white dark:hover:bg-slate-800">
+                                <div class="${item.completed ? 'completed-item' : 'uncompleted-item'} flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 group transition-colors hover:border-indigo-200 dark:hover:border-indigo-800/50 hover:bg-white dark:hover:bg-slate-800">
                                     <div class="flex items-center gap-3 flex-1 overflow-hidden">
                                         <button class="toggle-complete w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-500'}" data-id="${item.id}">
                                             ${item.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
@@ -2620,7 +2625,7 @@
                                 </h4>
                                 <span class="text-[11px] font-bold ${blockItems.length > 0 ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-900/40' : 'text-slate-400 bg-slate-200 dark:bg-slate-700'} px-2.5 py-1 rounded-md">${blockItems.length} items</span>
                             </div>
-                            <div class="p-4 flex-1 flex flex-col gap-2 min-h-[120px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <div class="hour-scroll-container p-4 flex-1 flex flex-col gap-2 min-h-[120px] max-h-[300px] overflow-y-auto custom-scrollbar" data-hour="${hourKey}">
                                 ${itemsHtml}
                             </div>
                             <div class="p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-gray-800">
@@ -2634,6 +2639,18 @@
                         blocksContainer.appendChild(blockDiv);
                     }
 
+                    function scrollToFirstUncompleted(hourKey) {
+                        setTimeout(() => {
+                            const scrollContainer = blocksContainer.querySelector(`.hour-scroll-container[data-hour="${hourKey}"]`);
+                            if (scrollContainer) {
+                                const firstUncompleted = scrollContainer.querySelector('.uncompleted-item');
+                                if (firstUncompleted) {
+                                    firstUncompleted.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                }
+                            }
+                        }, 50);
+                    }
+
                     // Attach Event Listeners for the generated blocks
                     blocksContainer.querySelectorAll('.toggle-complete').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -2641,12 +2658,14 @@
                             const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                             const idx = items.findIndex(i => i.id === id);
                             if (idx > -1) {
+                                const hourKeyToScroll = items[idx].targetHour || String(new Date(items[idx].createdAt).getHours()).padStart(2, '0');
                                 items[idx].completed = !items[idx].completed;
                                 items[idx].completedAt = items[idx].completed ? new Date().toISOString() : null;
                                 localStorage.setItem('breachItems', JSON.stringify(items));
                                 renderList();
                                 renderBreachCompletionTable();
                                 renderBreachStats();
+                                scrollToFirstUncompleted(hourKeyToScroll);
                             }
                         });
                     });
@@ -2663,12 +2682,14 @@
                             const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                             const idx = items.findIndex(i => i.id === id);
                             if (idx > -1 && !items[idx].completed) {
+                                const hourKeyToScroll = items[idx].targetHour || String(new Date(items[idx].createdAt).getHours()).padStart(2, '0');
                                 items[idx].completed = true;
                                 items[idx].completedAt = new Date().toISOString();
                                 localStorage.setItem('breachItems', JSON.stringify(items));
                                 renderList();
                                 renderBreachCompletionTable();
                                 renderBreachStats();
+                                scrollToFirstUncompleted(hourKeyToScroll);
                             } else {
                                 const span = e.currentTarget.querySelector('.text-\\[13px\\]');
                                 if(span) {
@@ -2715,35 +2736,56 @@
                             const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                             const matches = text.match(/(MON|EMS)\d+/gi);
                             
+                            let addedCount = 0;
+                            let dupCount = 0;
+                            
                             if (matches && matches.length > 0) {
                                 matches.forEach((match, index) => {
+                                    const upperMatch = match.toUpperCase();
+                                    if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
+                                        items.push({
+                                            id: Date.now().toString() + '-' + index,
+                                            text: upperMatch,
+                                            completed: false,
+                                            createdAt: new Date().toISOString(),
+                                            completedAt: null,
+                                            targetHour: hourKey
+                                        });
+                                        addedCount++;
+                                    } else {
+                                        dupCount++;
+                                    }
+                                });
+                            } else {
+                                const upperText = text.toUpperCase();
+                                if (!items.some(i => i.text.toUpperCase() === upperText)) {
                                     items.push({
-                                        id: Date.now().toString() + '-' + index,
-                                        text: match.toUpperCase(),
+                                        id: Date.now().toString(),
+                                        text: text,
                                         completed: false,
                                         createdAt: new Date().toISOString(),
                                         completedAt: null,
                                         targetHour: hourKey
                                     });
-                                });
-                            } else {
-                                items.push({
-                                    id: Date.now().toString(),
-                                    text: text,
-                                    completed: false,
-                                    createdAt: new Date().toISOString(),
-                                    completedAt: null,
-                                    targetHour: hourKey
-                                });
+                                    addedCount++;
+                                } else {
+                                    dupCount++;
+                                }
                             }
 
-                            localStorage.setItem('breachItems', JSON.stringify(items));
+                            if (dupCount > 0) showAlert(`${dupCount} duplicate item(s) skipped.`);
+
+                            if (addedCount > 0) {
+                                localStorage.setItem('breachItems', JSON.stringify(items));
+                                renderList();
+                                renderBreachStats();
+                            }
                             
-                            // Re-render and refocus input
-                            renderList();
-                            renderBreachStats();
                             const refreshedInput = document.querySelector(`.hourly-breach-input[data-hour="${hourKey}"]`);
-                            if(refreshedInput) refreshedInput.focus();
+                            if(refreshedInput) {
+                                refreshedInput.value = '';
+                                refreshedInput.focus();
+                            }
                         });
                     });
 
@@ -2781,31 +2823,50 @@
                         const items = JSON.parse(localStorage.getItem('breachItems')) || [];
                         const matches = text.match(/(MON|EMS)\d+/gi);
                         
+                        let addedCount = 0;
+                        let dupCount = 0;
+                        
                         if (matches && matches.length > 0) {
                             matches.forEach((match, index) => {
+                                const upperMatch = match.toUpperCase();
+                                if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
+                                    items.push({
+                                        id: Date.now().toString() + '-' + index,
+                                        text: upperMatch,
+                                        completed: false,
+                                        createdAt: new Date().toISOString(),
+                                        completedAt: null
+                                    });
+                                    addedCount++;
+                                } else {
+                                    dupCount++;
+                                }
+                            });
+                        } else {
+                            const upperText = text.toUpperCase();
+                            if (!items.some(i => i.text.toUpperCase() === upperText)) {
                                 items.push({
-                                    id: Date.now().toString() + '-' + index,
-                                    text: match.toUpperCase(),
+                                    id: Date.now().toString(),
+                                    text: text,
                                     completed: false,
                                     createdAt: new Date().toISOString(),
                                     completedAt: null
                                 });
-                            });
-                        } else {
-                            items.push({
-                                id: Date.now().toString(),
-                                text: text,
-                                completed: false,
-                                createdAt: new Date().toISOString(),
-                                completedAt: null
-                            });
+                                addedCount++;
+                            } else {
+                                dupCount++;
+                            }
                         }
 
-                        localStorage.setItem('breachItems', JSON.stringify(items));
-                        input.value = '';
+                        if (dupCount > 0) showAlert(`${dupCount} duplicate item(s) skipped.`);
+
+                        if (addedCount > 0) {
+                            localStorage.setItem('breachItems', JSON.stringify(items));
+                            renderList();
+                            renderBreachStats();
+                        }
                         
-                        renderList();
-                        renderBreachStats();
+                        input.value = '';
                     });
 
                     input.addEventListener('keypress', (e) => {
