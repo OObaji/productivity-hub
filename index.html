@@ -2465,15 +2465,35 @@
                 function updateCurrentSessionHour() {
                     const labelEl = document.getElementById('breach-current-hour-label');
                     if(labelEl) {
+                        let actualShiftStart = new Date();
+                        const startInput = document.getElementById('shift-start-time-input');
+                        
+                        if (startInput && startInput.value) {
+                            actualShiftStart = new Date(startInput.value);
+                        } else {
+                            actualShiftStart.setHours(19, 0, 0, 0);
+                        }
+
                         const now = new Date();
-                        const startHour = now.getHours();
-                        const endHour = (startHour + 1) % 24;
-                        const formatHour = (h) => {
-                            const ampm = h >= 12 ? 'pm' : 'am';
-                            const hr12 = h % 12 || 12;
-                            return `${String(hr12).padStart(2, '0')}:00${ampm}`;
-                        };
-                        labelEl.textContent = `${formatHour(startHour)} - ${formatHour(endHour)}`;
+                        let elapsedMs = now.getTime() - actualShiftStart.getTime();
+                        
+                        // Auto-adjust if the input is highly outdated relative to the current shift
+                        if (elapsedMs < 0 || elapsedMs > 24 * 3600000) {
+                            actualShiftStart = new Date();
+                            const shiftStartHour = startInput && startInput.value ? new Date(startInput.value).getHours() : 19;
+                            actualShiftStart.setHours(shiftStartHour, 0, 0, 0);
+                            if (now.getHours() < shiftStartHour && shiftStartHour >= 12) {
+                                actualShiftStart.setDate(actualShiftStart.getDate() - 1);
+                            }
+                            elapsedMs = now.getTime() - actualShiftStart.getTime();
+                        }
+
+                        const currentHourIndex = Math.max(0, Math.floor(elapsedMs / 3600000));
+                        const blockStart = new Date(actualShiftStart.getTime() + currentHourIndex * 3600000);
+                        const blockEnd = new Date(actualShiftStart.getTime() + (currentHourIndex + 1) * 3600000);
+
+                        const pad = (h) => String(h).padStart(2, '0');
+                        labelEl.textContent = `Hour ${currentHourIndex + 1} (${pad(blockStart.getHours())}:00 - ${pad(blockEnd.getHours())}:00)`;
                     }
                 }
                 
@@ -3145,6 +3165,14 @@
 
                 function updateVibeUI(index) {
                     const vibe = shiftVibes[index % shiftVibes.length];
+
+                    const blockStart = new Date(startTimeValue + index * 60 * 60 * 1000);
+                    const blockEnd = new Date(startTimeValue + (index + 1) * 60 * 60 * 1000);
+                    const pad = (n) => String(n).padStart(2, '0');
+                    const hourText = `Hour ${index + 1} (${pad(blockStart.getHours())}:00 - ${pad(blockEnd.getHours())}:00)`;
+                    
+                    const badge = document.getElementById('current-hour-badge');
+                    if(badge) badge.textContent = hourText;
 
                     // Main View Vibe
                     const mTitle = document.getElementById('current-hour-title');
