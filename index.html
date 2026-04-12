@@ -1004,7 +1004,7 @@
                     <!-- Breach Copilot -->
                     <div id="breach-copilot-container" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
                         <!-- Panel -->
-                        <div id="breach-copilot-panel" class="mb-4 bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 w-80 h-96 max-h-[60vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden">
+                        <div id="breach-copilot-panel" class="mb-4 bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 w-80 h-[30rem] max-h-[75vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden">
                             <div class="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 rounded-t-3xl flex justify-between items-center shrink-0">
                                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-[15px]">
                                     <span class="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center text-xs shadow-inner">🤖</span>
@@ -3574,15 +3574,16 @@
                     "NFA - No recent PW",
                     "NFA - Duplicate",
                     "NFA - Field Breached",
-                    "NFA - DW in Hospital"
+                    "NFA - DW in Hospital",
+                    "NFA - Incomplete visit"
                 ];
 
                 if (commentsList) {
                     commentsList.innerHTML = '';
                     quickComments.forEach(comment => {
                         const btn = document.createElement('button');
-                        btn.className = 'w-full text-left p-3.5 bg-white dark:bg-slate-700/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-100 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm group relative overflow-hidden';
-                        btn.innerHTML = `<span class="relative z-10">${comment}</span>`;
+                        btn.className = 'w-full text-left p-3.5 bg-white dark:bg-slate-700/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-100 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm group relative overflow-hidden shrink-0 min-h-[3rem]';
+                        btn.innerHTML = `<span class="relative z-10 block leading-tight">${comment}</span>`;
                         
                         btn.addEventListener('click', () => {
                             navigator.clipboard.writeText(comment).catch(() => {
