@@ -1126,13 +1126,13 @@
                     <!-- Breach Copilot -->
                     <div id="breach-copilot-container" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
                         <!-- Panel -->
-                        <div id="breach-copilot-panel" class="mb-4 bg-white dark:bg-slate-800 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 w-80 h-[30rem] max-h-[75vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden">
-                            <div class="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 rounded-t-3xl flex justify-between items-center shrink-0">
-                                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-[15px]">
-                                    <span class="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center text-xs shadow-inner">🤖</span>
+                        <div id="breach-copilot-panel" class="mb-4 bg-[#0b1120] rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-[#1e293b] w-80 h-[30rem] max-h-[75vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden overflow-hidden">
+                            <div class="p-5 border-b border-[#1e293b] bg-[#0f172a] flex justify-between items-center shrink-0">
+                                <h3 class="font-bold text-white flex items-center gap-2 text-[15px]">
+                                    <span class="w-6 h-6 rounded-full bg-[#0ea5e9]/20 flex items-center justify-center text-xs shadow-inner border border-[#0ea5e9]/50">🤖</span>
                                     Quick Comments
                                 </h3>
-                                <button id="close-copilot-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-200/50 dark:bg-slate-700 rounded-full p-1.5 transition-colors">
+                                <button id="close-copilot-btn" class="text-slate-400 hover:text-white bg-[#1e293b] rounded-full p-1.5 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
                             </div>
@@ -2879,34 +2879,78 @@
 
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
+                    { title: "Momentum", icon: "⚡", desc: "Build your rhythm. Handle quick wins and urgent comms." },
                     { title: "Deep Dive", icon: "🧠", desc: "Total focus. Tackle the most complex tasks now." },
-                    { title: "Momentum", icon: "⚡", desc: "Keep the energy high. Handle quick wins and comms." },
-                    { title: "The Grind", icon: "🧗", desc: "Push through the mid-shift wall. Hydrate and focus." },
-                    { title: "Admin Hour", icon: "📊", desc: "Process paperwork, update logs, and routine tasks." },
-                    { title: "Wrap Up", icon: "🌅", desc: "Tie up loose ends. Prepare handover and disconnect." }
+                    { title: "Flow State", icon: "🌊", desc: "You're in the zone. Keep distractions to a minimum." },
+                    { title: "The Grind", icon: "🧗", desc: "Push through the early wall. Stay hydrated and focused." },
+                    { title: "Halftime", icon: "🎯", desc: "Midway point. Reassess goals. Take a solid breather." },
+                    { title: "Second Wind", icon: "🌪️", desc: "Reset and recharge. Bring fresh energy to the back half." },
+                    { title: "Endurance", icon: "🛡️", desc: "Pace yourself. Steady, consistent output is key here." },
+                    { title: "Admin Push", icon: "📊", desc: "Process paperwork, update logs, clear the backlog." },
+                    { title: "Home Stretch", icon: "🏁", desc: "Almost there. Double-check your work for accuracy." },
+                    { title: "Wrap Up", icon: "🌅", desc: "Tie up loose ends. Prepare handover notes." },
+                    { title: "Disconnect", icon: "🔌", desc: "Final checks. Power down and transition to rest." }
                 ];
                 
-                let shiftVibes = JSON.parse(localStorage.getItem('customShiftVibes')) || JSON.parse(JSON.stringify(defaultVibes));
+                let shiftVibes = JSON.parse(localStorage.getItem('customShiftVibes'));
+                if (!shiftVibes || shiftVibes.length === 0) {
+                    shiftVibes = JSON.parse(JSON.stringify(defaultVibes));
+                } else if (shiftVibes.length < defaultVibes.length) {
+                    shiftVibes = shiftVibes.concat(defaultVibes.slice(shiftVibes.length));
+                    localStorage.setItem('customShiftVibes', JSON.stringify(shiftVibes));
+                }
 
                 const planModal = document.getElementById('shift-plan-modal');
                 const planInputsContainer = document.getElementById('plan-inputs-container');
                 
+                function addVibeRow(vibe, index) {
+                    const div = document.createElement('div');
+                    div.className = 'vibe-row p-4 bg-black/20 rounded-2xl border border-white/5 space-y-3 relative group';
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3 pr-8">
+                            <span class="phase-label text-xs font-bold text-slate-500 uppercase w-16 shrink-0">Phase ${index + 1}</span>
+                            <input type="text" class="vibe-icon w-12 text-center p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none" value="${vibe.icon}" placeholder="Icon">
+                            <input type="text" class="vibe-title flex-1 p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none font-bold" value="${vibe.title}" placeholder="Phase Title">
+                        </div>
+                        <input type="text" class="vibe-desc w-full p-2.5 rounded-xl bg-black/40 text-slate-300 border border-white/10 focus:border-indigo-500 focus:outline-none text-sm" value="${vibe.desc}" placeholder="Description / Task focus">
+                        <button class="remove-vibe-btn absolute top-4 right-4 text-slate-500 hover:text-rose-400 md:opacity-0 md:group-hover:opacity-100 transition-opacity" title="Remove Phase">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    `;
+                    div.querySelector('.remove-vibe-btn').addEventListener('click', () => {
+                        div.remove();
+                        const rows = planInputsContainer.querySelectorAll('.vibe-row');
+                        rows.forEach((row, i) => {
+                            row.querySelector('.phase-label').textContent = `Phase ${i + 1}`;
+                        });
+                    });
+                    
+                    const addBtn = planInputsContainer.querySelector('#add-new-vibe-btn');
+                    if (addBtn) {
+                        planInputsContainer.insertBefore(div, addBtn);
+                    } else {
+                        planInputsContainer.appendChild(div);
+                    }
+                }
+
                 function openVibeEditor() {
                     if (!planInputsContainer) return;
                     planInputsContainer.innerHTML = '';
+                    
+                    const addRowBtn = document.createElement('button');
+                    addRowBtn.id = "add-new-vibe-btn";
+                    addRowBtn.className = "w-full py-3 mt-2 border-2 border-dashed border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-300 rounded-2xl transition-all font-bold text-sm flex items-center justify-center gap-2";
+                    addRowBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add New Phase`;
+                    addRowBtn.onclick = () => {
+                        const currentIndex = planInputsContainer.querySelectorAll('.vibe-row').length;
+                        addVibeRow({ title: "New Phase", icon: "✨", desc: "Focus on the next objective." }, currentIndex);
+                    };
+                    planInputsContainer.appendChild(addRowBtn);
+
                     shiftVibes.forEach((vibe, index) => {
-                        const div = document.createElement('div');
-                        div.className = 'p-4 bg-black/20 rounded-2xl border border-white/5 space-y-3';
-                        div.innerHTML = `
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-bold text-slate-500 uppercase w-16">Phase ${index + 1}</span>
-                                <input type="text" class="vibe-icon w-12 text-center p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none" value="${vibe.icon}" placeholder="Icon">
-                                <input type="text" class="vibe-title flex-1 p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none font-bold" value="${vibe.title}" placeholder="Phase Title">
-                            </div>
-                            <input type="text" class="vibe-desc w-full p-2.5 rounded-xl bg-black/40 text-slate-300 border border-white/10 focus:border-indigo-500 focus:outline-none text-sm" value="${vibe.desc}" placeholder="Description / Task focus">
-                        `;
-                        planInputsContainer.appendChild(div);
+                        addVibeRow(vibe, index);
                     });
+
                     if (planModal) {
                         planModal.classList.remove('hidden');
                         planModal.classList.add('flex');
@@ -2922,16 +2966,15 @@
                 });
 
                 document.getElementById('save-plan-btn')?.addEventListener('click', () => {
-                    const icons = planInputsContainer.querySelectorAll('.vibe-icon');
-                    const titles = planInputsContainer.querySelectorAll('.vibe-title');
-                    const descs = planInputsContainer.querySelectorAll('.vibe-desc');
-                    
-                    shiftVibes = Array.from(icons).map((iconInput, i) => ({
-                        icon: iconInput.value || '✨',
-                        title: titles[i].value || `Phase ${i+1}`,
-                        desc: descs[i].value || ''
+                    const rows = planInputsContainer.querySelectorAll('.vibe-row');
+                    shiftVibes = Array.from(rows).map(row => ({
+                        icon: row.querySelector('.vibe-icon').value || '✨',
+                        title: row.querySelector('.vibe-title').value || 'Phase',
+                        desc: row.querySelector('.vibe-desc').value || ''
                     }));
                     
+                    if(shiftVibes.length === 0) shiftVibes = JSON.parse(JSON.stringify(defaultVibes));
+
                     localStorage.setItem('customShiftVibes', JSON.stringify(shiftVibes));
                     planModal.classList.add('hidden');
                     planModal.classList.remove('flex');
@@ -3490,10 +3533,13 @@
                     commentsList.innerHTML = '';
                     quickComments.forEach(comment => {
                         const btn = document.createElement('button');
-                        btn.className = 'w-full text-left p-3.5 bg-white dark:bg-slate-700/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-100 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors shadow-sm group relative overflow-hidden shrink-0 min-h-[3rem]';
-                        btn.innerHTML = `<span class="relative z-10 block leading-tight">${comment}</span>`;
+                        btn.className = 'w-full text-left px-4 py-3.5 bg-[#0f172a] hover:bg-[#1e293b] border border-[#1e293b] rounded-xl text-[13px] font-bold text-slate-300 hover:text-white transition-colors shadow-sm shrink-0 whitespace-normal break-words leading-snug';
+                        btn.innerHTML = `<span class="relative z-10 block">${comment}</span>`;
                         
                         btn.addEventListener('click', () => {
+                            if (btn.dataset.copied === 'true') return; // Prevent double-click bugs
+                            btn.dataset.copied = 'true';
+
                             navigator.clipboard.writeText(comment).catch(() => {
                                 const temp = document.createElement('textarea');
                                 temp.value = comment;
@@ -3503,13 +3549,13 @@
                                 document.body.removeChild(temp);
                             });
                             
-                            const originalHtml = btn.innerHTML;
-                            btn.innerHTML = `<span class="relative z-10 flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Copied!</span>`;
-                            btn.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                            btn.innerHTML = `<span class="relative z-10 flex items-center gap-2 text-[#4ade80]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Copied!</span>`;
+                            btn.classList.add('bg-[#4ade80]/10', 'border-[#4ade80]/30');
                             
                             setTimeout(() => {
-                                btn.innerHTML = originalHtml;
-                                btn.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'border-emerald-200', 'dark:border-emerald-800');
+                                btn.innerHTML = `<span class="relative z-10 block">${comment}</span>`;
+                                btn.classList.remove('bg-[#4ade80]/10', 'border-[#4ade80]/30');
+                                btn.dataset.copied = 'false';
                             }, 1500);
                         });
                         commentsList.appendChild(btn);
