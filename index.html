@@ -2499,13 +2499,23 @@
                             `).join('');
                         }
 
+                        const completedCount = blockItems.filter(item => item.completed).length;
+                        let badgeClass = 'text-slate-400 bg-slate-200 dark:bg-slate-700';
+                        if (blockItems.length > 0) {
+                            if (completedCount === blockItems.length) {
+                                badgeClass = 'text-emerald-600 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-900/40';
+                            } else {
+                                badgeClass = 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-900/40';
+                            }
+                        }
+
                         blockDiv.innerHTML = `
                             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/80 dark:bg-slate-800/80 flex justify-between items-center">
                                 <h4 class="font-bold text-slate-800 dark:text-slate-200 text-base md:text-lg flex items-center gap-3">
                                     <span class="w-3 h-3 rounded-full ${i === currentBlockIndex ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-indigo-500'}"></span>
                                     ${hourLabel}
                                 </h4>
-                                <span class="text-xs font-bold ${blockItems.length > 0 ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-900/40' : 'text-slate-400 bg-slate-200 dark:bg-slate-700'} px-3 py-1 rounded-md">${blockItems.length} items</span>
+                                <span class="text-xs font-bold ${badgeClass} px-3 py-1 rounded-md">${completedCount}/${blockItems.length} items</span>
                             </div>
                             <div class="hour-scroll-container p-4 flex-1 flex flex-col gap-2 min-h-[120px] max-h-[300px] overflow-y-auto custom-scrollbar" data-hour="${hourKey}">
                                 ${itemsHtml}
