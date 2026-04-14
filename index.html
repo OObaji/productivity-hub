@@ -146,6 +146,20 @@
         </div>
     </div>
 
+    <!-- Vibe Shift Modal -->
+    <div id="vibe-shift-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[200] hidden items-center justify-center p-4 transition-all">
+        <div class="bg-gradient-to-br from-slate-900 to-[#0b1120] rounded-[3rem] shadow-[0_0_80px_rgba(14,165,233,0.3)] p-12 w-full max-w-lg text-center border border-[#0ea5e9]/50 transform scale-100 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="text-7xl mb-6 animate-bounce filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" id="vibe-shift-icon">🚀</div>
+                <h2 id="vibe-shift-label" class="text-xl font-bold text-amber-400 uppercase tracking-widest mb-2">Vibe Changing in 60s</h2>
+                <h3 id="vibe-shift-title" class="text-5xl font-black text-white mb-6 tracking-tight">Ignition</h3>
+                <p id="vibe-shift-desc" class="text-xl text-slate-300 mb-10 leading-relaxed font-medium">Clear the deck. Review priorities. Set the pace.</p>
+                <button id="vibe-shift-ack-btn" class="w-full px-8 py-5 bg-[#0ea5e9] hover:bg-[#38bdf8] text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(56,189,248,0.6)] transition-all hover:scale-[1.02] focus:outline-none">Let's Go!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Principle Details Modal -->
     <div id="principle-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-lg text-left relative transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
@@ -2885,6 +2899,7 @@
                 let totalDuration;
                 let totalSegments = 0;
                 let currentVibeIndex = -1;
+                let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
 
                 const defaultVibes = [
@@ -3185,6 +3200,78 @@
                     }
                 }
 
+                function playVibeAlertSound() {
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const playBeep = (time, freq1, freq2) => {
+                            const osc1 = ctx.createOscillator();
+                            const osc2 = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            
+                            osc1.type = 'square';
+                            osc2.type = 'sawtooth';
+                            
+                            osc1.frequency.setValueAtTime(freq1, time);
+                            osc2.frequency.setValueAtTime(freq2, time);
+                            
+                            gain.gain.setValueAtTime(0.4, time); // Loud volume
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                            
+                            osc1.connect(gain);
+                            osc2.connect(gain);
+                            gain.connect(ctx.destination);
+                            
+                            osc1.start(time);
+                            osc2.start(time);
+                            osc1.stop(time + 0.3);
+                            osc2.stop(time + 0.3);
+                        };
+                        
+                        // Play a rapid, loud triple-chime sequence twice
+                        playBeep(ctx.currentTime, 659.25, 660); // E5
+                        playBeep(ctx.currentTime + 0.15, 880, 882); // A5
+                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050); // C6
+                        
+                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
+                        playBeep(ctx.currentTime + 0.85, 880, 882);
+                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
+                    } catch(e) { console.error('Audio context failed', e); }
+                }
+
+                const vibeModal = document.getElementById('vibe-shift-modal');
+                const vibeModalTitle = document.getElementById('vibe-shift-title');
+                const vibeModalDesc = document.getElementById('vibe-shift-desc');
+                const vibeModalIcon = document.getElementById('vibe-shift-icon');
+                const vibeModalLabel = document.getElementById('vibe-shift-label');
+                const vibeModalAckBtn = document.getElementById('vibe-shift-ack-btn');
+
+                if(vibeModalAckBtn) {
+                    vibeModalAckBtn.addEventListener('click', () => {
+                        vibeModal.classList.add('hidden');
+                        vibeModal.classList.remove('flex');
+                    });
+                }
+
+                function triggerVibeShiftAlert(index, isUpcoming = false) {
+                    const vibe = shiftVibes[index % shiftVibes.length];
+                    
+                    if (vibeModalTitle) vibeModalTitle.textContent = vibe.title;
+                    if (vibeModalDesc) vibeModalDesc.textContent = vibe.desc;
+                    if (vibeModalIcon) vibeModalIcon.textContent = vibe.icon;
+                    
+                    if(vibeModalLabel) {
+                        vibeModalLabel.textContent = isUpcoming ? "Vibe Changing in 60s" : "New Phase Activated";
+                        vibeModalLabel.className = isUpcoming ? "text-xl font-bold text-amber-400 uppercase tracking-widest mb-2" : "text-xl font-bold text-[#0ea5e9] uppercase tracking-widest mb-2";
+                    }
+
+                    if (vibeModal) {
+                        vibeModal.classList.remove('hidden');
+                        vibeModal.classList.add('flex');
+                    }
+                    
+                    playVibeAlertSound();
+                }
+
                 function updateDisplays(h, m, s, progress) {
                     const pad = (n) => String(n).padStart(2, '0');
                     
@@ -3235,8 +3322,24 @@
                     if (newIndex < 0) newIndex = 0;
 
                     if (newIndex !== currentVibeIndex) {
+                        const isInitialLoad = (currentVibeIndex === -1);
                         currentVibeIndex = newIndex;
                         updateVibeUI(currentVibeIndex);
+                        
+                        if (!isInitialLoad && nextVibeWarnedIndex !== currentVibeIndex) {
+                             triggerVibeShiftAlert(currentVibeIndex, false);
+                             nextVibeWarnedIndex = currentVibeIndex;
+                        }
+                    }
+
+                    // 60-second warning check for the next phase
+                    const msPerSegment = totalDuration / totalSegments;
+                    const currentSegmentEndMs = startTimeValue + (currentVibeIndex + 1) * msPerSegment;
+                    const msToNext = currentSegmentEndMs - now;
+
+                    if (msToNext <= 60000 && msToNext > 0 && currentVibeIndex < totalSegments - 1 && nextVibeWarnedIndex !== currentVibeIndex + 1) {
+                        nextVibeWarnedIndex = currentVibeIndex + 1;
+                        triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
                     }
                 }
 
@@ -3266,6 +3369,7 @@
                             totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
                             renderTimeline(totalSegments, startTimeValue, endTime);
                             currentVibeIndex = -1;
+                            nextVibeWarnedIndex = -1;
 
                             if(setupView) setupView.classList.add('hidden');
                             if(countdownView) countdownView.classList.remove('hidden');
@@ -3337,6 +3441,7 @@
                         totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
                         renderTimeline(totalSegments, startTimeValue, endTime);
                         currentVibeIndex = -1;
+                        nextVibeWarnedIndex = -1;
 
                         if(setupView) setupView.classList.add('hidden');
                         if(countdownView) countdownView.classList.remove('hidden');
