@@ -2638,14 +2638,16 @@
                             if (!text) return;
                             
                             const items = JSON.parse(localStorage.getItem('breachItems')) || [];
-                            const matches = text.match(/(MON|EMS)\d+/gi);
+                            // Advanced regex to extract ONLY the IDs even if buried in system text/names
+                            const matches = text.match(/(MON|EMS)\s*\d+/gi);
                             
                             let addedCount = 0;
                             let dupCount = 0;
                             
                             if (matches && matches.length > 0) {
                                 matches.forEach((match, index) => {
-                                    const upperMatch = match.toUpperCase();
+                                    // Remove spaces and uppercase to normalize (e.g. "ems 123" -> "EMS123")
+                                    const upperMatch = match.replace(/\s+/g, '').toUpperCase();
                                     if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
                                         items.push({
                                             id: Date.now().toString() + '-' + index,
@@ -2724,14 +2726,16 @@
                         if (!text) return;
                         
                         const items = JSON.parse(localStorage.getItem('breachItems')) || [];
-                        const matches = text.match(/(MON|EMS)\d+/gi);
+                        // Advanced regex to extract ONLY the IDs even if buried in system text/names
+                        const matches = text.match(/(MON|EMS)\s*\d+/gi);
                         
                         let addedCount = 0;
                         let dupCount = 0;
                         
                         if (matches && matches.length > 0) {
                             matches.forEach((match, index) => {
-                                const upperMatch = match.toUpperCase();
+                                // Remove spaces and uppercase to normalize
+                                const upperMatch = match.replace(/\s+/g, '').toUpperCase();
                                 if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
                                     items.push({
                                         id: Date.now().toString() + '-' + index,
