@@ -160,6 +160,20 @@
         </div>
     </div>
 
+    <!-- Break Alert Modal -->
+    <div id="break-alert-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[200] hidden items-center justify-center p-4 transition-all">
+        <div id="break-alert-bg" class="bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(currentColor_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none text-white"></div>
+            <div class="relative z-10">
+                <div class="text-7xl mb-6 animate-bounce filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" id="break-alert-icon">☕</div>
+                <h2 id="break-alert-label" class="text-xl font-bold text-emerald-400 uppercase tracking-widest mb-2">Break in 60s</h2>
+                <h3 id="break-alert-title" class="text-5xl font-black text-white mb-6 tracking-tight">Time to Rest</h3>
+                <p id="break-alert-desc" class="text-xl text-slate-300 mb-10 leading-relaxed font-medium">Wrap up your current task.</p>
+                <button id="break-alert-ack-btn" class="w-full px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] focus:outline-none">Got it!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Principle Details Modal -->
     <div id="principle-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-lg text-left relative transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
@@ -2905,6 +2919,8 @@
                 let currentVibeIndex = -1;
                 let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
+                let warnedBreaksStart = new Set();
+                let warnedBreaksEnd = new Set();
 
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
@@ -3256,6 +3272,14 @@
                     });
                 }
 
+                document.getElementById('break-alert-ack-btn')?.addEventListener('click', () => {
+                    const breakModal = document.getElementById('break-alert-modal');
+                    if (breakModal) {
+                        breakModal.classList.add('hidden');
+                        breakModal.classList.remove('flex');
+                    }
+                });
+
                 function triggerVibeShiftAlert(index, isUpcoming = false) {
                     const vibe = shiftVibes[index % shiftVibes.length];
                     
@@ -3273,6 +3297,40 @@
                         vibeModal.classList.add('flex');
                     }
                     
+                    playVibeAlertSound();
+                }
+
+                function triggerBreakAlert(type) {
+                    const modal = document.getElementById('break-alert-modal');
+                    const bg = document.getElementById('break-alert-bg');
+                    const icon = document.getElementById('break-alert-icon');
+                    const label = document.getElementById('break-alert-label');
+                    const title = document.getElementById('break-alert-title');
+                    const desc = document.getElementById('break-alert-desc');
+                    const btn = document.getElementById('break-alert-ack-btn');
+
+                    if (type === 'start') {
+                        bg.className = 'bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden';
+                        icon.textContent = '☕';
+                        label.textContent = 'Break Starting in 60s';
+                        label.className = 'text-xl font-bold text-emerald-400 uppercase tracking-widest mb-2';
+                        title.textContent = 'Get Ready to Rest';
+                        desc.textContent = 'Wrap up your current task. Recharge time is almost here.';
+                        btn.className = 'w-full px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] focus:outline-none';
+                    } else {
+                        bg.className = 'bg-gradient-to-br from-slate-900 to-rose-950 rounded-[3rem] shadow-[0_0_80px_rgba(244,63,94,0.3)] p-12 w-full max-w-lg text-center border border-rose-500/50 transform scale-100 relative overflow-hidden';
+                        icon.textContent = '⚡';
+                        label.textContent = 'Break Ending in 60s';
+                        label.className = 'text-xl font-bold text-rose-400 uppercase tracking-widest mb-2';
+                        title.textContent = 'Back to Action';
+                        desc.textContent = 'Time to get back in the zone. Prepare to resume your shift.';
+                        btn.className = 'w-full px-8 py-5 bg-rose-500 hover:bg-rose-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all hover:scale-[1.02] focus:outline-none';
+                    }
+
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
                     playVibeAlertSound();
                 }
 
@@ -3345,6 +3403,22 @@
                         nextVibeWarnedIndex = currentVibeIndex + 1;
                         triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
                     }
+
+                    // Break 60-second warning checks
+                    shiftBreaks.forEach((brk, index) => {
+                        const msToStart = brk.startMs - now;
+                        const msToEnd = brk.endMs - now;
+
+                        if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
+                            warnedBreaksStart.add(index);
+                            triggerBreakAlert('start');
+                        }
+
+                        if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
+                            warnedBreaksEnd.add(index);
+                            triggerBreakAlert('end');
+                        }
+                    });
                 }
 
                 function restoreActiveShift() {
@@ -3374,6 +3448,8 @@
                             renderTimeline(totalSegments, startTimeValue, endTime);
                             currentVibeIndex = -1;
                             nextVibeWarnedIndex = -1;
+                            warnedBreaksStart.clear();
+                            warnedBreaksEnd.clear();
 
                             if(setupView) setupView.classList.add('hidden');
                             if(countdownView) countdownView.classList.remove('hidden');
@@ -3446,6 +3522,8 @@
                         renderTimeline(totalSegments, startTimeValue, endTime);
                         currentVibeIndex = -1;
                         nextVibeWarnedIndex = -1;
+                        warnedBreaksStart.clear();
+                        warnedBreaksEnd.clear();
 
                         if(setupView) setupView.classList.add('hidden');
                         if(countdownView) countdownView.classList.remove('hidden');
@@ -3468,6 +3546,8 @@
                 if(resetBtn) resetBtn.addEventListener('click', () => {
                     clearInterval(shiftInterval);
                     localStorage.removeItem('activeShiftData');
+                    warnedBreaksStart.clear();
+                    warnedBreaksEnd.clear();
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
                     updateDisplays(0, 0, 0, 0);
