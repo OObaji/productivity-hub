@@ -683,7 +683,7 @@
                                                 <p class="text-[10px] text-gray-400 mt-0.5">Adds a 5m walk break every hour if gaps exist.</p>
                                             </div>
                                             <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
-                                                <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-green-400"/>
+                                                <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-green-400" checked/>
                                                 <label for="health-breaks-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
                                             </div>
                                         </div>
@@ -3300,7 +3300,7 @@
                     playVibeAlertSound();
                 }
 
-                function triggerBreakAlert(type) {
+                function triggerBreakAlert(type, isHealthBreak = false) {
                     const modal = document.getElementById('break-alert-modal');
                     const bg = document.getElementById('break-alert-bg');
                     const icon = document.getElementById('break-alert-icon');
@@ -3310,13 +3310,23 @@
                     const btn = document.getElementById('break-alert-ack-btn');
 
                     if (type === 'start') {
-                        bg.className = 'bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden';
-                        icon.textContent = '☕';
-                        label.textContent = 'Break Starting in 60s';
-                        label.className = 'text-xl font-bold text-emerald-400 uppercase tracking-widest mb-2';
-                        title.textContent = 'Get Ready to Rest';
-                        desc.textContent = 'Wrap up your current task. Recharge time is almost here.';
-                        btn.className = 'w-full px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] focus:outline-none';
+                        if (isHealthBreak) {
+                            bg.className = 'bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden';
+                            icon.textContent = '🧘';
+                            label.textContent = 'Health Break in 60s';
+                            label.className = 'text-xl font-bold text-emerald-400 uppercase tracking-widest mb-2';
+                            title.textContent = 'Time to Move';
+                            desc.textContent = 'Prepare to stand up, stretch your legs, and rest your eyes.';
+                            btn.className = 'w-full px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] focus:outline-none';
+                        } else {
+                            bg.className = 'bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden';
+                            icon.textContent = '☕';
+                            label.textContent = 'Break Starting in 60s';
+                            label.className = 'text-xl font-bold text-emerald-400 uppercase tracking-widest mb-2';
+                            title.textContent = 'Get Ready to Rest';
+                            desc.textContent = 'Wrap up your current task. Recharge time is almost here.';
+                            btn.className = 'w-full px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-[1.02] focus:outline-none';
+                        }
                     } else {
                         bg.className = 'bg-gradient-to-br from-slate-900 to-rose-950 rounded-[3rem] shadow-[0_0_80px_rgba(244,63,94,0.3)] p-12 w-full max-w-lg text-center border border-rose-500/50 transform scale-100 relative overflow-hidden';
                         icon.textContent = '⚡';
@@ -3404,6 +3414,71 @@
                         triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
                     }
 
+                    // Manage Active Break Display Overlay
+                    const activeBreak = shiftBreaks.find(b => now >= b.startMs && now < b.endMs);
+                    const breakDisplay = document.getElementById('break-active-display');
+                    const breakTimerLarge = document.getElementById('break-timer-large');
+                    const breakTitle = document.querySelector('#break-active-display h2');
+                    const breakDesc = document.querySelector('#break-active-display p');
+                    const breakIcon = document.querySelector('#break-active-display .w-32 span');
+
+                    if (activeBreak) {
+                        const breakRemaining = activeBreak.endMs - now;
+                        const bm = Math.floor(breakRemaining / 60000);
+                        const bs = Math.floor((breakRemaining % 60000) / 1000);
+                        const pad = n => String(n).padStart(2, '0');
+                        
+                        if (breakDisplay) {
+                            breakDisplay.classList.remove('hidden');
+                            breakDisplay.classList.add('flex');
+                        }
+                        if (breakTimerLarge) breakTimerLarge.textContent = `${pad(bm)}:${pad(bs)}`;
+                        
+                        if (activeBreak.isHealthBreak) {
+                            if (breakTitle) breakTitle.textContent = "Health Break";
+                            if (breakDesc) breakDesc.textContent = "Stand up, stretch your legs, and rest your eyes.";
+                            if (breakIcon) breakIcon.textContent = "🧘";
+                        } else {
+                            if (breakTitle) breakTitle.textContent = "Break Time";
+                            if (breakDesc) breakDesc.textContent = "Decompress. Hydrate. Move.";
+                            if (breakIcon) breakIcon.textContent = "☕";
+                        }
+                    } else {
+                        if (breakDisplay) {
+                            breakDisplay.classList.add('hidden');
+                            breakDisplay.classList.remove('flex');
+                        }
+                    }
+
+                    // Manage Next Break Countdown on Dashboard
+                    const nextBreakLabel = document.getElementById('next-break-time-label');
+                    const nextBreakCountdown = document.getElementById('time-to-next-break');
+                    const breachMiniBreak = document.getElementById('breach-mini-timer-break');
+                    
+                    const nextBreak = shiftBreaks.find(b => b.startMs > now);
+                    if (nextBreak) {
+                        const nextStart = new Date(nextBreak.startMs);
+                        const pad = n => String(n).padStart(2, '0');
+                        const timeStr = `${pad(nextStart.getHours())}:${pad(nextStart.getMinutes())}`;
+                        
+                        if (nextBreakLabel) nextBreakLabel.textContent = `at ${timeStr}`;
+                        if (breachMiniBreak) breachMiniBreak.textContent = timeStr;
+                        
+                        const msToNextBrk = nextBreak.startMs - now;
+                        const nh = Math.floor(msToNextBrk / 3600000);
+                        const nm = Math.floor((msToNextBrk % 3600000) / 60000);
+                        const ns = Math.floor((msToNextBrk % 60000) / 1000);
+                        
+                        if (nextBreakCountdown) {
+                            if (nh > 0) nextBreakCountdown.textContent = `${pad(nh)}:${pad(nm)}:${pad(ns)}`;
+                            else nextBreakCountdown.textContent = `${pad(nm)}:${pad(ns)}`;
+                        }
+                    } else {
+                        if (nextBreakLabel) nextBreakLabel.textContent = "No more breaks";
+                        if (nextBreakCountdown) nextBreakCountdown.textContent = "--:--";
+                        if (breachMiniBreak) breachMiniBreak.textContent = "--:--";
+                    }
+
                     // Break 60-second warning checks
                     shiftBreaks.forEach((brk, index) => {
                         const msToStart = brk.startMs - now;
@@ -3411,12 +3486,12 @@
 
                         if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
                             warnedBreaksStart.add(index);
-                            triggerBreakAlert('start');
+                            triggerBreakAlert('start', brk.isHealthBreak);
                         }
 
                         if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
                             warnedBreaksEnd.add(index);
-                            triggerBreakAlert('end');
+                            triggerBreakAlert('end', brk.isHealthBreak);
                         }
                     });
                 }
@@ -3506,19 +3581,40 @@
                                     const startMs = getAbsoluteTime(sStr, startTimeValue);
                                     const endMs = getAbsoluteTime(eStr, startTimeValue);
                                     if (endMs > startMs) {
-                                        shiftBreaks.push({ startMs, endMs });
+                                        shiftBreaks.push({ startMs, endMs, isHealthBreak: false });
                                     }
                                 }
                             });
                         }
                         
+                        totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
+
+                        // Generate Health Breaks if toggled
+                        const healthToggle = document.getElementById('health-breaks-toggle');
+                        if (healthToggle && healthToggle.checked) {
+                            for (let i = 0; i < totalSegments; i++) {
+                                const hStart = startTimeValue + i * 3600000;
+                                const hbStart = hStart + 50 * 60000; // 50 mins into the hour
+                                const hbEnd = hbStart + 5 * 60000; // 5 mins long
+                                
+                                if (hbEnd <= endTime) {
+                                    // Make sure it doesn't overlap with a manual break
+                                    const overlap = shiftBreaks.some(b => (hbStart < b.endMs && hbEnd > b.startMs));
+                                    if (!overlap) {
+                                        shiftBreaks.push({ startMs: hbStart, endMs: hbEnd, isHealthBreak: true });
+                                    }
+                                }
+                            }
+                        }
+                        
+                        shiftBreaks.sort((a, b) => a.startMs - b.startMs);
+
                         localStorage.setItem('activeShiftData', JSON.stringify({
                             startMs: startTimeValue,
                             endMs: endTime,
                             breaks: shiftBreaks
                         }));
 
-                        totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
                         renderTimeline(totalSegments, startTimeValue, endTime);
                         currentVibeIndex = -1;
                         nextVibeWarnedIndex = -1;
