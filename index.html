@@ -2788,7 +2788,6 @@
                             if (!text) return;
                             
                             const items = JSON.parse(localStorage.getItem('breachItems')) || [];
-                            // Advanced regex to extract ONLY the IDs even if buried in system text/names
                             const matches = text.match(/(MON|EMS)\s*\d+/gi);
                             
                             let addedCount = 0;
@@ -2796,7 +2795,6 @@
                             
                             if (matches && matches.length > 0) {
                                 matches.forEach((match, index) => {
-                                    // Remove spaces and uppercase to normalize (e.g. "ems 123" -> "EMS123")
                                     const upperMatch = match.replace(/\s+/g, '').toUpperCase();
                                     if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
                                         items.push({
@@ -2876,7 +2874,6 @@
                         if (!text) return;
                         
                         const items = JSON.parse(localStorage.getItem('breachItems')) || [];
-                        // Advanced regex to extract ONLY the IDs even if buried in system text/names
                         const matches = text.match(/(MON|EMS)\s*\d+/gi);
                         
                         let addedCount = 0;
@@ -2884,7 +2881,6 @@
                         
                         if (matches && matches.length > 0) {
                             matches.forEach((match, index) => {
-                                // Remove spaces and uppercase to normalize
                                 const upperMatch = match.replace(/\s+/g, '').toUpperCase();
                                 if (!items.some(i => i.text.toUpperCase() === upperMatch)) {
                                     items.push({
@@ -3507,50 +3503,98 @@
 
                 function tick() {
                     const now = new Date().getTime();
-                    const remaining = endTime - now;
 
-                    if (remaining <= 0) {
-                        clearInterval(shiftInterval);
-                        updateDisplays(0, 0, 0, 1);
-                        if(endMessage) endMessage.classList.remove('hidden');
-                        return;
-                    }
-
-                    const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((remaining % (1000 * 60)) / 1000);
-                    
-                    const elapsed = now - startTimeValue;
-                    const progress = elapsed / totalDuration;
-
-                    updateDisplays(h, m, s, progress);
-
-                    let newIndex = Math.floor(progress * totalSegments);
-                    if (newIndex >= totalSegments) newIndex = totalSegments - 1;
-                    if (newIndex < 0) newIndex = 0;
-
-                    if (newIndex !== currentVibeIndex) {
-                        const isInitialLoad = (currentVibeIndex === -1);
-                        currentVibeIndex = newIndex;
-                        updateVibeUI(currentVibeIndex);
+                    if (now < startTimeValue) {
+                        // PRE-SHIFT MODE: Countdown to start time
+                        const startsIn = startTimeValue - now;
+                        const h = Math.floor((startsIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((startsIn % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((startsIn % (1000 * 60)) / 1000);
                         
-                        if (!isInitialLoad && nextVibeWarnedIndex !== currentVibeIndex) {
-                             triggerVibeShiftAlert(currentVibeIndex, false);
-                             nextVibeWarnedIndex = currentVibeIndex;
+                        updateDisplays(h, m, s, 0);
+
+                        const dashEnd = document.getElementById('dash-mini-timer-end');
+                        const breachEnd = document.getElementById('breach-mini-timer-end');
+                        if(dashEnd && dashEnd.textContent !== "PRE-SHIFT") {
+                            dashEnd.textContent = "PRE-SHIFT";
+                            if(breachEnd) breachEnd.textContent = "PRE-SHIFT";
+                            
+                            const badge = document.getElementById('current-hour-badge');
+                            if(badge) badge.textContent = "STANDBY";
+                            
+                            const mTitle = document.getElementById('current-hour-title');
+                            const mIcon = document.getElementById('current-hour-icon');
+                            const mDesc = document.getElementById('current-hour-content');
+                            if(mTitle) mTitle.textContent = "Pre-Shift Prep";
+                            if(mIcon) mIcon.textContent = "⏳";
+                            if(mDesc) mDesc.innerHTML = `<p>Shift starts soon. Get your coffee, check your comms, and settle in.</p>`;
+
+                            const dTitle = document.getElementById('dash-vibe-title');
+                            const dIcon = document.getElementById('dash-vibe-icon');
+                            const dTask = document.getElementById('dash-vibe-task');
+                            if(dTitle) dTitle.textContent = "Pre-Shift Prep";
+                            if(dIcon) dIcon.textContent = "⏳";
+                            if(dTask) dTask.textContent = "Getting ready to start...";
+                        }
+                    } else {
+                        // NORMAL SHIFT MODE: Shift is active
+                        const remaining = endTime - now;
+
+                        if (remaining <= 0) {
+                            clearInterval(shiftInterval);
+                            updateDisplays(0, 0, 0, 1);
+                            if(endMessage) endMessage.classList.remove('hidden');
+                            return;
+                        }
+
+                        // Restore normal labels the second the shift actually starts
+                        const dashEnd = document.getElementById('dash-mini-timer-end');
+                        if (dashEnd && dashEnd.textContent === "PRE-SHIFT") {
+                            const endDateObj = new Date(endTime);
+                            const pad = (n) => String(n).padStart(2, '0');
+                            const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                            dashEnd.textContent = endStr;
+                            const breachEnd = document.getElementById('breach-mini-timer-end');
+                            if(breachEnd) breachEnd.textContent = endStr;
+                            currentVibeIndex = -1; // Force vibe update
+                        }
+
+                        const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((remaining % (1000 * 60)) / 1000);
+                        
+                        const elapsed = now - startTimeValue;
+                        const progress = elapsed / totalDuration;
+
+                        updateDisplays(h, m, s, progress);
+
+                        let newIndex = Math.floor(progress * totalSegments);
+                        if (newIndex >= totalSegments) newIndex = totalSegments - 1;
+                        if (newIndex < 0) newIndex = 0;
+
+                        if (newIndex !== currentVibeIndex) {
+                            const isInitialLoad = (currentVibeIndex === -1);
+                            currentVibeIndex = newIndex;
+                            updateVibeUI(currentVibeIndex);
+                            
+                            if (!isInitialLoad && nextVibeWarnedIndex !== currentVibeIndex) {
+                                 triggerVibeShiftAlert(currentVibeIndex, false);
+                                 nextVibeWarnedIndex = currentVibeIndex;
+                            }
+                        }
+
+                        // 60-second warning check for the next phase
+                        const msPerSegment = totalDuration / totalSegments;
+                        const currentSegmentEndMs = startTimeValue + (currentVibeIndex + 1) * msPerSegment;
+                        const msToNext = currentSegmentEndMs - now;
+
+                        if (msToNext <= 60000 && msToNext > 0 && currentVibeIndex < totalSegments - 1 && nextVibeWarnedIndex !== currentVibeIndex + 1) {
+                            nextVibeWarnedIndex = currentVibeIndex + 1;
+                            triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
                         }
                     }
 
-                    // 60-second warning check for the next phase
-                    const msPerSegment = totalDuration / totalSegments;
-                    const currentSegmentEndMs = startTimeValue + (currentVibeIndex + 1) * msPerSegment;
-                    const msToNext = currentSegmentEndMs - now;
-
-                    if (msToNext <= 60000 && msToNext > 0 && currentVibeIndex < totalSegments - 1 && nextVibeWarnedIndex !== currentVibeIndex + 1) {
-                        nextVibeWarnedIndex = currentVibeIndex + 1;
-                        triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
-                    }
-
-                    // Manage Active Break Display Overlay
+                    // Manage Active Break Display Overlay (runs in both modes)
                     const activeBreak = shiftBreaks.find(b => now >= b.startMs && now < b.endMs);
                     const breakDisplay = document.getElementById('break-active-display');
                     const breakTimerLarge = document.getElementById('break-timer-large');
@@ -3666,13 +3710,19 @@
                             if(countdownView) countdownView.classList.remove('hidden');
                             if(endMessage) endMessage.classList.add('hidden');
                             
-                            const endDateObj = new Date(endTime);
-                            const pad = (n) => String(n).padStart(2, '0');
-                            const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                            // Initialize dash text based on current time context
                             const dashEnd = document.getElementById('dash-mini-timer-end');
                             const breachEnd = document.getElementById('breach-mini-timer-end');
-                            if(dashEnd) dashEnd.textContent = endStr;
-                            if(breachEnd) breachEnd.textContent = endStr;
+                            if (now < startTimeValue) {
+                                if(dashEnd) dashEnd.textContent = "PRE-SHIFT";
+                                if(breachEnd) breachEnd.textContent = "PRE-SHIFT";
+                            } else {
+                                const endDateObj = new Date(endTime);
+                                const pad = (n) => String(n).padStart(2, '0');
+                                const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                                if(dashEnd) dashEnd.textContent = endStr;
+                                if(breachEnd) breachEnd.textContent = endStr;
+                            }
 
                             tick(); 
                             clearInterval(shiftInterval);
@@ -3684,6 +3734,25 @@
                     }
                     return false;
                 }
+
+                // --- Automatic Shift Detection System ---
+                function attemptAutoStartShift() {
+                    if (restoreActiveShift()) return; // Already running
+
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    
+                    // Trigger auto-shift if between 16:00 and 07:00 based on standard schedule
+                    if (currentHour >= 16 || currentHour < 7) {
+                        setTimes(19, 7); // Default logic to 19:00 - 07:00
+                        
+                        if (loadBreaksBtn) loadBreaksBtn.click(); // Load default breaks
+                        if (startBtn) startBtn.click(); // Trigger shift start securely
+                    }
+                }
+                
+                // Fire auto-start only once when dashboard fully initializes
+                setTimeout(attemptAutoStartShift, 1500);
 
                 if(!restoreActiveShift() && startBtn) {
                     startBtn.addEventListener('click', () => {
@@ -3761,13 +3830,20 @@
                         if(countdownView) countdownView.classList.remove('hidden');
                         if(endMessage) endMessage.classList.add('hidden');
                         
-                        const endDateObj = new Date(endTime);
-                        const pad = (n) => String(n).padStart(2, '0');
-                        const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                        // Set text labels depending on if we are in Pre-Shift or not
                         const dashEnd = document.getElementById('dash-mini-timer-end');
                         const breachEnd = document.getElementById('breach-mini-timer-end');
-                        if(dashEnd) dashEnd.textContent = endStr;
-                        if(breachEnd) breachEnd.textContent = endStr;
+                        const nowMs = Date.now();
+                        if (nowMs < startTimeValue) {
+                            if(dashEnd) dashEnd.textContent = "PRE-SHIFT";
+                            if(breachEnd) breachEnd.textContent = "PRE-SHIFT";
+                        } else {
+                            const endDateObj = new Date(endTime);
+                            const pad = (n) => String(n).padStart(2, '0');
+                            const endStr = `END: ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+                            if(dashEnd) dashEnd.textContent = endStr;
+                            if(breachEnd) breachEnd.textContent = endStr;
+                        }
 
                         tick(); 
                         clearInterval(shiftInterval);
@@ -3819,7 +3895,7 @@
                     ]
                 };
                 const clContainer = document.getElementById('scenario-buttons');
-                let clState = { type: 'PD Call', event: null };
+                let clState = { type: 'Incoming Call', event: null };
                 if(!clContainer) return;
                 
                 function renderScenarioButtons() {
@@ -3827,9 +3903,10 @@
                     (scenarios[clState.type] || []).forEach((evt) => {
                         const btn = document.createElement('button');
                         const isSelected = clState.event === evt;
-                        btn.className = `w-full h-14 rounded-xl text-xs sm:text-sm font-bold transition-all uppercase tracking-wide flex items-center px-4 border ${
-                            isSelected ? 'bg-cyan-50 dark:bg-cyan-900/30 border-cyan-400 text-cyan-700 dark:text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.2)] border-l-4' 
-                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-cyan-300 dark:hover:border-cyan-600 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10'
+                        btn.className = `w-full h-14 rounded-xl text-[11px] sm:text-xs font-bold transition-all uppercase tracking-wider flex items-center px-5 border text-left ${
+                            isSelected 
+                            ? 'bg-[#0ea5e9]/10 border-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.2)]' 
+                            : 'bg-[#0f172a] border-[#1e293b] text-slate-400 hover:border-[#0ea5e9]/50 hover:text-slate-200 shadow-sm'
                         }`;
                         btn.textContent = evt;
                         btn.addEventListener('click', () => { clState.event = evt; renderScenarioButtons(); updateLogOutput(); });
@@ -3841,11 +3918,11 @@
                 const btnPd = document.getElementById('btn-type-pd');
                 function updateCallTypeUI() {
                     if (clState.type === "PD Call") {
-                        btnPd.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all active bg-cyan-600 text-white shadow-lg";
-                        btnInbound.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 bg-transparent";
+                        btnPd.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all bg-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.4)]";
+                        btnInbound.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-400 hover:text-slate-200 bg-[#0f172a] border border-[#1e293b] hover:border-[#0ea5e9]/50";
                     } else {
-                        btnInbound.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all active bg-emerald-500 text-white shadow-lg";
-                        btnPd.className = "flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 bg-transparent";
+                        btnInbound.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all bg-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.4)]";
+                        btnPd.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-400 hover:text-slate-200 bg-[#0f172a] border border-[#1e293b] hover:border-[#0ea5e9]/50";
                     }
                 }
 
@@ -3872,12 +3949,15 @@
                         const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp);
                     });
                     const originalHtml = btnEl.innerHTML;
-                    btnEl.innerHTML = '<span class="text-emerald-500 font-bold flex items-center gap-1">Copied!</span>';
+                    btnEl.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1">Copied!</span>';
                     setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
                 };
 
                 document.getElementById('copy-title-btn')?.addEventListener('click', function() { copyData(document.getElementById('call-title-output'), this); });
                 document.getElementById('copy-log-btn')?.addEventListener('click', function() { copyData(document.getElementById('log-output'), this); });
+                
+                // Initialize default state
+                updateCallTypeUI();
                 renderScenarioButtons();
             }
 
