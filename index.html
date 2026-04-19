@@ -1237,7 +1237,68 @@
         </main>
     </div>
     
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let fbUser = null;
+
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        
+        onAuthStateChanged(auth, (user) => { fbUser = user; });
+        await initAuth();
+
+        // --- Cloud Storage Engine ---
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+        
+        window.syncToCloud = async function(username) {
+            if (!fbUser) return;
+            const dataToSave = {};
+            syncKeys.forEach(k => {
+                const val = localStorage.getItem(k);
+                if (val !== null) dataToSave[k] = val;
+            });
+            
+            try {
+                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
+                await setDoc(agentRef, { data: dataToSave }, { merge: true });
+            } catch (e) {
+                console.error("Cloud sync failed", e);
+            }
+        };
+
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            originalSetItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) window.syncToCloud(currentUser);
+            }
+        };
+
+        const originalRemoveItem = localStorage.removeItem;
+        localStorage.removeItem = function(key) {
+            originalRemoveItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) window.syncToCloud(currentUser);
+            }
+        };
+
+
         // ... (Existing NoiseGenerator Class logic - Unchanged) ...
         class NoiseGenerator {
             constructor() {
@@ -1690,6 +1751,10 @@
             alertCloseBtn.addEventListener('click', hideAlert);
             // --- End Modal Functions ---
 
+            // Custom events for Cloud sync reactivity
+            window.addEventListener('cloudDataSynced', () => {
+                if(typeof renderList === 'function') renderList();
+            });
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
@@ -1845,7 +1910,7 @@
                 dashboardInitialized = true;
             }
             
-            // --- Authentication Logic ---
+            // --- Authentication Logic with Cloud Storage Sync ---
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
             const toggleRegBtn = document.getElementById('toggle-register-btn');
@@ -1902,38 +1967,102 @@
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
                 navigateToView('dashboard-home');
+                
+                // Dispatch event so that scoped functions (timer, list) can react and reload cloud state
+                window.dispatchEvent(new Event('cloudDataSynced'));
             }
 
-            registerForm?.addEventListener('submit', (e) => {
+            registerForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('reg-username').value.trim();
+                const user = document.getElementById('reg-username').value.trim().toLowerCase();
                 const pass = document.getElementById('reg-password').value;
+                const err = document.getElementById('reg-error');
+                const btn = registerForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user]) {
-                    document.getElementById('reg-error').classList.remove('hidden');
-                } else {
-                    users[user] = pass;
-                    localStorage.setItem('myndarcUsers', JSON.stringify(users));
-                    document.getElementById('reg-error').classList.add('hidden');
-                    loginSuccess(user);
+                if (!window.fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Securing Credentials...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'data', 'agents', user);
+                    const snap = await window.getDoc(agentRef);
+                    
+                    if (snap.exists()) {
+                        err.textContent = "Username already exists.";
+                        err.classList.remove('hidden');
+                    } else {
+                        await window.setDoc(agentRef, { password: pass, data: {} });
+                        err.classList.add('hidden');
+                        
+                        // Clear any old local data
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        syncKeys.forEach(k => {
+                            if(typeof window.originalRemoveItem !== 'undefined') window.originalRemoveItem.call(localStorage, k);
+                        });
+                        
+                        loginSuccess(user);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Register";
+                btn.disabled = false;
             });
 
-            loginForm?.addEventListener('submit', (e) => {
+            loginForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('login-username').value.trim();
+                const user = document.getElementById('login-username').value.trim().toLowerCase();
                 const pass = document.getElementById('login-password').value;
+                const err = document.getElementById('login-error');
+                const btn = loginForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user] && users[user] === pass) {
-                    document.getElementById('login-error').classList.add('hidden');
-                    loginSuccess(user);
-                } else {
-                    document.getElementById('login-error').classList.remove('hidden');
+                if (!window.fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Authenticating...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'data', 'agents', user);
+                    const snap = await window.getDoc(agentRef);
+                    
+                    if (snap.exists() && snap.data().password === pass) {
+                        err.classList.add('hidden');
+                        
+                        // Load cloud data into localStorage silently
+                        const cloudData = snap.data().data || {};
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        
+                        syncKeys.forEach(k => {
+                            if (cloudData[k] !== undefined) {
+                                if(typeof window.originalSetItem !== 'undefined') window.originalSetItem.call(localStorage, k, cloudData[k]);
+                            } else {
+                                if(typeof window.originalRemoveItem !== 'undefined') window.originalRemoveItem.call(localStorage, k);
+                            }
+                        });
+                        
+                        loginSuccess(user);
+                    } else {
+                        err.textContent = "Invalid Username or Password.";
+                        err.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Login";
+                btn.disabled = false;
             });
 
             logoutBtn.addEventListener('click', (e) => {
@@ -3355,38 +3484,26 @@
                 function playVibeAlertSound() {
                     try {
                         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const playBeep = (time, freq1, freq2) => {
-                            const osc1 = ctx.createOscillator();
-                            const osc2 = ctx.createOscillator();
+                        const playBeep = (time) => {
+                            const osc = ctx.createOscillator();
                             const gain = ctx.createGain();
                             
-                            osc1.type = 'square';
-                            osc2.type = 'sawtooth';
+                            osc.type = 'sine'; // Clean, soft beep instead of harsh square/saw
+                            osc.frequency.setValueAtTime(800, time); // 800Hz pitch
                             
-                            osc1.frequency.setValueAtTime(freq1, time);
-                            osc2.frequency.setValueAtTime(freq2, time);
+                            gain.gain.setValueAtTime(0.2, time); // Much softer volume (was 0.4)
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3); // Quick fade out
                             
-                            gain.gain.setValueAtTime(0.4, time); // Loud volume
-                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-                            
-                            osc1.connect(gain);
-                            osc2.connect(gain);
+                            osc.connect(gain);
                             gain.connect(ctx.destination);
                             
-                            osc1.start(time);
-                            osc2.start(time);
-                            osc1.stop(time + 0.3);
-                            osc2.stop(time + 0.3);
+                            osc.start(time);
+                            osc.stop(time + 0.3);
                         };
                         
-                        // Play a rapid, loud triple-chime sequence twice
-                        playBeep(ctx.currentTime, 659.25, 660); // E5
-                        playBeep(ctx.currentTime + 0.15, 880, 882); // A5
-                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050); // C6
-                        
-                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
-                        playBeep(ctx.currentTime + 0.85, 880, 882);
-                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
+                        // Play a simple, gentle double-beep
+                        playBeep(ctx.currentTime);
+                        playBeep(ctx.currentTime + 0.3);
                     } catch(e) { console.error('Audio context failed', e); }
                 }
 
@@ -3736,6 +3853,7 @@
                 }
 
                 // --- Automatic Shift Detection System ---
+                // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
                 function attemptAutoStartShift() {
                     if (restoreActiveShift()) return; // Already running
 
@@ -3746,7 +3864,7 @@
                     if (currentHour >= 16 || currentHour < 7) {
                         setTimes(19, 7); // Default logic to 19:00 - 07:00
                         
-                        if (loadBreaksBtn) loadBreaksBtn.click(); // Load default breaks
+                        if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click(); // Load default breaks
                         if (startBtn) startBtn.click(); // Trigger shift start securely
                     }
                 }
