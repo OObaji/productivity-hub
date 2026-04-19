@@ -1259,12 +1259,11 @@
         }
         
         onAuthStateChanged(auth, (user) => { fbUser = user; });
-        await initAuth();
 
         // --- Cloud Storage Engine ---
         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
         
-        window.syncToCloud = async function(username) {
+        async function syncToCloud(username) {
             if (!fbUser) return;
             const dataToSave = {};
             syncKeys.forEach(k => {
@@ -1278,14 +1277,14 @@
             } catch (e) {
                 console.error("Cloud sync failed", e);
             }
-        };
+        }
 
         const originalSetItem = localStorage.setItem;
         localStorage.setItem = function(key, value) {
             originalSetItem.apply(this, arguments);
             if (syncKeys.includes(key)) {
                 const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) window.syncToCloud(currentUser);
+                if (currentUser) syncToCloud(currentUser);
             }
         };
 
@@ -1294,7 +1293,7 @@
             originalRemoveItem.apply(this, arguments);
             if (syncKeys.includes(key)) {
                 const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) window.syncToCloud(currentUser);
+                if (currentUser) syncToCloud(currentUser);
             }
         };
 
@@ -1718,7 +1717,9 @@
             }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const bootApp = async () => {
+            await initAuth(); // Wait for cloud authentication to initialize
+            
             const landingPage = document.getElementById('landing-page');
             const appLayout = document.getElementById('app-layout');
             const logoutBtn = document.getElementById('logout-btn');
@@ -1979,7 +1980,7 @@
                 const err = document.getElementById('reg-error');
                 const btn = registerForm.querySelector('button[type="submit"]');
                 
-                if (!window.fbUser) {
+                if (!fbUser) {
                     err.textContent = "Cloud connection initializing, please wait...";
                     err.classList.remove('hidden');
                     return;
@@ -1989,20 +1990,20 @@
                 btn.disabled = true;
 
                 try {
-                    const agentRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'data', 'agents', user);
-                    const snap = await window.getDoc(agentRef);
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
                     
                     if (snap.exists()) {
                         err.textContent = "Username already exists.";
                         err.classList.remove('hidden');
                     } else {
-                        await window.setDoc(agentRef, { password: pass, data: {} });
+                        await setDoc(agentRef, { password: pass, data: {} });
                         err.classList.add('hidden');
                         
                         // Clear any old local data
                         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
                         syncKeys.forEach(k => {
-                            if(typeof window.originalRemoveItem !== 'undefined') window.originalRemoveItem.call(localStorage, k);
+                            originalRemoveItem.call(localStorage, k);
                         });
                         
                         loginSuccess(user);
@@ -2023,7 +2024,7 @@
                 const err = document.getElementById('login-error');
                 const btn = loginForm.querySelector('button[type="submit"]');
                 
-                if (!window.fbUser) {
+                if (!fbUser) {
                     err.textContent = "Cloud connection initializing, please wait...";
                     err.classList.remove('hidden');
                     return;
@@ -2033,8 +2034,8 @@
                 btn.disabled = true;
 
                 try {
-                    const agentRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'data', 'agents', user);
-                    const snap = await window.getDoc(agentRef);
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
                     
                     if (snap.exists() && snap.data().password === pass) {
                         err.classList.add('hidden');
@@ -2045,9 +2046,9 @@
                         
                         syncKeys.forEach(k => {
                             if (cloudData[k] !== undefined) {
-                                if(typeof window.originalSetItem !== 'undefined') window.originalSetItem.call(localStorage, k, cloudData[k]);
+                                originalSetItem.call(localStorage, k, cloudData[k]);
                             } else {
-                                if(typeof window.originalRemoveItem !== 'undefined') window.originalRemoveItem.call(localStorage, k);
+                                originalRemoveItem.call(localStorage, k);
                             }
                         });
                         
@@ -4233,7 +4234,13 @@
                     navigateToView(lastView);
                 }
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootApp);
+        } else {
+            bootApp();
+        }
     </script>
 </body>
 </html>
