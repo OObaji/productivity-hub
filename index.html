@@ -273,8 +273,8 @@
             <!-- Login Form -->
             <form id="login-form" class="space-y-5 text-left">
                 <div>
-                    <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Username</label>
-                    <input type="text" id="login-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Username" required>
+                    <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Email address</label>
+                    <input type="email" id="login-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Email address" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Password</label>
@@ -285,18 +285,27 @@
                         </button>
                     </div>
                 </div>
-                <p id="login-error" class="text-rose-400 text-xs font-bold hidden text-center">Invalid Username or Password.</p>
+                <p id="login-error" class="text-rose-400 text-xs font-bold hidden text-center">Invalid Email address or Password.</p>
                 <button type="submit" class="w-full px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02] mt-2">Login</button>
-                <div class="text-center mt-4">
+                <div class="text-center mt-6 space-y-4">
                     <button type="button" id="toggle-register-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors">New user? <span class="text-indigo-400">Register</span></button>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="h-px bg-white/10 w-12"></div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">OR</span>
+                        <div class="h-px bg-white/10 w-12"></div>
+                    </div>
+                    <button type="button" id="guest-login-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 mx-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Continue as Guest
+                    </button>
                 </div>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" class="space-y-5 text-left hidden">
                 <div>
-                    <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Username</label>
-                    <input type="text" id="reg-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Username" required>
+                    <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Email address</label>
+                    <input type="email" id="reg-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Email address" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Password</label>
@@ -307,10 +316,19 @@
                         </button>
                     </div>
                 </div>
-                <p id="reg-error" class="text-rose-400 text-xs font-bold hidden text-center">Username already exists.</p>
+                <p id="reg-error" class="text-rose-400 text-xs font-bold hidden text-center">Email address already exists.</p>
                 <button type="submit" class="w-full px-8 py-4 bg-teal-600 text-white font-bold text-lg rounded-xl hover:bg-teal-500 transition-all shadow-lg hover:shadow-teal-500/30 hover:scale-[1.02] mt-2">Register</button>
-                <div class="text-center mt-4">
+                <div class="text-center mt-6 space-y-4">
                     <button type="button" id="toggle-login-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors">Already registered? <span class="text-teal-400">Login</span></button>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="h-px bg-white/10 w-12"></div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">OR</span>
+                        <div class="h-px bg-white/10 w-12"></div>
+                    </div>
+                    <button type="button" id="guest-reg-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 mx-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Continue as Guest
+                    </button>
                 </div>
             </form>
         </div>
@@ -1029,6 +1047,23 @@
                                     <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
                                 </button>
                             </div>
+
+                            <h2 class="text-xl font-bold mb-6 mt-8 pb-4 border-b border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white">Alerts & Notifications</h2>
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div>
+                                    <label for="notification-sound-select" class="font-bold text-lg text-slate-800 dark:text-slate-200 block">Notification Sound</label>
+                                    <p class="text-slate-500 text-sm mt-1">Choose the alarm tone for shift and break events.</p>
+                                </div>
+                                <div class="flex items-center gap-3 w-full md:w-auto">
+                                    <button id="test-sound-btn" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800/50">Test</button>
+                                    <select id="notification-sound-select" class="flex-1 md:w-48 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition-colors">
+                                        <option value="beep">Gentle Beep</option>
+                                        <option value="chime">Synth Chime (Loud)</option>
+                                        <option value="bell">Soft Bell</option>
+                                        <option value="digital">Digital Alert</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                       </div>
                 </div>
@@ -1237,7 +1272,67 @@
         </main>
     </div>
     
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let fbUser = null;
+
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        
+        onAuthStateChanged(auth, (user) => { fbUser = user; });
+
+        // --- Cloud Storage Engine ---
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound'];
+        
+        async function syncToCloud(username) {
+            if (!fbUser || username === 'guest') return;
+            const dataToSave = {};
+            syncKeys.forEach(k => {
+                const val = localStorage.getItem(k);
+                if (val !== null) dataToSave[k] = val;
+            });
+            
+            try {
+                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
+                await setDoc(agentRef, { data: dataToSave }, { merge: true });
+            } catch (e) {
+                console.error("Cloud sync failed", e);
+            }
+        }
+
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            originalSetItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) syncToCloud(currentUser);
+            }
+        };
+
+        const originalRemoveItem = localStorage.removeItem;
+        localStorage.removeItem = function(key) {
+            originalRemoveItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) syncToCloud(currentUser);
+            }
+        };
+
+
         // ... (Existing NoiseGenerator Class logic - Unchanged) ...
         class NoiseGenerator {
             constructor() {
@@ -1657,7 +1752,9 @@
             }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const bootApp = async () => {
+            await initAuth(); // Wait for cloud authentication to initialize
+            
             const landingPage = document.getElementById('landing-page');
             const appLayout = document.getElementById('app-layout');
             const logoutBtn = document.getElementById('logout-btn');
@@ -1690,6 +1787,96 @@
             alertCloseBtn.addEventListener('click', hideAlert);
             // --- End Modal Functions ---
 
+            // Global Notification Sound System
+            window.playVibeAlertSound = function() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const soundType = localStorage.getItem('shiftNotificationSound') || 'beep';
+
+                    if (soundType === 'chime') {
+                        const playBeep = (time, freq1, freq2) => {
+                            const osc1 = ctx.createOscillator();
+                            const osc2 = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc1.type = 'square';
+                            osc2.type = 'sawtooth';
+                            osc1.frequency.setValueAtTime(freq1, time);
+                            osc2.frequency.setValueAtTime(freq2, time);
+                            gain.gain.setValueAtTime(0.4, time);
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                            osc1.connect(gain);
+                            osc2.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc1.start(time);
+                            osc2.start(time);
+                            osc1.stop(time + 0.3);
+                            osc2.stop(time + 0.3);
+                        };
+                        playBeep(ctx.currentTime, 659.25, 660);
+                        playBeep(ctx.currentTime + 0.15, 880, 882);
+                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050);
+                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
+                        playBeep(ctx.currentTime + 0.85, 880, 882);
+                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
+                    } else if (soundType === 'bell') {
+                        const playBell = (time) => {
+                            const osc1 = ctx.createOscillator();
+                            const osc2 = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc1.type = 'sine';
+                            osc2.type = 'triangle';
+                            osc1.frequency.setValueAtTime(600, time);
+                            osc2.frequency.setValueAtTime(1200, time);
+                            gain.gain.setValueAtTime(0.5, time);
+                            gain.gain.exponentialRampToValueAtTime(0.001, time + 2.0);
+                            osc1.connect(gain);
+                            osc2.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc1.start(time);
+                            osc2.start(time);
+                            osc1.stop(time + 2.0);
+                            osc2.stop(time + 2.0);
+                        };
+                        playBell(ctx.currentTime);
+                        playBell(ctx.currentTime + 0.5);
+                    } else if (soundType === 'digital') {
+                        const playWatch = (time) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'square';
+                            osc.frequency.setValueAtTime(2000, time);
+                            gain.gain.setValueAtTime(0.1, time);
+                            gain.gain.setValueAtTime(0, time + 0.08);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(time);
+                            osc.stop(time + 0.08);
+                        };
+                        for(let i=0; i<4; i++) playWatch(ctx.currentTime + i*0.15);
+                    } else {
+                        // default 'beep'
+                        const playBeep = (time) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(800, time);
+                            gain.gain.setValueAtTime(0.2, time);
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(time);
+                            osc.stop(time + 0.3);
+                        };
+                        playBeep(ctx.currentTime);
+                        playBeep(ctx.currentTime + 0.3);
+                    }
+                } catch(e) { console.error('Audio context failed', e); }
+            };
+
+            // Custom events for Cloud sync reactivity
+            window.addEventListener('cloudDataSynced', () => {
+                if(typeof renderList === 'function') renderList();
+            });
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
@@ -1845,13 +2032,16 @@
                 dashboardInitialized = true;
             }
             
-            // --- Authentication Logic ---
+            // --- Authentication Logic with Cloud Storage Sync ---
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
             const toggleRegBtn = document.getElementById('toggle-register-btn');
             const toggleLoginBtn = document.getElementById('toggle-login-btn');
             const authTitle = document.getElementById('auth-title');
             const authSubtitle = document.getElementById('auth-subtitle');
+            
+            const guestLoginBtn = document.getElementById('guest-login-btn');
+            const guestRegBtn = document.getElementById('guest-reg-btn');
             
             const userInfoContainer = document.getElementById('user-info-container');
             const userIdDisplay = document.getElementById('user-id-display');
@@ -1871,6 +2061,15 @@
                     }
                 });
             });
+
+            const handleGuestLogin = () => {
+                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('reg-error').classList.add('hidden');
+                loginSuccess('guest');
+            };
+
+            guestLoginBtn?.addEventListener('click', handleGuestLogin);
+            guestRegBtn?.addEventListener('click', handleGuestLogin);
 
             toggleRegBtn?.addEventListener('click', () => {
                 loginForm.classList.add('hidden');
@@ -1902,38 +2101,102 @@
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
                 navigateToView('dashboard-home');
+                
+                // Dispatch event so that scoped functions (timer, list) can react and reload cloud state
+                window.dispatchEvent(new Event('cloudDataSynced'));
             }
 
-            registerForm?.addEventListener('submit', (e) => {
+            registerForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('reg-username').value.trim();
+                const user = document.getElementById('reg-username').value.trim().toLowerCase();
                 const pass = document.getElementById('reg-password').value;
+                const err = document.getElementById('reg-error');
+                const btn = registerForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user]) {
-                    document.getElementById('reg-error').classList.remove('hidden');
-                } else {
-                    users[user] = pass;
-                    localStorage.setItem('myndarcUsers', JSON.stringify(users));
-                    document.getElementById('reg-error').classList.add('hidden');
-                    loginSuccess(user);
+                if (!fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Securing Credentials...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
+                    
+                    if (snap.exists()) {
+                        err.textContent = "Email address already exists.";
+                        err.classList.remove('hidden');
+                    } else {
+                        await setDoc(agentRef, { password: pass, data: {} });
+                        err.classList.add('hidden');
+                        
+                        // Clear any old local data
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        syncKeys.forEach(k => {
+                            originalRemoveItem.call(localStorage, k);
+                        });
+                        
+                        loginSuccess(user);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Register";
+                btn.disabled = false;
             });
 
-            loginForm?.addEventListener('submit', (e) => {
+            loginForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('login-username').value.trim();
+                const user = document.getElementById('login-username').value.trim().toLowerCase();
                 const pass = document.getElementById('login-password').value;
+                const err = document.getElementById('login-error');
+                const btn = loginForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user] && users[user] === pass) {
-                    document.getElementById('login-error').classList.add('hidden');
-                    loginSuccess(user);
-                } else {
-                    document.getElementById('login-error').classList.remove('hidden');
+                if (!fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Authenticating...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
+                    
+                    if (snap.exists() && snap.data().password === pass) {
+                        err.classList.add('hidden');
+                        
+                        // Load cloud data into localStorage silently
+                        const cloudData = snap.data().data || {};
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        
+                        syncKeys.forEach(k => {
+                            if (cloudData[k] !== undefined) {
+                                originalSetItem.call(localStorage, k, cloudData[k]);
+                            } else {
+                                originalRemoveItem.call(localStorage, k);
+                            }
+                        });
+                        
+                        loginSuccess(user);
+                    } else {
+                        err.textContent = "Invalid Email address or Password.";
+                        err.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Login";
+                btn.disabled = false;
             });
 
             logoutBtn.addEventListener('click', (e) => {
@@ -2461,25 +2724,44 @@
                 const toggle = document.getElementById('theme-toggle');
                 const darkIcon = document.getElementById('theme-toggle-dark-icon');
                 const lightIcon = document.getElementById('theme-toggle-light-icon');
-                if(!toggle) return;
+                if(toggle) {
+                    if (document.documentElement.classList.contains('dark')) {
+                        lightIcon.classList.remove('hidden');
+                    } else {
+                        darkIcon.classList.remove('hidden');
+                    }
 
-                if (document.documentElement.classList.contains('dark')) {
-                    lightIcon.classList.remove('hidden');
-                } else {
-                    darkIcon.classList.remove('hidden');
+                    toggle.addEventListener('click', () => {
+                        darkIcon.classList.toggle('hidden');
+                        lightIcon.classList.toggle('hidden');
+                        if (document.documentElement.classList.contains('dark')) {
+                            document.documentElement.classList.remove('dark');
+                            localStorage.setItem('color-theme', 'light');
+                        } else {
+                            document.documentElement.classList.add('dark');
+                            localStorage.setItem('color-theme', 'dark');
+                        }
+                    });
                 }
 
-                toggle.addEventListener('click', () => {
-                    darkIcon.classList.toggle('hidden');
-                    lightIcon.classList.toggle('hidden');
-                    if (document.documentElement.classList.contains('dark')) {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    } else {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    }
-                });
+                // Notification Sound Settings
+                const soundSelect = document.getElementById('notification-sound-select');
+                const testBtn = document.getElementById('test-sound-btn');
+                
+                if(soundSelect) {
+                    soundSelect.value = localStorage.getItem('shiftNotificationSound') || 'beep';
+                    soundSelect.addEventListener('change', (e) => {
+                        localStorage.setItem('shiftNotificationSound', e.target.value);
+                    });
+                }
+                
+                if(testBtn) {
+                    testBtn.addEventListener('click', () => {
+                        if(typeof window.playVibeAlertSound === 'function') {
+                            window.playVibeAlertSound();
+                        }
+                    });
+                }
             }
             
             function setupBreachList() {
@@ -3352,44 +3634,6 @@
                     }
                 }
 
-                function playVibeAlertSound() {
-                    try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const playBeep = (time, freq1, freq2) => {
-                            const osc1 = ctx.createOscillator();
-                            const osc2 = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            
-                            osc1.type = 'square';
-                            osc2.type = 'sawtooth';
-                            
-                            osc1.frequency.setValueAtTime(freq1, time);
-                            osc2.frequency.setValueAtTime(freq2, time);
-                            
-                            gain.gain.setValueAtTime(0.4, time); // Loud volume
-                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-                            
-                            osc1.connect(gain);
-                            osc2.connect(gain);
-                            gain.connect(ctx.destination);
-                            
-                            osc1.start(time);
-                            osc2.start(time);
-                            osc1.stop(time + 0.3);
-                            osc2.stop(time + 0.3);
-                        };
-                        
-                        // Play a rapid, loud triple-chime sequence twice
-                        playBeep(ctx.currentTime, 659.25, 660); // E5
-                        playBeep(ctx.currentTime + 0.15, 880, 882); // A5
-                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050); // C6
-                        
-                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
-                        playBeep(ctx.currentTime + 0.85, 880, 882);
-                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
-                    } catch(e) { console.error('Audio context failed', e); }
-                }
-
                 const vibeModal = document.getElementById('vibe-shift-modal');
                 const vibeModalTitle = document.getElementById('vibe-shift-title');
                 const vibeModalDesc = document.getElementById('vibe-shift-desc');
@@ -3429,7 +3673,7 @@
                         vibeModal.classList.add('flex');
                     }
                     
-                    playVibeAlertSound();
+                    window.playVibeAlertSound();
                 }
 
                 function triggerBreakAlert(type, isHealthBreak = false) {
@@ -3473,7 +3717,7 @@
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
                     }
-                    playVibeAlertSound();
+                    window.playVibeAlertSound();
                 }
 
                 function updateDisplays(h, m, s, progress) {
@@ -3736,6 +3980,7 @@
                 }
 
                 // --- Automatic Shift Detection System ---
+                // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
                 function attemptAutoStartShift() {
                     if (restoreActiveShift()) return; // Already running
 
@@ -3746,7 +3991,7 @@
                     if (currentHour >= 16 || currentHour < 7) {
                         setTimes(19, 7); // Default logic to 19:00 - 07:00
                         
-                        if (loadBreaksBtn) loadBreaksBtn.click(); // Load default breaks
+                        if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click(); // Load default breaks
                         if (startBtn) startBtn.click(); // Trigger shift start securely
                     }
                 }
@@ -4115,7 +4360,13 @@
                     navigateToView(lastView);
                 }
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootApp);
+        } else {
+            bootApp();
+        }
     </script>
 </body>
 </html>
