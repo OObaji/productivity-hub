@@ -273,8 +273,8 @@
             <!-- Login Form -->
             <form id="login-form" class="space-y-5 text-left">
                 <div>
-                    <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Username</label>
-                    <input type="text" id="login-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Username" required>
+                    <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Email address</label>
+                    <input type="email" id="login-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Email address" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1.5 ml-1">Password</label>
@@ -285,18 +285,27 @@
                         </button>
                     </div>
                 </div>
-                <p id="login-error" class="text-rose-400 text-xs font-bold hidden text-center">Invalid Username or Password.</p>
+                <p id="login-error" class="text-rose-400 text-xs font-bold hidden text-center">Invalid Email address or Password.</p>
                 <button type="submit" class="w-full px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02] mt-2">Login</button>
-                <div class="text-center mt-4">
+                <div class="text-center mt-6 space-y-4">
                     <button type="button" id="toggle-register-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors">New user? <span class="text-indigo-400">Register</span></button>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="h-px bg-white/10 w-12"></div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">OR</span>
+                        <div class="h-px bg-white/10 w-12"></div>
+                    </div>
+                    <button type="button" id="guest-login-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 mx-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Continue as Guest
+                    </button>
                 </div>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" class="space-y-5 text-left hidden">
                 <div>
-                    <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Username</label>
-                    <input type="text" id="reg-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Username" required>
+                    <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Email address</label>
+                    <input type="email" id="reg-username" class="w-full p-3.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm placeholder-slate-500" placeholder="Enter Email address" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-teal-300 uppercase tracking-widest mb-1.5 ml-1">Password</label>
@@ -307,10 +316,19 @@
                         </button>
                     </div>
                 </div>
-                <p id="reg-error" class="text-rose-400 text-xs font-bold hidden text-center">Username already exists.</p>
+                <p id="reg-error" class="text-rose-400 text-xs font-bold hidden text-center">Email address already exists.</p>
                 <button type="submit" class="w-full px-8 py-4 bg-teal-600 text-white font-bold text-lg rounded-xl hover:bg-teal-500 transition-all shadow-lg hover:shadow-teal-500/30 hover:scale-[1.02] mt-2">Register</button>
-                <div class="text-center mt-4">
+                <div class="text-center mt-6 space-y-4">
                     <button type="button" id="toggle-login-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors">Already registered? <span class="text-teal-400">Login</span></button>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="h-px bg-white/10 w-12"></div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">OR</span>
+                        <div class="h-px bg-white/10 w-12"></div>
+                    </div>
+                    <button type="button" id="guest-reg-btn" class="text-slate-400 hover:text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 mx-auto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Continue as Guest
+                    </button>
                 </div>
             </form>
         </div>
@@ -379,17 +397,9 @@
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                     Breach List
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="call-log">
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                    Call Log
-                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="visit-request">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Visit Requests
-                </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="ems-info">
-                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    EMS Info
                 </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="idea-board">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21h6m-3-3v3m-5-8a5 5 0 1110 0c0 2.21-1.34 4-3 5.46V18H9v-.54C7.34 16 6 14.21 6 12z"></path></svg>
@@ -774,9 +784,6 @@
                                     <div class="flex items-center gap-4">
                                         <!-- Mode Toggle -->
                                         <div class="flex bg-slate-800/50 backdrop-blur-md rounded-xl p-1 border border-white/10">
-                                            <button id="shift-mode-call" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white flex items-center gap-2 border border-transparent">
-                                                <span>📞</span> Calls
-                                            </button>
                                             <button id="shift-mode-breach" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)] flex items-center gap-2">
                                                 <span>⚡</span> Breach
                                             </button>
@@ -870,117 +877,6 @@
                     </div>
                 </div>
 
-                <!-- EMS Information Directory -->
-                <div id="ems-info" class="page-view container mx-auto px-6 py-10 max-w-7xl">
-                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">EMS Tag Information</h1>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Overview -->
-                        <div class="lg:col-span-2 space-y-8">
-                            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700">
-                                <h2 class="text-2xl font-bold mb-6 text-slate-900 dark:text-white flex items-center gap-2"><span class="w-2 h-6 bg-indigo-500 rounded-full"></span> Tag Types</h2>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:border-indigo-300 transition-colors">
-                                        <h3 class="font-bold text-indigo-600 dark:text-indigo-400 mb-2">Radio Frequency (RF)</h3>
-                                        <p class="text-sm text-slate-600 dark:text-slate-400">Used strictly for curfew monitoring. Communicates with a Home Monitoring Unit (HMU). Triggers an absence if the tag leaves the HMU's range during curfew hours.</p>
-                                    </div>
-                                    <div class="p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:border-teal-300 transition-colors">
-                                        <h3 class="font-bold text-teal-600 dark:text-teal-400 mb-2">Global Positioning System (GPS)</h3>
-                                        <p class="text-sm text-slate-600 dark:text-slate-400">Provides 24/7 location tracking. Used to enforce exclusion zones (places the subject cannot go) or inclusion zones (places they must be). Requires daily charging.</p>
-                                    </div>
-                                    <div class="p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:border-rose-300 transition-colors">
-                                        <h3 class="font-bold text-rose-600 dark:text-rose-400 mb-2">Alcohol Monitoring (AAMR)</h3>
-                                        <p class="text-sm text-slate-600 dark:text-slate-400">Transdermal tag that tests sweat for alcohol concentration. Usually takes readings every 30 minutes to enforce abstinence requirements.</p>
-                                    </div>
-                                    <div class="p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-300 transition-colors">
-                                        <h3 class="font-bold text-emerald-600 dark:text-emerald-400 mb-2">Non-Fitted Devices (PID)</h3>
-                                        <p class="text-sm text-slate-600 dark:text-slate-400">Portable Identification Devices or biometric checkers used in specific scenarios where a fitted tag isn't suitable or is used as a supplementary tracker.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700">
-                                <h2 class="text-2xl font-bold mb-6 text-slate-900 dark:text-white flex items-center gap-2"><span class="w-2 h-6 bg-rose-500 rounded-full"></span> Common Violations & Breaches</h2>
-                                <div class="space-y-4">
-                                    <div class="flex items-start gap-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/50">
-                                        <span class="text-rose-500 text-xl">✂️</span> 
-                                        <div>
-                                            <strong class="block text-rose-700 dark:text-rose-300 mb-1">Strap Tamper</strong>
-                                            <span class="text-sm text-slate-600 dark:text-slate-400">The fibre-optic or conductive wire inside the strap has been severed or stretched, indicating an attempt to remove the tag.</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/50">
-                                        <span class="text-rose-500 text-xl">🔨</span> 
-                                        <div>
-                                            <strong class="block text-rose-700 dark:text-rose-300 mb-1">Case Tamper</strong>
-                                            <span class="text-sm text-slate-600 dark:text-slate-400">The main body of the tag or the HMU has been opened, damaged, or subjected to extreme force/temperature.</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50">
-                                        <span class="text-amber-500 text-xl">🏃</span> 
-                                        <div>
-                                            <strong class="block text-amber-700 dark:text-amber-300 mb-1">Absence</strong>
-                                            <span class="text-sm text-slate-600 dark:text-slate-400">The DW (Device Wearer) is out of range of the HMU during their specified curfew hours.</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50">
-                                        <span class="text-amber-500 text-xl">🔋</span> 
-                                        <div>
-                                            <strong class="block text-amber-700 dark:text-amber-300 mb-1">Battery Depletion</strong>
-                                            <span class="text-sm text-slate-600 dark:text-slate-400">The DW failed to charge their GPS or AAMR tag, resulting in a loss of monitoring data.</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/50">
-                                        <span class="text-rose-500 text-xl">🗺️</span> 
-                                        <div>
-                                            <strong class="block text-rose-700 dark:text-rose-300 mb-1">Zone Breach</strong>
-                                            <span class="text-sm text-slate-600 dark:text-slate-400">A GPS wearer has entered an exclusion zone or left a mandated inclusion zone.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Sidebar: Troubleshooting & Definitions -->
-                        <div class="space-y-8">
-                            <div class="bg-indigo-600 p-8 rounded-[2rem] shadow-sm text-white">
-                                <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                                    Terminology
-                                </h2>
-                                <div class="space-y-4 text-sm">
-                                    <div class="border-b border-indigo-500/50 pb-3"><strong class="block text-indigo-200 mb-1">DW</strong> Device Wearer (the subject).</div>
-                                    <div class="border-b border-indigo-500/50 pb-3"><strong class="block text-indigo-200 mb-1">HMU</strong> Home Monitoring Unit.</div>
-                                    <div class="border-b border-indigo-500/50 pb-3"><strong class="block text-indigo-200 mb-1">PID</strong> Portable Identification Device.</div>
-                                    <div class="border-b border-indigo-500/50 pb-3"><strong class="block text-indigo-200 mb-1">NFA</strong> No Further Action.</div>
-                                    <div class="border-b border-indigo-500/50 pb-3"><strong class="block text-indigo-200 mb-1">AAMR</strong> Alcohol Abstinence Monitoring Requirement.</div>
-                                    <div><strong class="block text-indigo-200 mb-1">Decom</strong> Decommissioning (removing equipment).</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700">
-                                <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                                    Standard Protocols
-                                </h2>
-                                <div class="space-y-5 text-sm text-slate-600 dark:text-slate-400">
-                                    <div>
-                                        <strong class="block text-slate-800 dark:text-slate-200 mb-1">Power Issues</strong>
-                                        If GPS is below 10%, DW must be contacted to charge the tag immediately. It requires 1-2 hours daily.
-                                    </div>
-                                    <div>
-                                        <strong class="block text-slate-800 dark:text-slate-200 mb-1">Medical Holds</strong>
-                                        If DW is in hospital, verify location and log "NFA - DW in Hospital". Tag may need to be removed for MRI/X-rays.
-                                    </div>
-                                    <div>
-                                        <strong class="block text-slate-800 dark:text-slate-200 mb-1">Equipment Fault</strong>
-                                        If the charger is broken or strap is causing medical issues (swelling, allergic reaction), log a Visit Request for a field officer.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Hour Calculator -->
                 <div id="hour-calculator" class="page-view container mx-auto px-6 py-10 max-w-5xl">
                     <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Hour Calculator</h1>
@@ -1028,6 +924,23 @@
                                     <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                                     <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
                                 </button>
+                            </div>
+
+                            <h2 class="text-xl font-bold mb-6 mt-8 pb-4 border-b border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white">Alerts & Notifications</h2>
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div>
+                                    <label for="notification-sound-select" class="font-bold text-lg text-slate-800 dark:text-slate-200 block">Notification Sound</label>
+                                    <p class="text-slate-500 text-sm mt-1">Choose the alarm tone for shift and break events.</p>
+                                </div>
+                                <div class="flex items-center gap-3 w-full md:w-auto">
+                                    <button id="test-sound-btn" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800/50">Test</button>
+                                    <select id="notification-sound-select" class="flex-1 md:w-48 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition-colors">
+                                        <option value="beep">Gentle Beep</option>
+                                        <option value="chime">Synth Chime (Loud)</option>
+                                        <option value="bell">Soft Bell</option>
+                                        <option value="digital">Digital Alert</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                       </div>
@@ -1107,16 +1020,7 @@
                                             <button id="breach-status-btn" class="flex items-center gap-2.5 bg-black/30 hover:bg-black/50 border border-white/10 rounded-xl px-3.5 py-2 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-white/20 backdrop-blur-md">
                                                 <span id="breach-status-indicator" class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse"></span>
                                                 <span id="breach-status-text" class="text-[10px] font-bold text-white uppercase tracking-wider">Breach</span>
-                                                <svg class="w-3 h-3 text-white/60 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                             </button>
-                                            <div id="breach-status-menu" class="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden hidden z-50 transform origin-top-right transition-all">
-                                                <button class="w-full text-left px-4 py-3 text-[11px] uppercase tracking-wider font-bold text-slate-200 hover:bg-slate-700 hover:text-white flex items-center gap-3 transition-colors border-b border-slate-700/50" data-status="breach">
-                                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span> Breaches
-                                                </button>
-                                                <button class="w-full text-left px-4 py-3 text-[11px] uppercase tracking-wider font-bold text-slate-200 hover:bg-slate-700 hover:text-white flex items-center gap-3 transition-colors" data-status="call">
-                                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span> Calls
-                                                </button>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -1195,6 +1099,74 @@
                         </div>
                     </div>
 
+                    <!-- Visit Request -->
+                    <div id="visit-request" class="page-view container mx-auto px-6 py-10 max-w-4xl">
+                        <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Visit Request</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Controls -->
+                            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700">
+                                <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Request Details</h2>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Equipment Type</label>
+                                        <div class="flex gap-3">
+                                            <button id="vr-equip-rf" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">RF Tag</button>
+                                            <button id="vr-equip-gps" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">GPS Tag</button>
+                                        </div>
+                                    </div>
+                                    <div id="vr-no-curfew-container" class="hidden items-center gap-2 mt-2">
+                                        <input type="checkbox" id="vr-no-curfew" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                        <label for="vr-no-curfew" class="text-sm font-bold text-slate-600 dark:text-slate-400">No Curfew</label>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Curfew Hours</label>
+                                        <div class="flex items-center gap-3">
+                                            <input type="time" id="vr-curfew-start" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:border-indigo-500 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                            <span class="text-slate-400 font-bold">to</span>
+                                            <input type="time" id="vr-curfew-end" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:border-indigo-500 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Reason for Visit</label>
+                                        <div id="vr-scenario-buttons" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                                            <!-- Injected by JS -->
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Additional Notes (Optional)</label>
+                                        <textarea id="vr-custom-details" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:border-indigo-500 text-sm font-medium text-slate-700 dark:text-slate-300 resize-none h-20 placeholder-slate-400" placeholder="Any specific details for the field officer..."></textarea>
+                                    </div>
+                                    <button id="vr-generate-log-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Generate Request</button>
+                                </div>
+                            </div>
+
+                            <!-- Output -->
+                            <div class="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-[2rem] shadow-sm border border-indigo-100 dark:border-indigo-800/30 flex flex-col">
+                                <h2 class="text-xl font-bold mb-6 text-indigo-900 dark:text-indigo-300">Generated Request</h2>
+                                <div class="flex-1 flex flex-col gap-5">
+                                    <div class="flex flex-col gap-2">
+                                        <div class="flex justify-between items-end">
+                                            <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest ml-1">Title</label>
+                                            <button id="vr-copy-title-btn" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy
+                                            </button>
+                                        </div>
+                                        <input type="text" id="vr-title-output" readonly class="w-full px-4 py-3 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold focus:outline-none shadow-sm">
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-end">
+                                            <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest ml-1">Body</label>
+                                            <button id="vr-copy-log-btn" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy
+                                            </button>
+                                        </div>
+                                        <textarea id="vr-log-output" readonly class="w-full flex-1 min-h-[200px] px-4 py-4 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-sm leading-relaxed focus:outline-none shadow-sm resize-none"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Breach Copilot -->
                     <div id="breach-copilot-container" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
                         <!-- Panel -->
@@ -1237,7 +1209,67 @@
         </main>
     </div>
     
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let fbUser = null;
+
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        
+        onAuthStateChanged(auth, (user) => { fbUser = user; });
+
+        // --- Cloud Storage Engine ---
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound'];
+        
+        async function syncToCloud(username) {
+            if (!fbUser || username === 'guest') return;
+            const dataToSave = {};
+            syncKeys.forEach(k => {
+                const val = localStorage.getItem(k);
+                if (val !== null) dataToSave[k] = val;
+            });
+            
+            try {
+                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
+                await setDoc(agentRef, { data: dataToSave }, { merge: true });
+            } catch (e) {
+                console.error("Cloud sync failed", e);
+            }
+        }
+
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            originalSetItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) syncToCloud(currentUser);
+            }
+        };
+
+        const originalRemoveItem = localStorage.removeItem;
+        localStorage.removeItem = function(key) {
+            originalRemoveItem.apply(this, arguments);
+            if (syncKeys.includes(key)) {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) syncToCloud(currentUser);
+            }
+        };
+
+
         // ... (Existing NoiseGenerator Class logic - Unchanged) ...
         class NoiseGenerator {
             constructor() {
@@ -1657,7 +1689,9 @@
             }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const bootApp = async () => {
+            await initAuth(); // Wait for cloud authentication to initialize
+            
             const landingPage = document.getElementById('landing-page');
             const appLayout = document.getElementById('app-layout');
             const logoutBtn = document.getElementById('logout-btn');
@@ -1690,6 +1724,96 @@
             alertCloseBtn.addEventListener('click', hideAlert);
             // --- End Modal Functions ---
 
+            // Global Notification Sound System
+            window.playVibeAlertSound = function() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const soundType = localStorage.getItem('shiftNotificationSound') || 'beep';
+
+                    if (soundType === 'chime') {
+                        const playBeep = (time, freq1, freq2) => {
+                            const osc1 = ctx.createOscillator();
+                            const osc2 = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc1.type = 'square';
+                            osc2.type = 'sawtooth';
+                            osc1.frequency.setValueAtTime(freq1, time);
+                            osc2.frequency.setValueAtTime(freq2, time);
+                            gain.gain.setValueAtTime(0.4, time);
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                            osc1.connect(gain);
+                            osc2.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc1.start(time);
+                            osc2.start(time);
+                            osc1.stop(time + 0.3);
+                            osc2.stop(time + 0.3);
+                        };
+                        playBeep(ctx.currentTime, 659.25, 660);
+                        playBeep(ctx.currentTime + 0.15, 880, 882);
+                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050);
+                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
+                        playBeep(ctx.currentTime + 0.85, 880, 882);
+                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
+                    } else if (soundType === 'bell') {
+                        const playBell = (time) => {
+                            const osc1 = ctx.createOscillator();
+                            const osc2 = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc1.type = 'sine';
+                            osc2.type = 'triangle';
+                            osc1.frequency.setValueAtTime(600, time);
+                            osc2.frequency.setValueAtTime(1200, time);
+                            gain.gain.setValueAtTime(0.5, time);
+                            gain.gain.exponentialRampToValueAtTime(0.001, time + 2.0);
+                            osc1.connect(gain);
+                            osc2.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc1.start(time);
+                            osc2.start(time);
+                            osc1.stop(time + 2.0);
+                            osc2.stop(time + 2.0);
+                        };
+                        playBell(ctx.currentTime);
+                        playBell(ctx.currentTime + 0.5);
+                    } else if (soundType === 'digital') {
+                        const playWatch = (time) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'square';
+                            osc.frequency.setValueAtTime(2000, time);
+                            gain.gain.setValueAtTime(0.1, time);
+                            gain.gain.setValueAtTime(0, time + 0.08);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(time);
+                            osc.stop(time + 0.08);
+                        };
+                        for(let i=0; i<4; i++) playWatch(ctx.currentTime + i*0.15);
+                    } else {
+                        // default 'beep'
+                        const playBeep = (time) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(800, time);
+                            gain.gain.setValueAtTime(0.2, time);
+                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(time);
+                            osc.stop(time + 0.3);
+                        };
+                        playBeep(ctx.currentTime);
+                        playBeep(ctx.currentTime + 0.3);
+                    }
+                } catch(e) { console.error('Audio context failed', e); }
+            };
+
+            // Custom events for Cloud sync reactivity
+            window.addEventListener('cloudDataSynced', () => {
+                if(typeof renderList === 'function') renderList();
+            });
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
@@ -1839,19 +1963,21 @@
                 setupBallGame(); 
                 setupShiftTimer();
                 setupSoundscapes();
-                setupCallLog();
                 setupVisitRequest();
                 setupBreachCopilot();
                 dashboardInitialized = true;
             }
             
-            // --- Authentication Logic ---
+            // --- Authentication Logic with Cloud Storage Sync ---
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
             const toggleRegBtn = document.getElementById('toggle-register-btn');
             const toggleLoginBtn = document.getElementById('toggle-login-btn');
             const authTitle = document.getElementById('auth-title');
             const authSubtitle = document.getElementById('auth-subtitle');
+            
+            const guestLoginBtn = document.getElementById('guest-login-btn');
+            const guestRegBtn = document.getElementById('guest-reg-btn');
             
             const userInfoContainer = document.getElementById('user-info-container');
             const userIdDisplay = document.getElementById('user-id-display');
@@ -1872,7 +1998,16 @@
                 });
             });
 
-            toggleRegBtn?.addEventListener('click', () => {
+            const handleGuestLogin = () => {
+                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('reg-error').classList.add('hidden');
+                loginSuccess('guest');
+            };
+
+            if(guestLoginBtn) guestLoginBtn.addEventListener('click', handleGuestLogin);
+            if(guestRegBtn) guestRegBtn.addEventListener('click', handleGuestLogin);
+
+            if(toggleRegBtn) toggleRegBtn.addEventListener('click', () => {
                 loginForm.classList.add('hidden');
                 registerForm.classList.remove('hidden');
                 authTitle.textContent = "Register";
@@ -1880,7 +2015,7 @@
                 document.getElementById('login-error').classList.add('hidden');
             });
 
-            toggleLoginBtn?.addEventListener('click', () => {
+            if(toggleLoginBtn) toggleLoginBtn.addEventListener('click', () => {
                 registerForm.classList.add('hidden');
                 loginForm.classList.remove('hidden');
                 authTitle.textContent = "Login";
@@ -1902,41 +2037,105 @@
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
                 navigateToView('dashboard-home');
+                
+                // Dispatch event so that scoped functions (timer, list) can react and reload cloud state
+                window.dispatchEvent(new Event('cloudDataSynced'));
             }
 
-            registerForm?.addEventListener('submit', (e) => {
+            if(registerForm) registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('reg-username').value.trim();
+                const user = document.getElementById('reg-username').value.trim().toLowerCase();
                 const pass = document.getElementById('reg-password').value;
+                const err = document.getElementById('reg-error');
+                const btn = registerForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user]) {
-                    document.getElementById('reg-error').classList.remove('hidden');
-                } else {
-                    users[user] = pass;
-                    localStorage.setItem('myndarcUsers', JSON.stringify(users));
-                    document.getElementById('reg-error').classList.add('hidden');
-                    loginSuccess(user);
+                if (!fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Securing Credentials...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
+                    
+                    if (snap.exists()) {
+                        err.textContent = "Email address already exists.";
+                        err.classList.remove('hidden');
+                    } else {
+                        await setDoc(agentRef, { password: pass, data: {} });
+                        err.classList.add('hidden');
+                        
+                        // Clear any old local data
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        syncKeys.forEach(k => {
+                            originalRemoveItem.call(localStorage, k);
+                        });
+                        
+                        loginSuccess(user);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Register";
+                btn.disabled = false;
             });
 
-            loginForm?.addEventListener('submit', (e) => {
+            if(loginForm) loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const user = document.getElementById('login-username').value.trim();
+                const user = document.getElementById('login-username').value.trim().toLowerCase();
                 const pass = document.getElementById('login-password').value;
+                const err = document.getElementById('login-error');
+                const btn = loginForm.querySelector('button[type="submit"]');
                 
-                let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                
-                if (users[user] && users[user] === pass) {
-                    document.getElementById('login-error').classList.add('hidden');
-                    loginSuccess(user);
-                } else {
-                    document.getElementById('login-error').classList.remove('hidden');
+                if (!fbUser) {
+                    err.textContent = "Cloud connection initializing, please wait...";
+                    err.classList.remove('hidden');
+                    return;
                 }
+                
+                btn.textContent = "Authenticating...";
+                btn.disabled = true;
+
+                try {
+                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
+                    const snap = await getDoc(agentRef);
+                    
+                    if (snap.exists() && snap.data().password === pass) {
+                        err.classList.add('hidden');
+                        
+                        // Load cloud data into localStorage silently
+                        const cloudData = snap.data().data || {};
+                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        
+                        syncKeys.forEach(k => {
+                            if (cloudData[k] !== undefined) {
+                                originalSetItem.call(localStorage, k, cloudData[k]);
+                            } else {
+                                originalRemoveItem.call(localStorage, k);
+                            }
+                        });
+                        
+                        loginSuccess(user);
+                    } else {
+                        err.textContent = "Invalid Email address or Password.";
+                        err.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    err.textContent = "Connection error. Try again.";
+                    err.classList.remove('hidden');
+                }
+                btn.textContent = "Login";
+                btn.disabled = false;
             });
 
-            logoutBtn.addEventListener('click', (e) => {
+            if(logoutBtn) logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 localStorage.removeItem('appEntered');
                 localStorage.removeItem('currentUser');
@@ -1953,8 +2152,10 @@
                     
                     if(loginForm) loginForm.reset();
                     if(registerForm) registerForm.reset();
-                    document.getElementById('login-error')?.classList.add('hidden');
-                    document.getElementById('reg-error')?.classList.add('hidden');
+                    const loginErr = document.getElementById('login-error');
+                    const regErr = document.getElementById('reg-error');
+                    if(loginErr) loginErr.classList.add('hidden');
+                    if(regErr) regErr.classList.add('hidden');
                     
                     landingPage.style.display = 'flex';
                     setTimeout(() => {
@@ -1996,36 +2197,36 @@
                 const toolsArrow = document.getElementById('tools-arrow');
                 const topicFilters = document.querySelectorAll('.topic-filter');
 
-                openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
-                closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
+                if(openSidebarBtn) openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
+                if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
 
                 navLinks.forEach(link => {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
                         navigateToView(link.dataset.view);
-                        if (window.innerWidth < 1024) {
+                        if (window.innerWidth < 1024 && sidebar) {
                            sidebar.classList.add('-translate-x-full');
                         }
                     });
                 });
 
-                topicsToggleBtn.addEventListener('click', () => {
+                if(topicsToggleBtn) topicsToggleBtn.addEventListener('click', () => {
                     if (topicsSubmenu.style.maxHeight) {
                         topicsSubmenu.style.maxHeight = null;
-                        topicsArrow.classList.remove('rotate-180');
+                        if(topicsArrow) topicsArrow.classList.remove('rotate-180');
                     } else {
                         topicsSubmenu.style.maxHeight = topicsSubmenu.scrollHeight + "px";
-                        topicsArrow.classList.add('rotate-180');
+                        if(topicsArrow) topicsArrow.classList.add('rotate-180');
                     }
                 });
                 
-                toolsToggleBtn.addEventListener('click', () => {
+                if(toolsToggleBtn) toolsToggleBtn.addEventListener('click', () => {
                     if (toolsSubmenu.style.maxHeight) {
                         toolsSubmenu.style.maxHeight = null;
-                        toolsArrow.classList.remove('rotate-180');
+                        if(toolsArrow) toolsArrow.classList.remove('rotate-180');
                     } else {
                         toolsSubmenu.style.maxHeight = toolsSubmenu.scrollHeight + "px";
-                        toolsArrow.classList.add('rotate-180');
+                        if(toolsArrow) toolsArrow.classList.add('rotate-180');
                     }
                 });
 
@@ -2037,7 +2238,7 @@
                         document.querySelectorAll('.module-card').forEach(card => {
                             card.style.display = (moduleToShow === 'all' || card.dataset.module === moduleToShow) ? 'flex' : 'none';
                         });
-                        if (window.innerWidth < 1024) {
+                        if (window.innerWidth < 1024 && sidebar) {
                            sidebar.classList.add('-translate-x-full');
                         }
                     });
@@ -2046,6 +2247,7 @@
 
             function setupPrincipleModals() {
                 const modal = document.getElementById('principle-modal');
+                if(!modal) return;
                 const modalContent = modal.querySelector('.transform');
                 const modalTitle = document.getElementById('principle-modal-title');
                 const modalDescription = document.getElementById('principle-modal-description');
@@ -2058,47 +2260,50 @@
                     modal.classList.add('flex');
                     setTimeout(() => {
                         modal.classList.remove('opacity-0');
-                        modalContent.classList.remove('scale-95');
+                        if(modalContent) modalContent.classList.remove('scale-95');
                     }, 10);
                 }
 
                 function hideModal() {
                     modal.classList.add('opacity-0');
-                    modalContent.classList.add('scale-95');
+                    if(modalContent) modalContent.classList.add('scale-95');
                     setTimeout(() => {
                         modal.classList.add('hidden');
                         modal.classList.remove('flex');
                     }, 300);
                 }
 
-                document.getElementById('curriculum-grid').addEventListener('click', (e) => {
+                const currGrid = document.getElementById('curriculum-grid');
+                if(currGrid) currGrid.addEventListener('click', (e) => {
                     const learnMoreBtn = e.target.closest('.learn-more-btn');
                     if (learnMoreBtn) {
                         const title = learnMoreBtn.dataset.module;
                         const description = learnMoreBtn.dataset.description;
                         const topics = JSON.parse(learnMoreBtn.dataset.topics);
 
-                        modalTitle.textContent = title;
-                        modalDescription.textContent = description;
+                        if(modalTitle) modalTitle.textContent = title;
+                        if(modalDescription) modalDescription.textContent = description;
                         
-                        modalTasks.innerHTML = ''; 
-                        let tasksHtml = '';
-                        topics.forEach(topic => {
-                            tasksHtml += `<h4 class="font-bold text-lg mt-6 mb-3 text-slate-800 dark:text-white flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>${topic.title}</h4>`;
-                            tasksHtml += '<ul class="space-y-2 text-slate-600 dark:text-slate-400 text-sm ml-4 border-l-2 border-slate-100 dark:border-slate-700 pl-4">';
-                            topic.items.forEach(item => {
-                                tasksHtml += `<li>${item}</li>`;
+                        if(modalTasks) {
+                            modalTasks.innerHTML = ''; 
+                            let tasksHtml = '';
+                            topics.forEach(topic => {
+                                tasksHtml += `<h4 class="font-bold text-lg mt-6 mb-3 text-slate-800 dark:text-white flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>${topic.title}</h4>`;
+                                tasksHtml += '<ul class="space-y-2 text-slate-600 dark:text-slate-400 text-sm ml-4 border-l-2 border-slate-100 dark:border-slate-700 pl-4">';
+                                topic.items.forEach(item => {
+                                    tasksHtml += `<li>${item}</li>`;
+                                });
+                                tasksHtml += '</ul>';
                             });
-                            tasksHtml += '</ul>';
-                        });
-                        modalTasks.innerHTML = tasksHtml;
+                            modalTasks.innerHTML = tasksHtml;
+                        }
 
                         showModal();
                     }
                 });
 
-                closeBtn.addEventListener('click', hideModal);
-                okBtn.addEventListener('click', hideModal);
+                if(closeBtn) closeBtn.addEventListener('click', hideModal);
+                if(okBtn) okBtn.addEventListener('click', hideModal);
                 modal.addEventListener('click', (e) => {
                     if(e.target === modal) {
                         hideModal();
@@ -2108,24 +2313,26 @@
             
             function setupPomodoro() {
                 const pomodoroPage = document.getElementById('pomodoro');
+                if(!pomodoroPage) return;
                 const modes = {
                     pomodoro: { name: 'Focus', time: 25, color: '#6366f1', icon: '🍅', next: 'shortBreak', background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop' },
                     shortBreak: { name: 'Relax', time: 5, color: '#3b82f6', icon: '☕', next: 'pomodoro', background: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2940&auto=format&fit=crop' },
                 };
                 let timer; let currentMode = 'pomodoro'; let totalSeconds = modes[currentMode].time * 60; let remainingSeconds = totalSeconds; let isPaused = true; let sessionCount = 0;
-                const canvas = document.getElementById('pomodoro-canvas'); const ctx = canvas.getContext('2d'); const timeDisplay = document.getElementById('pomodoro-time'); const modeDisplay = document.getElementById('pomodoro-mode'); const iconDisplay = document.getElementById('pomodoro-icon'); const playPauseBtn = document.getElementById('pomodoro-play-pause'); const playIcon = document.getElementById('play-icon'); const pauseIcon = document.getElementById('pause-icon'); const switchModeBtn = document.getElementById('pomodoro-switch-mode'); const sessionCountDisplay = document.getElementById('pomodoro-session-count');
+                const canvas = document.getElementById('pomodoro-canvas'); const ctx = canvas ? canvas.getContext('2d') : null; const timeDisplay = document.getElementById('pomodoro-time'); const modeDisplay = document.getElementById('pomodoro-mode'); const iconDisplay = document.getElementById('pomodoro-icon'); const playPauseBtn = document.getElementById('pomodoro-play-pause'); const playIcon = document.getElementById('play-icon'); const pauseIcon = document.getElementById('pause-icon'); const switchModeBtn = document.getElementById('pomodoro-switch-mode'); const sessionCountDisplay = document.getElementById('pomodoro-session-count');
                 
                 function drawCircle(progress) {
+                    if(!canvas || !ctx) return;
                     const centerX = canvas.width / 2; const centerY = canvas.height / 2; const radius = canvas.width / 2 - 10;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 15; ctx.stroke();
                     if (progress > 0) { ctx.beginPath(); ctx.arc(centerX, centerY, radius, -0.5 * Math.PI, (progress * 2 * Math.PI) - 0.5 * Math.PI); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(255,255,255,0.5)'; ctx.stroke(); ctx.shadowBlur = 0; }
                 }
-                function updateDisplay() { const minutes = Math.floor(remainingSeconds / 60); const seconds = remainingSeconds % 60; timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`; const progress = (totalSeconds - remainingSeconds) / totalSeconds; drawCircle(progress); }
-                function setMode(modeKey) { currentMode = modeKey; const mode = modes[currentMode]; totalSeconds = mode.time * 60; remainingSeconds = totalSeconds; modeDisplay.textContent = mode.name; iconDisplay.textContent = mode.icon; switchModeBtn.textContent = mode.next === 'pomodoro' ? 'Start Focus' : 'Take a Break'; pomodoroPage.style.backgroundImage = `url('${mode.background}')`; updateDisplay(); }
-                function countdown() { if (isPaused) return; if (remainingSeconds > 0) { remainingSeconds--; updateDisplay(); } else { clearInterval(timer); isPaused = true; playIcon.classList.remove('hidden'); pauseIcon.classList.add('hidden'); if (currentMode === 'pomodoro') { sessionCount++; sessionCountDisplay.textContent = sessionCount; } showAlert(`${modes[currentMode].name} session is over!`); setMode(modes[currentMode].next); } }
-                playPauseBtn.addEventListener('click', () => { hideAlert(); isPaused = !isPaused; if (!isPaused) { timer = setInterval(countdown, 1000); playIcon.classList.add('hidden'); pauseIcon.classList.remove('hidden'); } else { clearInterval(timer); playIcon.classList.remove('hidden'); pauseIcon.classList.add('hidden'); } });
-                switchModeBtn.addEventListener('click', () => { hideAlert(); isPaused = true; clearInterval(timer); playIcon.classList.remove('hidden'); pauseIcon.classList.add('hidden'); setMode(modes[currentMode].next); });
+                function updateDisplay() { const minutes = Math.floor(remainingSeconds / 60); const seconds = remainingSeconds % 60; if(timeDisplay) timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`; const progress = (totalSeconds - remainingSeconds) / totalSeconds; drawCircle(progress); }
+                function setMode(modeKey) { currentMode = modeKey; const mode = modes[currentMode]; totalSeconds = mode.time * 60; remainingSeconds = totalSeconds; if(modeDisplay) modeDisplay.textContent = mode.name; if(iconDisplay) iconDisplay.textContent = mode.icon; if(switchModeBtn) switchModeBtn.textContent = mode.next === 'pomodoro' ? 'Start Focus' : 'Take a Break'; pomodoroPage.style.backgroundImage = `url('${mode.background}')`; updateDisplay(); }
+                function countdown() { if (isPaused) return; if (remainingSeconds > 0) { remainingSeconds--; updateDisplay(); } else { clearInterval(timer); isPaused = true; if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); if (currentMode === 'pomodoro') { sessionCount++; if(sessionCountDisplay) sessionCountDisplay.textContent = sessionCount; } showAlert(`${modes[currentMode].name} session is over!`); setMode(modes[currentMode].next); } }
+                if(playPauseBtn) playPauseBtn.addEventListener('click', () => { hideAlert(); isPaused = !isPaused; if (!isPaused) { timer = setInterval(countdown, 1000); if(playIcon) playIcon.classList.add('hidden'); if(pauseIcon) pauseIcon.classList.remove('hidden'); } else { clearInterval(timer); if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); } });
+                if(switchModeBtn) switchModeBtn.addEventListener('click', () => { hideAlert(); isPaused = true; clearInterval(timer); if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); setMode(modes[currentMode].next); });
                 setMode('pomodoro');
             }
 
@@ -2143,6 +2350,7 @@
                 const refreshText = document.getElementById('refresh-text');
                 const refreshControls = document.getElementById('refresh-controls');
                 const refreshCircle = document.getElementById('refresh-circle');
+                if(!tabBreathing) return;
 
                 let sessionTimer, instructionTimer;
                 let isBreathing = false;
@@ -2175,7 +2383,7 @@
 
                 function loadSessionCount() {
                     const count = localStorage.getItem('mindfulnessSessions') || 0;
-                    sessionCountEl.textContent = count;
+                    if(sessionCountEl) sessionCountEl.textContent = count;
                 }
 
                 function updateInstruction() {
@@ -2230,7 +2438,7 @@
                         let count = parseInt(localStorage.getItem('mindfulnessSessions') || 0);
                         count++;
                         localStorage.setItem('mindfulnessSessions', count);
-                        sessionCountEl.textContent = count;
+                        if(sessionCountEl) sessionCountEl.textContent = count;
                         showAlert("Mindfulness session complete. Well done!");
                     }
                 }
@@ -2289,7 +2497,8 @@
 
             function setupTimeAndWeather() {
                 const timeEl = document.getElementById('time-display'); const dateEl = document.getElementById('date-display'); const weatherEl = document.getElementById('weather-display');
-                function updateTime() { const now = new Date(); timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
+                if(!timeEl) return;
+                function updateTime() { const now = new Date(); timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); if(dateEl) dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
                 
                 async function fetchWeatherData(lat, lon, locationLabel) {
                     try { 
@@ -2313,16 +2522,16 @@
                         if (!response.ok) throw new Error('Weather fetch failed'); 
                         const data = await response.json(); 
                         const weather = data.current_weather; 
-                        weatherEl.innerHTML = `<div class="text-4xl filter drop-shadow-md">${getWeatherIcon(weather.weathercode)}</div><div class="text-right"><p class="font-bold text-2xl">${Math.round(weather.temperature)}°C</p><p class="text-xs font-bold uppercase tracking-wider text-white/70">${displayLabel}</p></div>`; 
+                        if(weatherEl) weatherEl.innerHTML = `<div class="text-4xl filter drop-shadow-md">${getWeatherIcon(weather.weathercode)}</div><div class="text-right"><p class="font-bold text-2xl">${Math.round(weather.temperature)}°C</p><p class="text-xs font-bold uppercase tracking-wider text-white/70">${displayLabel}</p></div>`; 
                     } catch (error) { 
-                        weatherEl.innerHTML = `<div class="text-4xl">⛅</div><div><p class="font-bold text-xl">--°C</p><p class="text-xs text-white/60">Offline</p></div>`; 
+                        if(weatherEl) weatherEl.innerHTML = `<div class="text-4xl">⛅</div><div><p class="font-bold text-xl">--°C</p><p class="text-xs text-white/60">Offline</p></div>`; 
                     }
                 }
 
                 function fetchWeather() { 
                     if (navigator.geolocation) {
                         // Show loading state
-                        weatherEl.innerHTML = `<div class="animate-pulse flex gap-2 items-center"><div class="h-6 w-6 bg-white/30 rounded-full animate-bounce"></div><div class="h-4 w-12 bg-white/30 rounded"></div></div>`;
+                        if(weatherEl) weatherEl.innerHTML = `<div class="animate-pulse flex gap-2 items-center"><div class="h-6 w-6 bg-white/30 rounded-full animate-bounce"></div><div class="h-4 w-12 bg-white/30 rounded"></div></div>`;
                         navigator.geolocation.getCurrentPosition(
                             (position) => fetchWeatherData(position.coords.latitude, position.coords.longitude, "Local Weather"),
                             () => fetchWeatherData(53.4808, -2.2426, "Manchester") // Fallback location
@@ -2355,8 +2564,10 @@
                     { text: "Until we can manage time, we can manage nothing else.", author: "Peter Drucker" }
                 ];
                 const q = quotes[Math.floor(Math.random() * quotes.length)];
-                document.getElementById('quote-text').textContent = `"${q.text}"`;
-                document.getElementById('quote-author').textContent = `— ${q.author}`;
+                const qText = document.getElementById('quote-text');
+                const qAuthor = document.getElementById('quote-author');
+                if(qText) qText.textContent = `"${q.text}"`;
+                if(qAuthor) qAuthor.textContent = `— ${q.author}`;
             }
 
             function setupHourCalculator() {
@@ -2364,6 +2575,7 @@
                 const addBtn = document.getElementById('add-time-row');
                 const calcBtn = document.getElementById('calculate-time-btn');
                 const clearBtn = document.getElementById('clear-time-btn');
+                if(!container) return;
                 
                 function createRow() {
                     const div = document.createElement('div');
@@ -2394,15 +2606,18 @@
                     });
                     const h = Math.floor(totalMins / 60);
                     const m = totalMins % 60;
-                    document.getElementById('total-time-hms').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`;
-                    document.getElementById('total-time-decimal').textContent = (totalMins / 60).toFixed(2);
+                    const th = document.getElementById('total-time-hms');
+                    const td = document.getElementById('total-time-decimal');
+                    if(th) th.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`;
+                    if(td) td.textContent = (totalMins / 60).toFixed(2);
                 }
 
                 if(addBtn) addBtn.addEventListener('click', createRow);
                 if(calcBtn) calcBtn.addEventListener('click', calculate);
                 if(clearBtn) clearBtn.addEventListener('click', () => { container.innerHTML = ''; createRow(); calculate(); });
-                if(document.getElementById('print-time-btn')) document.getElementById('print-time-btn').addEventListener('click', () => window.print());
-                if(container) createRow();
+                const printBtn = document.getElementById('print-time-btn');
+                if(printBtn) printBtn.addEventListener('click', () => window.print());
+                createRow();
             }
 
             function setupIdeaBoard() {
@@ -2461,25 +2676,44 @@
                 const toggle = document.getElementById('theme-toggle');
                 const darkIcon = document.getElementById('theme-toggle-dark-icon');
                 const lightIcon = document.getElementById('theme-toggle-light-icon');
-                if(!toggle) return;
+                if(toggle) {
+                    if (document.documentElement.classList.contains('dark')) {
+                        lightIcon.classList.remove('hidden');
+                    } else {
+                        darkIcon.classList.remove('hidden');
+                    }
 
-                if (document.documentElement.classList.contains('dark')) {
-                    lightIcon.classList.remove('hidden');
-                } else {
-                    darkIcon.classList.remove('hidden');
+                    toggle.addEventListener('click', () => {
+                        darkIcon.classList.toggle('hidden');
+                        lightIcon.classList.toggle('hidden');
+                        if (document.documentElement.classList.contains('dark')) {
+                            document.documentElement.classList.remove('dark');
+                            localStorage.setItem('color-theme', 'light');
+                        } else {
+                            document.documentElement.classList.add('dark');
+                            localStorage.setItem('color-theme', 'dark');
+                        }
+                    });
                 }
 
-                toggle.addEventListener('click', () => {
-                    darkIcon.classList.toggle('hidden');
-                    lightIcon.classList.toggle('hidden');
-                    if (document.documentElement.classList.contains('dark')) {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    } else {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    }
-                });
+                // Notification Sound Settings
+                const soundSelect = document.getElementById('notification-sound-select');
+                const testBtn = document.getElementById('test-sound-btn');
+                
+                if(soundSelect) {
+                    soundSelect.value = localStorage.getItem('shiftNotificationSound') || 'beep';
+                    soundSelect.addEventListener('change', (e) => {
+                        localStorage.setItem('shiftNotificationSound', e.target.value);
+                    });
+                }
+                
+                if(testBtn) {
+                    testBtn.addEventListener('click', () => {
+                        if(typeof window.playVibeAlertSound === 'function') {
+                            window.playVibeAlertSound();
+                        }
+                    });
+                }
             }
             
             function setupBreachList() {
@@ -2488,6 +2722,7 @@
                 const blocksContainer = document.getElementById('breach-blocks-container');
                 const hourlyCount = document.getElementById('breach-hourly-count');
                 const todayTotal = document.getElementById('breach-today-total');
+                if(!blocksContainer) return;
                 
                 function updateCurrentSessionHour() {
                     const labelEl = document.getElementById('breach-current-hour-label');
@@ -2993,7 +3228,8 @@
                 let score = 0, lives = 3, highScore = localStorage.getItem('breakGameHighScore') || 0;
                 let isPlaying = false, animationId;
                 
-                document.getElementById('game-high-score').textContent = `High Score: ${highScore}`;
+                const hsEl = document.getElementById('game-high-score');
+                if(hsEl) hsEl.textContent = `High Score: ${highScore}`;
                 
                 document.addEventListener("keydown", e => { if(e.key=="Right" || e.key=="ArrowRight") rightPressed=true; else if(e.key=="Left" || e.key=="ArrowLeft") leftPressed=true; });
                 document.addEventListener("keyup", e => { if(e.key=="Right" || e.key=="ArrowRight") rightPressed=false; else if(e.key=="Left" || e.key=="ArrowLeft") leftPressed=false; });
@@ -3021,9 +3257,75 @@
                     x += dx; y += dy;
                     if(isPlaying) animationId = requestAnimationFrame(draw);
                 }
-                document.getElementById('start-game-btn').addEventListener('click', () => { if(!isPlaying){ lives=3; score=0; document.getElementById('game-score').textContent="Score: 0"; document.getElementById('game-lives').textContent="Lives: 3"; isPlaying=true; draw(); } });
-                document.getElementById('reset-game-btn').addEventListener('click', () => { isPlaying=false; cancelAnimationFrame(animationId); ctx.clearRect(0, 0, canvas.width, canvas.height); x=canvas.width/2; y=canvas.height-30; drawBall(); drawPaddle(); });
+                const startBtn = document.getElementById('start-game-btn');
+                const resBtn = document.getElementById('reset-game-btn');
+                if(startBtn) startBtn.addEventListener('click', () => { if(!isPlaying){ lives=3; score=0; document.getElementById('game-score').textContent="Score: 0"; document.getElementById('game-lives').textContent="Lives: 3"; isPlaying=true; draw(); } });
+                if(resBtn) resBtn.addEventListener('click', () => { isPlaying=false; cancelAnimationFrame(animationId); ctx.clearRect(0, 0, canvas.width, canvas.height); x=canvas.width/2; y=canvas.height-30; drawBall(); drawPaddle(); });
                 drawBall(); drawPaddle();
+            }
+
+            function setupVisitRequest() {
+                const vrContainer = document.getElementById('vr-scenario-buttons');
+                if(!vrContainer) return;
+                const vrScenarios = ["Equipment Tamper", "Equipment Charger request", "Equipment Check", "Equipment Re-Range", "HMU replacement", "Strap too big", "Strap too small", "Consent Withdrawn", "Decom", "Install", "Equipment retrieval"];
+                let vrState = { equip: null, scenario: null };
+
+                vrScenarios.forEach(sc => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full h-12 rounded-xl text-xs font-bold transition-all uppercase tracking-wide flex items-center justify-center px-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-cyan-300 dark:hover:border-cyan-600 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10 text-center`;
+                    btn.textContent = sc;
+                    btn.addEventListener('click', () => {
+                        Array.from(vrContainer.children).forEach(b => { b.classList.remove('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4'); b.classList.add('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400'); });
+                        btn.classList.add('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4');
+                        btn.classList.remove('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400');
+                        vrState.scenario = sc;
+                    });
+                    vrContainer.appendChild(btn);
+                });
+
+                const btnRf = document.getElementById('vr-equip-rf'); const btnGps = document.getElementById('vr-equip-gps');
+                function updateEquipUI() {
+                    const act = ['bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-400', 'text-indigo-700', 'dark:text-indigo-300', 'border-l-4'];
+                    const inact = ['border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-300'];
+                    if (vrState.equip === 'RF') { btnRf.classList.add(...act); btnRf.classList.remove(...inact); btnGps.classList.remove(...act); btnGps.classList.add(...inact); }
+                    else if (vrState.equip === 'GPS') { btnGps.classList.add(...act); btnGps.classList.remove(...inact); btnRf.classList.remove(...act); btnRf.classList.add(...inact); }
+                    const isGps = vrState.equip === 'GPS';
+                    const vrCurfewStart = document.getElementById('vr-curfew-start');
+                    const vrCurfewEnd = document.getElementById('vr-curfew-end');
+                    if(vrCurfewStart) vrCurfewStart.disabled = !isGps; 
+                    if(vrCurfewEnd) vrCurfewEnd.disabled = !isGps;
+                    const noCurfewContainer = document.getElementById('vr-no-curfew-container');
+                    if (noCurfewContainer) { if (isGps) { noCurfewContainer.classList.remove('hidden'); noCurfewContainer.classList.add('flex'); } else { noCurfewContainer.classList.add('hidden'); noCurfewContainer.classList.remove('flex'); } }
+                }
+                if(btnRf && btnGps) { btnRf.addEventListener('click', () => { vrState.equip = 'RF'; updateEquipUI(); }); btnGps.addEventListener('click', () => { vrState.equip = 'GPS'; updateEquipUI(); }); }
+
+                document.getElementById('vr-generate-log-btn')?.addEventListener('click', () => {
+                    if(!vrState.equip || !vrState.scenario) return showAlert("Please select Equipment Type and Reason");
+                    let curfewText = 'NC';
+                    const noCurfewCheck = document.getElementById('vr-no-curfew');
+                    const curStart = document.getElementById('vr-curfew-start');
+                    const curEnd = document.getElementById('vr-curfew-end');
+                    if ((vrState.equip === 'GPS' && noCurfewCheck && !noCurfewCheck.checked) || vrState.equip === 'RF') {
+                        curfewText = `${curStart ? curStart.value : ''}-${curEnd ? curEnd.value : ''}`;
+                    }
+                    const customDetailsEl = document.getElementById('vr-custom-details');
+                    const customDetails = customDetailsEl ? customDetailsEl.value : '';
+                    const title = `${vrState.scenario} - ${vrState.equip} - ${curfewText}`;
+                    const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: Requested for ${vrState.scenario}.${customDetails ? '\n\nNotes: ' + customDetails : ''}`;
+                    const tOut = document.getElementById('vr-title-output');
+                    const lOut = document.getElementById('vr-log-output');
+                    if(tOut) tOut.value = title; 
+                    if(lOut) lOut.value = body;
+                });
+                
+                const copyData = (inputEl, btnEl) => {
+                    if(!inputEl) return;
+                    const text = inputEl.value; if(!text) return;
+                    navigator.clipboard.writeText(text).catch(() => { const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); });
+                    const originalHtml = btnEl.innerHTML; btnEl.innerHTML = '<span class="text-emerald-500 font-bold">Copied!</span>'; setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
+                };
+                document.getElementById('vr-copy-title-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-title-output'), this); });
+                document.getElementById('vr-copy-log-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-log-output'), this); });
             }
 
             function setupShiftTimer() {
@@ -3134,15 +3436,23 @@
                     }
                 }
 
-                document.getElementById('edit-plan-btn')?.addEventListener('click', openVibeEditor);
-                document.getElementById('edit-active-plan-btn')?.addEventListener('click', openVibeEditor);
+                const editPlanBtn = document.getElementById('edit-plan-btn');
+                const editActivePlanBtn = document.getElementById('edit-active-plan-btn');
+                const closePlanModalBtn = document.getElementById('close-plan-modal-btn');
+                const savePlanBtn = document.getElementById('save-plan-btn');
+                const resetPlanBtn = document.getElementById('reset-plan-btn');
+
+                if(editPlanBtn) editPlanBtn.addEventListener('click', openVibeEditor);
+                if(editActivePlanBtn) editActivePlanBtn.addEventListener('click', openVibeEditor);
                 
-                document.getElementById('close-plan-modal-btn')?.addEventListener('click', () => {
-                    planModal.classList.add('hidden');
-                    planModal.classList.remove('flex');
+                if(closePlanModalBtn) closePlanModalBtn.addEventListener('click', () => {
+                    if(planModal) {
+                        planModal.classList.add('hidden');
+                        planModal.classList.remove('flex');
+                    }
                 });
 
-                document.getElementById('save-plan-btn')?.addEventListener('click', () => {
+                if(savePlanBtn) savePlanBtn.addEventListener('click', () => {
                     const rows = planInputsContainer.querySelectorAll('.vibe-row');
                     shiftVibes = Array.from(rows).map(row => ({
                         icon: row.querySelector('.vibe-icon').value || '✨',
@@ -3153,15 +3463,17 @@
                     if(shiftVibes.length === 0) shiftVibes = JSON.parse(JSON.stringify(defaultVibes));
 
                     localStorage.setItem('customShiftVibes', JSON.stringify(shiftVibes));
-                    planModal.classList.add('hidden');
-                    planModal.classList.remove('flex');
+                    if(planModal) {
+                        planModal.classList.add('hidden');
+                        planModal.classList.remove('flex');
+                    }
                     
                     if (currentVibeIndex !== -1) {
                         updateVibeUI(currentVibeIndex);
                     }
                 });
 
-                document.getElementById('reset-plan-btn')?.addEventListener('click', () => {
+                if(resetPlanBtn) resetPlanBtn.addEventListener('click', () => {
                     shiftVibes = JSON.parse(JSON.stringify(defaultVibes));
                     localStorage.removeItem('customShiftVibes');
                     openVibeEditor();
@@ -3352,44 +3664,6 @@
                     }
                 }
 
-                function playVibeAlertSound() {
-                    try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const playBeep = (time, freq1, freq2) => {
-                            const osc1 = ctx.createOscillator();
-                            const osc2 = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            
-                            osc1.type = 'square';
-                            osc2.type = 'sawtooth';
-                            
-                            osc1.frequency.setValueAtTime(freq1, time);
-                            osc2.frequency.setValueAtTime(freq2, time);
-                            
-                            gain.gain.setValueAtTime(0.4, time); // Loud volume
-                            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-                            
-                            osc1.connect(gain);
-                            osc2.connect(gain);
-                            gain.connect(ctx.destination);
-                            
-                            osc1.start(time);
-                            osc2.start(time);
-                            osc1.stop(time + 0.3);
-                            osc2.stop(time + 0.3);
-                        };
-                        
-                        // Play a rapid, loud triple-chime sequence twice
-                        playBeep(ctx.currentTime, 659.25, 660); // E5
-                        playBeep(ctx.currentTime + 0.15, 880, 882); // A5
-                        playBeep(ctx.currentTime + 0.30, 1046.50, 1050); // C6
-                        
-                        playBeep(ctx.currentTime + 0.70, 659.25, 660);
-                        playBeep(ctx.currentTime + 0.85, 880, 882);
-                        playBeep(ctx.currentTime + 1.00, 1046.50, 1050);
-                    } catch(e) { console.error('Audio context failed', e); }
-                }
-
                 const vibeModal = document.getElementById('vibe-shift-modal');
                 const vibeModalTitle = document.getElementById('vibe-shift-title');
                 const vibeModalDesc = document.getElementById('vibe-shift-desc');
@@ -3429,7 +3703,7 @@
                         vibeModal.classList.add('flex');
                     }
                     
-                    playVibeAlertSound();
+                    if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
                 }
 
                 function triggerBreakAlert(type, isHealthBreak = false) {
@@ -3473,7 +3747,7 @@
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
                     }
-                    playVibeAlertSound();
+                    if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
                 }
 
                 function updateDisplays(h, m, s, progress) {
@@ -3736,6 +4010,7 @@
                 }
 
                 // --- Automatic Shift Detection System ---
+                // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
                 function attemptAutoStartShift() {
                     if (restoreActiveShift()) return; // Already running
 
@@ -3746,7 +4021,7 @@
                     if (currentHour >= 16 || currentHour < 7) {
                         setTimes(19, 7); // Default logic to 19:00 - 07:00
                         
-                        if (loadBreaksBtn) loadBreaksBtn.click(); // Load default breaks
+                        if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click(); // Load default breaks
                         if (startBtn) startBtn.click(); // Trigger shift start securely
                     }
                 }
@@ -3883,137 +4158,6 @@
                 });
             }
 
-            function setupCallLog() {
-                const scenarios = {
-                    "Incoming Call": [
-                        "Out past curfew", "Left home during curfew", "DW called", "Police called", "Other called", 
-                        "Battery status", "Equipment charger fault", "Hospital", "Visit enquiry", "Other incident"
-                    ],
-                    "PD Call": [
-                        "Left home during the curfew", "Out past curfew", "Denied absence during curfew",
-                        "Denied Lateness for curfew", "Other Answered", "Equipment tamper", "Equipment power off", "Other incident"
-                    ]
-                };
-                const clContainer = document.getElementById('scenario-buttons');
-                let clState = { type: 'Incoming Call', event: null };
-                if(!clContainer) return;
-                
-                function renderScenarioButtons() {
-                    clContainer.innerHTML = '';
-                    (scenarios[clState.type] || []).forEach((evt) => {
-                        const btn = document.createElement('button');
-                        const isSelected = clState.event === evt;
-                        btn.className = `w-full h-14 rounded-xl text-[11px] sm:text-xs font-bold transition-all uppercase tracking-wider flex items-center px-5 border text-left ${
-                            isSelected 
-                            ? 'bg-[#0ea5e9]/10 border-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.2)]' 
-                            : 'bg-[#0f172a] border-[#1e293b] text-slate-400 hover:border-[#0ea5e9]/50 hover:text-slate-200 shadow-sm'
-                        }`;
-                        btn.textContent = evt;
-                        btn.addEventListener('click', () => { clState.event = evt; renderScenarioButtons(); updateLogOutput(); });
-                        clContainer.appendChild(btn);
-                    });
-                }
-
-                const btnInbound = document.getElementById('btn-type-inbound');
-                const btnPd = document.getElementById('btn-type-pd');
-                function updateCallTypeUI() {
-                    if (clState.type === "PD Call") {
-                        btnPd.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all bg-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.4)]";
-                        btnInbound.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-400 hover:text-slate-200 bg-[#0f172a] border border-[#1e293b] hover:border-[#0ea5e9]/50";
-                    } else {
-                        btnInbound.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all bg-[#0ea5e9] text-white shadow-[0_0_15px_rgba(14,165,233,0.4)]";
-                        btnPd.className = "relative z-10 flex-1 py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm tracking-wide transition-all text-slate-400 hover:text-slate-200 bg-[#0f172a] border border-[#1e293b] hover:border-[#0ea5e9]/50";
-                    }
-                }
-
-                if(btnInbound) btnInbound.addEventListener('click', () => { clState.type = "Incoming Call"; clState.event = null; updateCallTypeUI(); renderScenarioButtons(); updateLogOutput(); });
-                if(btnPd) btnPd.addEventListener('click', () => { clState.type = "PD Call"; clState.event = null; updateCallTypeUI(); renderScenarioButtons(); updateLogOutput(); });
-
-                const clCustomInput = document.getElementById('call-log-custom-details');
-                if(clCustomInput) clCustomInput.addEventListener('input', updateLogOutput);
-
-                function updateLogOutput() {
-                    const titleOut = document.getElementById('call-title-output');
-                    const logOut = document.getElementById('log-output');
-                    const customText = clCustomInput ? clCustomInput.value : '';
-
-                    if (!clState.event) { titleOut.value = ''; logOut.value = ''; return; }
-                    titleOut.value = clState.event === 'Other incident' ? `${clState.type} - ` : `${clState.type} - ${clState.event}`;
-                    logOut.value = `Caller details: System generated log\nRv's confirmed: Name, DOB\nAgent statement: Advised on ${clState.event}\nNotes: ${customText}\nAction: Call Logged`;
-                }
-
-                const copyData = (inputEl, btnEl) => {
-                    const text = inputEl.value;
-                    if(!text) return;
-                    navigator.clipboard.writeText(text).catch(() => {
-                        const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp);
-                    });
-                    const originalHtml = btnEl.innerHTML;
-                    btnEl.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1">Copied!</span>';
-                    setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
-                };
-
-                document.getElementById('copy-title-btn')?.addEventListener('click', function() { copyData(document.getElementById('call-title-output'), this); });
-                document.getElementById('copy-log-btn')?.addEventListener('click', function() { copyData(document.getElementById('log-output'), this); });
-                
-                // Initialize default state
-                updateCallTypeUI();
-                renderScenarioButtons();
-            }
-
-            function setupVisitRequest() {
-                const vrContainer = document.getElementById('vr-scenario-buttons');
-                if(!vrContainer) return;
-                const vrScenarios = ["Equipment Tamper", "Equipment Charger request", "Equipment Check", "Equipment Re-Range", "HMU replacement", "Strap too big", "Strap too small", "Consent Withdrawn", "Decom", "Install", "Equipment retrieval"];
-                let vrState = { equip: null, scenario: null };
-
-                vrScenarios.forEach(sc => {
-                    const btn = document.createElement('button');
-                    btn.className = `w-full h-12 rounded-xl text-xs font-bold transition-all uppercase tracking-wide flex items-center justify-center px-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-cyan-300 dark:hover:border-cyan-600 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10 text-center`;
-                    btn.textContent = sc;
-                    btn.addEventListener('click', () => {
-                        Array.from(vrContainer.children).forEach(b => { b.classList.remove('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4'); b.classList.add('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400'); });
-                        btn.classList.add('bg-cyan-50', 'dark:bg-cyan-900/30', 'border-cyan-400', 'text-cyan-700', 'dark:text-cyan-300', 'shadow-[0_0_15px_rgba(34,211,238,0.2)]', 'border-l-4');
-                        btn.classList.remove('border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-400');
-                        vrState.scenario = sc;
-                    });
-                    vrContainer.appendChild(btn);
-                });
-
-                const btnRf = document.getElementById('vr-equip-rf'); const btnGps = document.getElementById('vr-equip-gps');
-                function updateEquipUI() {
-                    const act = ['bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-400', 'text-indigo-700', 'dark:text-indigo-300', 'border-l-4'];
-                    const inact = ['border-slate-200', 'dark:border-slate-700', 'text-slate-600', 'dark:text-slate-300'];
-                    if (vrState.equip === 'RF') { btnRf.classList.add(...act); btnRf.classList.remove(...inact); btnGps.classList.remove(...act); btnGps.classList.add(...inact); }
-                    else if (vrState.equip === 'GPS') { btnGps.classList.add(...act); btnGps.classList.remove(...inact); btnRf.classList.remove(...act); btnRf.classList.add(...inact); }
-                    const isGps = vrState.equip === 'GPS';
-                    document.getElementById('vr-curfew-start').disabled = !isGps; document.getElementById('vr-curfew-end').disabled = !isGps;
-                    const noCurfewContainer = document.getElementById('vr-no-curfew-container');
-                    if (noCurfewContainer) { if (isGps) { noCurfewContainer.classList.remove('hidden'); noCurfewContainer.classList.add('flex'); } else { noCurfewContainer.classList.add('hidden'); noCurfewContainer.classList.remove('flex'); } }
-                }
-                if(btnRf && btnGps) { btnRf.addEventListener('click', () => { vrState.equip = 'RF'; updateEquipUI(); }); btnGps.addEventListener('click', () => { vrState.equip = 'GPS'; updateEquipUI(); }); }
-
-                document.getElementById('vr-generate-log-btn')?.addEventListener('click', () => {
-                    if(!vrState.equip || !vrState.scenario) return showAlert("Please select Equipment Type and Reason");
-                    let curfewText = 'NC';
-                    if ((vrState.equip === 'GPS' && !document.getElementById('vr-no-curfew').checked) || vrState.equip === 'RF') {
-                        curfewText = `${document.getElementById('vr-curfew-start').value}-${document.getElementById('vr-curfew-end').value}`;
-                    }
-                    const customDetails = document.getElementById('vr-custom-details').value;
-                    const title = `${vrState.scenario} - ${vrState.equip} - ${curfewText}`;
-                    const body = `Curfew Hours: ${curfewText}\nEquipment Type: ${vrState.equip}\n\nVisit statement: Requested for ${vrState.scenario}.${customDetails ? '\n\nNotes: ' + customDetails : ''}`;
-                    document.getElementById('vr-title-output').value = title; document.getElementById('vr-log-output').value = body;
-                });
-                
-                const copyData = (inputEl, btnEl) => {
-                    const text = inputEl.value; if(!text) return;
-                    navigator.clipboard.writeText(text).catch(() => { const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); });
-                    const originalHtml = btnEl.innerHTML; btnEl.innerHTML = '<span class="text-emerald-500 font-bold">Copied!</span>'; setTimeout(() => btnEl.innerHTML = originalHtml, 1500);
-                };
-                document.getElementById('vr-copy-title-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-title-output'), this); });
-                document.getElementById('vr-copy-log-btn')?.addEventListener('click', function() { copyData(document.getElementById('vr-log-output'), this); });
-            }
-
             function setupBreachCopilot() {
                 const copilotBtn = document.getElementById('breach-copilot-btn');
                 const copilotPanel = document.getElementById('breach-copilot-panel');
@@ -4115,7 +4259,13 @@
                     navigateToView(lastView);
                 }
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootApp);
+        } else {
+            bootApp();
+        }
     </script>
 </body>
 </html>
