@@ -1214,41 +1214,42 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
+        let app, auth, db;
+        let appId = 'default-app-id';
         let fbUser = null;
 
+        // Define initAuth globally so bootApp can access it
         async function initAuth() {
+            if (!auth) return; // Safely skip if Firebase isn't initialized (Netlify mode)
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
                 await signInAnonymously(auth);
             }
         }
-        
-        onAuthStateChanged(auth, (user) => { fbUser = user; });
+
+        try {
+            // Only initialize Firebase if the environment provides the config (e.g., in the Hub)
+            if (typeof __firebase_config !== 'undefined') {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+                onAuthStateChanged(auth, (user) => { fbUser = user; });
+            } else {
+                console.log("Running in standalone mode (Netlify). Cloud sync disabled, using LocalStorage.");
+            }
+        } catch (e) {
+            console.warn("Firebase initialization skipped:", e);
+        }
 
         // --- Cloud Storage Engine ---
         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound'];
         
         async function syncToCloud(username) {
-            if (!fbUser || username === 'guest') return;
-            const dataToSave = {};
-            syncKeys.forEach(k => {
-                const val = localStorage.getItem(k);
-                if (val !== null) dataToSave[k] = val;
-            });
-            
-            try {
-                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
-                await setDoc(agentRef, { data: dataToSave }, { merge: true });
-            } catch (e) {
-                console.error("Cloud sync failed", e);
-            }
+            if (!fbUser || !db || username === 'guest') return;
         }
 
         const originalSetItem = localStorage.setItem;
@@ -2049,14 +2050,33 @@
                 const err = document.getElementById('reg-error');
                 const btn = registerForm.querySelector('button[type="submit"]');
                 
+                btn.textContent = "Securing Credentials...";
+                btn.disabled = true;
+
+                // Fallback to LocalStorage Auth if deployed on Netlify without Firebase
+                if (!db) {
+                    let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
+                    if (users[user]) {
+                        err.textContent = "Email address already exists.";
+                        err.classList.remove('hidden');
+                    } else {
+                        users[user] = pass;
+                        localStorage.setItem('myndarcUsers', JSON.stringify(users));
+                        err.classList.add('hidden');
+                        loginSuccess(user);
+                    }
+                    btn.textContent = "Register";
+                    btn.disabled = false;
+                    return;
+                }
+
                 if (!fbUser) {
                     err.textContent = "Cloud connection initializing, please wait...";
                     err.classList.remove('hidden');
+                    btn.textContent = "Register";
+                    btn.disabled = false;
                     return;
                 }
-                
-                btn.textContent = "Securing Credentials...";
-                btn.disabled = true;
 
                 try {
                     const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
@@ -2093,14 +2113,31 @@
                 const err = document.getElementById('login-error');
                 const btn = loginForm.querySelector('button[type="submit"]');
                 
+                btn.textContent = "Authenticating...";
+                btn.disabled = true;
+
+                // Fallback to LocalStorage Auth if deployed on Netlify without Firebase
+                if (!db) {
+                    let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
+                    if (users[user] && users[user] === pass) {
+                        err.classList.add('hidden');
+                        loginSuccess(user);
+                    } else {
+                        err.textContent = "Invalid Email address or Password.";
+                        err.classList.remove('hidden');
+                    }
+                    btn.textContent = "Login";
+                    btn.disabled = false;
+                    return;
+                }
+
                 if (!fbUser) {
                     err.textContent = "Cloud connection initializing, please wait...";
                     err.classList.remove('hidden');
+                    btn.textContent = "Login";
+                    btn.disabled = false;
                     return;
                 }
-                
-                btn.textContent = "Authenticating...";
-                btn.disabled = true;
 
                 try {
                     const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
