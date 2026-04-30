@@ -734,7 +734,7 @@
                                         <div class="flex items-center justify-between">
                                             <div class="text-left pr-4">
                                                 <label for="health-breaks-toggle" class="text-sm font-bold text-gray-200 cursor-pointer select-none">Smart Health Breaks</label>
-                                                <p class="text-[10px] text-gray-400 mt-0.5">Adds a 5m walk break every hour if gaps exist.</p>
+                                                <p class="text-[10px] text-gray-400 mt-0.5">Adds a 5m break at the end of every hour (no pop-up).</p>
                                             </div>
                                             <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                                                 <input type="checkbox" name="health-breaks-toggle" id="health-breaks-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-green-400" checked/>
@@ -3138,6 +3138,34 @@
                     if (todayTotal) {
                         todayTotal.textContent = currentItems.length;
                     }
+                    
+                    const effEl = document.getElementById('breach-efficiency');
+                    if (effEl) {
+                        if (currentItems.length === 0) {
+                            effEl.textContent = '100%';
+                            effEl.className = "text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1 tracking-tighter transition-colors";
+                        } else {
+                            let score = 0;
+                            currentItems.forEach(item => {
+                                if (item.completed) {
+                                    score += item.passedOn ? 0.5 : 1; // 50% credit if late/carried over
+                                } else {
+                                    score += item.passedOn ? -0.2 : 0; // Extra penalty if carried over & still incomplete
+                                }
+                            });
+                            
+                            let eff = Math.max(0, Math.min(100, (score / currentItems.length) * 100));
+                            effEl.textContent = `${Math.round(eff)}%`;
+
+                            if (eff >= 90) {
+                                effEl.className = "text-3xl font-black text-emerald-500 dark:text-emerald-400 mt-1 tracking-tighter transition-colors";
+                            } else if (eff >= 60) {
+                                effEl.className = "text-3xl font-black text-amber-500 dark:text-amber-400 mt-1 tracking-tighter transition-colors";
+                            } else {
+                                effEl.className = "text-3xl font-black text-rose-500 dark:text-rose-400 mt-1 tracking-tighter transition-colors";
+                            }
+                        }
+                    }
                 }
 
                 if(addBtn && input) {
@@ -3912,6 +3940,7 @@
                     const breakTitle = document.querySelector('#break-active-display h2');
                     const breakDesc = document.querySelector('#break-active-display p');
                     const breakIcon = document.querySelector('#break-active-display .w-32 span');
+                    const breakAlertBanner = document.getElementById('break-alert-banner');
 
                     if (activeBreak) {
                         const breakRemaining = activeBreak.endMs - now;
@@ -3919,17 +3948,26 @@
                         const bs = Math.floor((breakRemaining % 60000) / 1000);
                         const pad = n => String(n).padStart(2, '0');
                         
-                        if (breakDisplay) {
-                            breakDisplay.classList.remove('hidden');
-                            breakDisplay.classList.add('flex');
-                        }
-                        if (breakTimerLarge) breakTimerLarge.textContent = `${pad(bm)}:${pad(bs)}`;
-                        
                         if (activeBreak.isHealthBreak) {
-                            if (breakTitle) breakTitle.textContent = "Health Break";
-                            if (breakDesc) breakDesc.textContent = "Stand up, stretch your legs, and rest your eyes.";
-                            if (breakIcon) breakIcon.textContent = "🧘";
+                            if (breakDisplay) {
+                                breakDisplay.classList.add('hidden');
+                                breakDisplay.classList.remove('flex');
+                            }
+                            if (breakAlertBanner) {
+                                breakAlertBanner.classList.remove('hidden');
+                                breakAlertBanner.classList.add('flex');
+                                breakAlertBanner.innerHTML = `<span class="text-xl">🧘</span> HEALTH BREAK: ${pad(bm)}:${pad(bs)}`;
+                            }
                         } else {
+                            if (breakAlertBanner) {
+                                breakAlertBanner.classList.add('hidden');
+                                breakAlertBanner.classList.remove('flex');
+                            }
+                            if (breakDisplay) {
+                                breakDisplay.classList.remove('hidden');
+                                breakDisplay.classList.add('flex');
+                            }
+                            if (breakTimerLarge) breakTimerLarge.textContent = `${pad(bm)}:${pad(bs)}`;
                             if (breakTitle) breakTitle.textContent = "Break Time";
                             if (breakDesc) breakDesc.textContent = "Decompress. Hydrate. Move.";
                             if (breakIcon) breakIcon.textContent = "☕";
@@ -3938,6 +3976,10 @@
                         if (breakDisplay) {
                             breakDisplay.classList.add('hidden');
                             breakDisplay.classList.remove('flex');
+                        }
+                        if (breakAlertBanner) {
+                            breakAlertBanner.classList.add('hidden');
+                            breakAlertBanner.classList.remove('flex');
                         }
                     }
 
@@ -3977,12 +4019,20 @@
 
                         if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
                             warnedBreaksStart.add(index);
-                            triggerBreakAlert('start', brk.isHealthBreak);
+                            if (brk.isHealthBreak) {
+                                if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
+                            } else {
+                                triggerBreakAlert('start', false);
+                            }
                         }
 
                         if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
                             warnedBreaksEnd.add(index);
-                            triggerBreakAlert('end', brk.isHealthBreak);
+                            if (brk.isHealthBreak) {
+                                if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
+                            } else {
+                                triggerBreakAlert('end', false);
+                            }
                         }
                     });
                 }
@@ -4111,8 +4161,8 @@
                         if (healthToggle && healthToggle.checked) {
                             for (let i = 0; i < totalSegments; i++) {
                                 const hStart = startTimeValue + i * 3600000;
-                                const hbStart = hStart + 50 * 60000; // 50 mins into the hour
-                                const hbEnd = hbStart + 5 * 60000; // 5 mins long
+                                const hbStart = hStart + 55 * 60000; // 55 mins into the hour
+                                const hbEnd = hStart + 60 * 60000; // 60 mins into the hour (end of hour)
                                 
                                 if (hbEnd <= endTime) {
                                     // Make sure it doesn't overlap with a manual break
