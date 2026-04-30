@@ -838,8 +838,13 @@
                                     <div class="absolute -right-20 -top-20 w-60 h-60 bg-teal-600/10 rounded-full blur-3xl pointer-events-none group-hover:bg-teal-600/20 transition-all"></div>
                                     <div class="flex flex-col md:flex-row md:items-start justify-between mb-8 relative z-10 gap-4">
                                         <div>
-                                            <div class="flex items-center gap-3 mb-2">
+                                            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                                                 <span id="current-hour-badge" class="px-3 py-1 bg-teal-500/20 text-teal-200 text-[10px] uppercase font-extrabold tracking-[0.2em] rounded-md border border-teal-500/30">Hourly Objective</span>
+                                                <span id="vibe-progress-counter" class="px-2 py-1 bg-black/30 text-teal-300 text-[10px] uppercase font-bold tracking-widest rounded-md border border-white/10 hidden sm:inline-block">0 / 0 Done</span>
+                                                
+                                                <button id="mark-vibe-done-btn" class="p-1.5 bg-white/5 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 rounded-md transition-all border border-white/10 flex items-center justify-center cursor-pointer relative z-20 group ml-1" title="Mark Phase as Done">
+                                                    <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                </button>
                                                 <button id="shuffle-vibe-btn" class="p-1.5 bg-white/5 hover:bg-white/20 text-teal-200 hover:text-white rounded-md transition-colors border border-white/10 flex items-center justify-center cursor-pointer relative z-20" title="Shuffle Objective">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                                                 </button>
@@ -848,7 +853,7 @@
                                                 </button>
                                                 <p id="current-hour-theme" class="text-teal-400 text-sm font-mono uppercase tracking-widest">// Vibe</p>
                                             </div>
-                                            <h3 id="current-hour-title" class="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight">Phase</h3>
+                                            <h3 id="current-hour-title" class="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight transition-all">Phase</h3>
                                         </div>
                                         <div class="w-16 h-16 bg-white/5 rounded-2xl flex flex-shrink-0 items-center justify-center border border-white/10 shadow-inner self-start"><span id="current-hour-icon" class="text-4xl filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🚀</span></div>
                                     </div>
@@ -3418,6 +3423,7 @@
                 let currentVibeIndex = -1;
                 let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
+                let shiftVibeStatus = [];
                 let warnedBreaksStart = new Set();
                 let warnedBreaksEnd = new Set();
 
@@ -3693,9 +3699,32 @@
                     const mTitle = document.getElementById('current-hour-title');
                     const mIcon = document.getElementById('current-hour-icon');
                     const mDesc = document.getElementById('current-hour-content');
-                    if(mTitle) mTitle.textContent = vibe.title;
+                    const markDoneBtn = document.getElementById('mark-vibe-done-btn');
+                    const progCounter = document.getElementById('vibe-progress-counter');
+
+                    if(mTitle) {
+                        mTitle.textContent = vibe.title;
+                        if (shiftVibeStatus[index]) {
+                            mTitle.classList.add('opacity-50', 'line-through');
+                        } else {
+                            mTitle.classList.remove('opacity-50', 'line-through');
+                        }
+                    }
                     if(mIcon) mIcon.textContent = vibe.icon;
                     if(mDesc) mDesc.innerHTML = `<p>${vibe.desc}</p>`;
+
+                    if (markDoneBtn) {
+                        if (shiftVibeStatus[index]) {
+                            markDoneBtn.className = 'p-1.5 bg-emerald-500 text-white rounded-md transition-all border border-emerald-400 flex items-center justify-center cursor-pointer relative z-20 shadow-[0_0_10px_rgba(16,185,129,0.4)] scale-105 ml-1';
+                        } else {
+                            markDoneBtn.className = 'p-1.5 bg-white/5 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 rounded-md transition-all border border-white/10 flex items-center justify-center cursor-pointer relative z-20 group ml-1';
+                        }
+                    }
+
+                    if (progCounter) {
+                        const completedCount = shiftVibeStatus.filter(v => v).length;
+                        progCounter.textContent = `${completedCount} / ${totalSegments} Done`;
+                    }
 
                     const dTitle = document.getElementById('dash-vibe-title');
                     const dIcon = document.getElementById('dash-vibe-icon');
@@ -3813,6 +3842,23 @@
                         modal.classList.add('flex');
                     }
                     if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
+                }
+
+                const markVibeDoneBtn = document.getElementById('mark-vibe-done-btn');
+                if (markVibeDoneBtn) {
+                    markVibeDoneBtn.addEventListener('click', () => {
+                        if (currentVibeIndex < 0 || currentVibeIndex >= totalSegments) return;
+                        shiftVibeStatus[currentVibeIndex] = !shiftVibeStatus[currentVibeIndex];
+                        
+                        const savedShiftStr = localStorage.getItem('activeShiftData');
+                        if (savedShiftStr) {
+                            const savedShift = JSON.parse(savedShiftStr);
+                            savedShift.vibeStatus = shiftVibeStatus;
+                            localStorage.setItem('activeShiftData', JSON.stringify(savedShift));
+                        }
+                        
+                        updateVibeUI(currentVibeIndex);
+                    });
                 }
 
                 function updateDisplays(h, m, s, progress) {
@@ -4061,6 +4107,7 @@
                             }
 
                             totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
+                            shiftVibeStatus = savedShift.vibeStatus || new Array(totalSegments).fill(false);
                             renderTimeline(totalSegments, startTimeValue, endTime);
                             currentVibeIndex = -1;
                             nextVibeWarnedIndex = -1;
@@ -4175,11 +4222,13 @@
                         }
                         
                         shiftBreaks.sort((a, b) => a.startMs - b.startMs);
+                        shiftVibeStatus = new Array(totalSegments).fill(false);
 
                         localStorage.setItem('activeShiftData', JSON.stringify({
                             startMs: startTimeValue,
                             endMs: endTime,
-                            breaks: shiftBreaks
+                            breaks: shiftBreaks,
+                            vibeStatus: shiftVibeStatus
                         }));
 
                         renderTimeline(totalSegments, startTimeValue, endTime);
@@ -4218,9 +4267,13 @@
                     localStorage.removeItem('activeShiftData');
                     warnedBreaksStart.clear();
                     warnedBreaksEnd.clear();
+                    shiftVibeStatus = [];
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
                     updateDisplays(0, 0, 0, 0);
+                    
+                    const progCounter = document.getElementById('vibe-progress-counter');
+                    if (progCounter) progCounter.textContent = '0 / 0 Done';
                     
                     const resets = [
                         { t: 'dash-vibe-title', i: 'dash-vibe-icon', m: 'dash-vibe-task', sub: 'Start a shift to see your vibe.' },
