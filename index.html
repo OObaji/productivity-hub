@@ -464,6 +464,10 @@
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Shift Timer
                 </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="ot-generator">
+                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    OT Generator
+                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="breach-list">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                     Breach List
@@ -981,6 +985,73 @@
                     </div>
                 </div>
 
+                <!-- Overtime Generator -->
+                <div id="ot-generator" class="page-view container mx-auto px-6 py-10 max-w-6xl">
+                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Overtime Generator</h1>
+                    <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl">Automatically calculates available dates based on your bi-weekly schedule (Week A: Mon, Tue, Thu, Sat | Week B: Wed, Thu, Sat). It ensures a maximum of 6 working days per week and permanently reserves Sunday as a rest day.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Controls -->
+                        <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-6">
+                            <div>
+                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Start Date</label>
+                                <input type="date" id="ot-gen-start" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Weeks to Generate</label>
+                                <input type="number" id="ot-gen-weeks" value="4" min="1" max="12" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Shift Time</label>
+                                <input type="text" id="ot-gen-time" value="19:00 - 05:00" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Duties Trained On</label>
+                                <div class="flex gap-2 mb-3">
+                                    <input type="text" id="ot-new-duty-input" placeholder="Add custom duty..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                    <button type="button" id="ot-add-duty-btn" class="px-4 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl transition-colors text-sm shadow-sm">+</button>
+                                </div>
+                                <div id="ot-gen-duties-container" class="flex flex-wrap gap-2">
+                                    <button type="button" class="duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]" data-selected="true" data-duty="PD/ Incoming calls">PD/ Incoming calls</button>
+                                    <button type="button" class="duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]" data-selected="true" data-duty="AL13">AL13</button>
+                                    <button type="button" class="duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]" data-selected="true" data-duty="AL105">AL105</button>
+                                    <button type="button" class="duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]" data-selected="true" data-duty="AL106">AL106</button>
+                                    <button type="button" class="duty-toggle px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-bold transition-all hover:bg-slate-200 dark:hover:bg-slate-800" data-selected="false" data-duty="Trail data">Trail data</button>
+                                </div>
+                            </div>
+                            <button id="ot-gen-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Generate Requests</button>
+                        </div>
+                        
+                        <!-- Output Table -->
+                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
+                                <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
+                                    <span>Copy Table</span>
+                                </button>
+                            </div>
+                            
+                            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-600 flex-1">
+                                <table class="w-full text-left text-sm text-slate-800 dark:text-slate-300">
+                                    <thead class="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-600">
+                                        <tr>
+                                            <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">OT Request Date</th>
+                                            <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">Time</th>
+                                            <th class="px-4 py-3 font-bold">Duties Trained on</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ot-gen-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800/50 font-mono text-xs">
+                                        <tr>
+                                            <td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">Click "Generate Requests" to calculate dates.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Settings -->
                 <div id="settings" class="page-view container mx-auto px-6 py-10 max-w-4xl">
                       <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Settings</h1>
@@ -1166,6 +1237,63 @@
                             <div id="view-breach-history" class="hidden flex-1 flex-col p-0 bg-slate-50/30 dark:bg-gray-900/10 rounded-b-[2.5rem] overflow-y-auto custom-scrollbar">
                                 <div id="breach-history-container" class="flex-1 p-8 space-y-6 pb-8">
                                     <!-- History groups go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overtime Generator -->
+                    <div id="ot-generator" class="page-view container mx-auto px-6 py-10 max-w-6xl">
+                        <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Overtime Generator</h1>
+                        <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl">Automatically calculates available dates based on your bi-weekly schedule (Week A: Mon, Tue, Thu, Sat | Week B: Wed, Thu, Sat). It ensures a maximum of 6 working days per week and permanently reserves Sunday as a rest day.</p>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <!-- Controls -->
+                            <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Start Date</label>
+                                    <input type="date" id="ot-gen-start" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Weeks to Generate</label>
+                                    <input type="number" id="ot-gen-weeks" value="4" min="1" max="12" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Shift Time</label>
+                                    <input type="text" id="ot-gen-time" value="19:00 - 05:00" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Duties Trained On</label>
+                                    <input type="text" id="ot-gen-duties" value="PD/ Incoming calls | AL13 | AL105 | AL106" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-white transition-all">
+                                </div>
+                                <button id="ot-gen-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Generate Requests</button>
+                            </div>
+                            
+                            <!-- Output Table -->
+                            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
+                                    <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
+                                        <span>Copy Table</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-600 flex-1">
+                                    <table class="w-full text-left text-sm text-slate-800 dark:text-slate-300">
+                                        <thead class="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-600">
+                                            <tr>
+                                                <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">OT Request Date</th>
+                                                <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">Time</th>
+                                                <th class="px-4 py-3 font-bold">Duties Trained on</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ot-gen-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800/50 font-mono text-xs">
+                                            <tr>
+                                                <td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">Click "Generate Requests" to calculate dates.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -1965,6 +2093,7 @@
                 setupBreachList();
                 setupSalaryCalculator();
                 setupOvertimeTracker();
+                setupOTGenerator();
                 setupBallGame(); 
                 setupShiftTimer();
                 setupSoundscapes();
@@ -3282,6 +3411,235 @@
                     div.className = "p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 flex justify-between items-center";
                     div.innerHTML = `<div><p class="font-bold">${date}</p><p class="text-xs text-slate-500">${hours}h @ £${rate}/h • ${alloc}</p></div><div class="font-bold text-indigo-600 dark:text-indigo-400">+£${total}</div>`;
                     list.prepend(div);
+                });
+            }
+
+            function setupOTGenerator() {
+                const startInput = document.getElementById('ot-gen-start');
+                const btn = document.getElementById('ot-gen-btn');
+                const tbody = document.getElementById('ot-gen-tbody');
+                const copyBtn = document.getElementById('ot-copy-btn');
+                
+                if (!startInput || !btn) return;
+                
+                // Default to today
+                const today = new Date();
+                const offset = today.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(Date.now() - offset)).toISOString().split('T')[0];
+                startInput.value = localISOTime;
+
+                // Duty Toggles Logic (with persistent custom duties)
+                const dutiesContainer = document.getElementById('ot-gen-duties-container');
+                if (dutiesContainer) {
+                    // Event delegation for toggling
+                    dutiesContainer.addEventListener('click', (e) => {
+                        const toggleBtn = e.target.closest('.duty-toggle');
+                        if (!toggleBtn) return;
+                        
+                        const isSelected = toggleBtn.dataset.selected === 'true';
+                        if (isSelected) {
+                            toggleBtn.dataset.selected = 'false';
+                            toggleBtn.className = 'duty-toggle px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-bold transition-all hover:bg-slate-200 dark:hover:bg-slate-800';
+                        } else {
+                            toggleBtn.dataset.selected = 'true';
+                            toggleBtn.className = 'duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]';
+                        }
+                    });
+
+                    // Manage custom duties
+                    const newDutyInput = document.getElementById('ot-new-duty-input');
+                    const addDutyBtn = document.getElementById('ot-add-duty-btn');
+
+                    const saveCustomDuties = () => {
+                        const defaultDuties = ["PD/ Incoming calls", "AL13", "AL105", "AL106", "Trail data"];
+                        const currentDuties = Array.from(dutiesContainer.querySelectorAll('.duty-toggle')).map(b => b.dataset.duty);
+                        const customDuties = currentDuties.filter(d => !defaultDuties.includes(d));
+                        localStorage.setItem('customOTDuties', JSON.stringify(customDuties));
+                    };
+
+                    const loadCustomDuties = () => {
+                        const custom = JSON.parse(localStorage.getItem('customOTDuties') || '[]');
+                        custom.forEach(dutyName => {
+                            const existing = Array.from(dutiesContainer.querySelectorAll('.duty-toggle')).map(b => b.dataset.duty.toLowerCase());
+                            if (existing.includes(dutyName.toLowerCase())) return;
+
+                            const customBtn = document.createElement('button');
+                            customBtn.type = 'button';
+                            customBtn.className = 'duty-toggle px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-bold transition-all hover:bg-slate-200 dark:hover:bg-slate-800';
+                            customBtn.dataset.selected = 'false';
+                            customBtn.dataset.duty = dutyName;
+                            customBtn.textContent = dutyName;
+                            dutiesContainer.appendChild(customBtn);
+                        });
+                    };
+
+                    loadCustomDuties();
+
+                    if (addDutyBtn && newDutyInput) {
+                        addDutyBtn.addEventListener('click', () => {
+                            const dutyName = newDutyInput.value.trim();
+                            if (!dutyName) return;
+
+                            const existing = Array.from(dutiesContainer.querySelectorAll('.duty-toggle')).map(b => b.dataset.duty.toLowerCase());
+                            if (existing.includes(dutyName.toLowerCase())) {
+                                newDutyInput.value = '';
+                                return; // Skip duplicates
+                            }
+
+                            const customBtn = document.createElement('button');
+                            customBtn.type = 'button';
+                            customBtn.className = 'duty-toggle px-3 py-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold transition-all shadow-[0_0_10px_rgba(99,102,241,0.2)]';
+                            customBtn.dataset.selected = 'true';
+                            customBtn.dataset.duty = dutyName;
+                            customBtn.textContent = dutyName;
+                            
+                            dutiesContainer.appendChild(customBtn);
+                            newDutyInput.value = '';
+                            saveCustomDuties();
+                        });
+
+                        newDutyInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addDutyBtn.click();
+                            }
+                        });
+                    }
+                }
+
+                // Base Reference Date: Monday, April 27, 2026 (Start of Week A)
+                const baseWeekA_Monday = new Date('2026-04-27T00:00:00').getTime();
+                const msPerDay = 1000 * 60 * 60 * 24;
+
+                let generatedResults = [];
+
+                btn.addEventListener('click', () => {
+                    const startStr = startInput.value;
+                    const weeks = parseInt(document.getElementById('ot-gen-weeks').value) || 4;
+                    const timeStr = document.getElementById('ot-gen-time').value || "19:00 - 05:00";
+                    
+                    const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
+                                                .map(b => b.dataset.duty)
+                                                .join(' | ');
+                    const dutiesStr = selectedDuties || "None";
+                    
+                    if (!startStr) {
+                        if (typeof showAlert === 'function') return showAlert("Please select a start date.");
+                        else return alert("Please select a start date.");
+                    }
+
+                    const startDate = new Date(startStr);
+                    startDate.setHours(0,0,0,0);
+                    let currentDateMs = startDate.getTime();
+                    const endDateMs = currentDateMs + (weeks * 7 * msPerDay);
+                    
+                    generatedResults = [];
+                    tbody.innerHTML = '';
+
+                    while (currentDateMs < endDateMs) {
+                        const daysSinceBase = Math.floor((currentDateMs - baseWeekA_Monday) / msPerDay);
+                        
+                        // Modulo 14 for the 14-day bi-weekly cycle
+                        let cycleDay = daysSinceBase % 14;
+                        if (cycleDay < 0) cycleDay += 14; 
+                        
+                        /* * Cycle Day Map (Starts Monday Week A)
+                         * Week A working: Mon(0), Tue(1), Thu(3), Sat(5). 
+                         * Week A Off: Wed(2), Fri(4), Sun(6 - Reserved) -> OT on 2, 4
+                         * Week B working: Wed(9), Thu(10), Sat(12).
+                         * Week B Off: Mon(7), Tue(8), Fri(11), Sun(13 - Reserved) -> OT on 7, 8, 11
+                         */
+                        const availableOTDays = [2, 4, 7, 8, 11];
+
+                        if (availableOTDays.includes(cycleDay)) {
+                            const d = new Date(currentDateMs);
+                            const pad = n => String(n).padStart(2, '0');
+                            const formattedDate = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+                            
+                            generatedResults.push({
+                                date: formattedDate,
+                                time: timeStr,
+                                duties: dutiesStr
+                            });
+
+                            const tr = document.createElement('tr');
+                            tr.className = "hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors";
+                            tr.innerHTML = `
+                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold">${formattedDate}</td>
+                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">${timeStr}</td>
+                                <td class="px-4 py-3 text-slate-500 dark:text-slate-400">${dutiesStr}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        }
+                        
+                        currentDateMs += msPerDay;
+                    }
+
+                    if (generatedResults.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">No available overtime dates found in this range.</td></tr>`;
+                    }
+                });
+
+                copyBtn.addEventListener('click', () => {
+                    if (generatedResults.length === 0) {
+                        if (typeof showAlert === 'function') return showAlert("Generate some dates first before copying.");
+                        else return alert("Generate some dates first before copying.");
+                    }
+
+                    // Build HTML Table for Rich Text paste (Teams/Word/Excel) with explicit borders
+                    let htmlString = '<table style="border-collapse: collapse; border: 1px solid #94a3b8; font-family: sans-serif; text-align: left; width: 100%;">';
+                    htmlString += '<thead><tr>';
+                    htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">OT Request Date</th>';
+                    htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">Time</th>';
+                    htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">Duties Trained on</th>';
+                    htmlString += '</tr></thead><tbody>';
+                    
+                    generatedResults.forEach(row => {
+                        htmlString += '<tr>';
+                        htmlString += `<td style="border: 1px solid #94a3b8; padding: 8px; color: #334155;">${row.date}</td>`;
+                        htmlString += `<td style="border: 1px solid #94a3b8; padding: 8px; color: #334155;">${row.time}</td>`;
+                        htmlString += `<td style="border: 1px solid #94a3b8; padding: 8px; color: #334155;">${row.duties}</td>`;
+                        htmlString += '</tr>';
+                    });
+                    htmlString += '</tbody></table>';
+
+                    // Use a hidden div to execute a rich text copy
+                    const tempDiv = document.createElement('div');
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    tempDiv.innerHTML = htmlString;
+                    document.body.appendChild(tempDiv);
+
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(tempDiv);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+
+                    try {
+                        // Copy the formatted HTML to keep the borders
+                        document.execCommand('copy');
+                    } catch (err) {
+                        console.error('Failed to copy rich text table: ', err);
+                        // Fallback to TSV if HTML copy fails
+                        let tsvString = "OT Request Date\tTime\tDuties Trained on\n";
+                        generatedResults.forEach(row => {
+                            tsvString += `${row.date}\t${row.time}\t${row.duties}\n`;
+                        });
+                        const temp = document.createElement('textarea');
+                        temp.value = tsvString;
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                    }
+
+                    selection.removeAllRanges();
+                    document.body.removeChild(tempDiv);
+
+                    const originalHtml = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-emerald-500 font-bold ml-2">Copied!</span>';
+                    setTimeout(() => copyBtn.innerHTML = originalHtml, 2000);
                 });
             }
 
