@@ -1020,6 +1020,29 @@
                                 </div>
                             </div>
                             <button id="ot-gen-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Generate Requests</button>
+                            
+                            <!-- Mini Calendar View -->
+                            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Shift Pattern</h3>
+                                    <div class="flex gap-1 items-center bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-600 p-1">
+                                        <button type="button" id="cal-prev-month" class="px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-500 dark:text-slate-400 transition-colors">&lt;</button>
+                                        <span id="cal-month-label" class="text-[10px] font-bold uppercase w-20 text-center text-slate-700 dark:text-slate-300"></span>
+                                        <button type="button" id="cal-next-month" class="px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-slate-500 dark:text-slate-400 transition-colors">&gt;</button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 mb-2">
+                                    <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
+                                </div>
+                                <div id="ot-mini-calendar" class="grid grid-cols-7 gap-1.5">
+                                    <!-- dynamically injected -->
+                                </div>
+                                <div class="flex items-center gap-4 mt-5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span> Working</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-300 shadow-[0_0_8px_rgba(250,204,21,0.5)]"></span> Confirmed OT</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></span> Rest</div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Output Table -->
@@ -1378,10 +1401,22 @@
         }
 
         // --- Cloud Storage Engine ---
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound', 'myndarcOTRequests'];
         
         async function syncToCloud(username) {
             if (!fbUser || !db || username === 'guest') return;
+            const dataToSave = {};
+            syncKeys.forEach(k => {
+                const val = localStorage.getItem(k);
+                if (val !== null) dataToSave[k] = val;
+            });
+            
+            try {
+                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
+                await setDoc(agentRef, { data: dataToSave }, { merge: true });
+            } catch (e) {
+                console.error("Cloud sync failed", e);
+            }
         }
 
         const originalSetItem = localStorage.setItem;
@@ -3419,6 +3454,7 @@
                 const btn = document.getElementById('ot-gen-btn');
                 const tbody = document.getElementById('ot-gen-tbody');
                 const copyBtn = document.getElementById('ot-copy-btn');
+                const clearBtn = document.getElementById('ot-clear-btn');
                 
                 if (!startInput || !btn) return;
                 
@@ -3510,8 +3546,167 @@
                 // Base Reference Date: Monday, April 27, 2026 (Start of Week A)
                 const baseWeekA_Monday = new Date('2026-04-27T00:00:00').getTime();
                 const msPerDay = 1000 * 60 * 60 * 24;
+                
+                // Track generated results globally so the calendar can read them
+                let generatedResults = JSON.parse(localStorage.getItem('myndarcOTRequests')) || [];
+                
+                // --- Mini Calendar Logic ---
+                const workingDaysCycle = [0, 1, 3, 5, 9, 10, 12];
+                let currentCalDate = new Date();
+                if(startInput.value) {
+                    const parts = startInput.value.split('-');
+                    currentCalDate = new Date(parts[0], parts[1]-1, parts[2]);
+                }
 
-                let generatedResults = [];
+                function renderMiniCalendar() {
+                    const calContainer = document.getElementById('ot-mini-calendar');
+                    const monthLabel = document.getElementById('cal-month-label');
+                    if(!calContainer || !monthLabel) return;
+
+                    const year = currentCalDate.getFullYear();
+                    const month = currentCalDate.getMonth();
+                    monthLabel.textContent = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+                    const firstDayOfMonth = new Date(year, month, 1);
+                    const lastDayOfMonth = new Date(year, month + 1, 0);
+                    const realToday = new Date();
+
+                    let startingBlankDays = firstDayOfMonth.getDay() - 1; // 0 is Sunday, 1 is Monday.
+                    if (startingBlankDays < 0) startingBlankDays = 6; // Sunday becomes 6
+
+                    let html = '';
+                    // Blanks
+                    for (let i = 0; i < startingBlankDays; i++) {
+                        html += `<div class="aspect-square"></div>`;
+                    }
+
+                    // Days
+                    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+                        const dateObj = new Date(year, month, day, 0, 0, 0);
+                        const daysSinceBase = Math.floor((dateObj.getTime() - baseWeekA_Monday) / msPerDay);
+                        let cycleDay = daysSinceBase % 14;
+                        if (cycleDay < 0) cycleDay += 14;
+
+                        const pad = n => String(n).padStart(2, '0');
+                        const formattedDate = `${pad(day)}/${pad(month + 1)}/${year}`;
+
+                        const isWorking = workingDaysCycle.includes(cycleDay);
+                        const isConfirmedOT = generatedResults.some(r => r.date === formattedDate && r.confirmed);
+                        const isToday = year === realToday.getFullYear() && month === realToday.getMonth() && day === realToday.getDate();
+                        
+                        let classes = "aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition-all ";
+                        if (isConfirmedOT) {
+                            classes += "bg-yellow-400 text-yellow-900 border border-yellow-300 shadow-[0_0_10px_rgba(250,204,21,0.3)] hover:scale-110 cursor-default";
+                        } else if (isWorking) {
+                            classes += "bg-emerald-500 text-white border border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:scale-110 cursor-default";
+                        } else {
+                            classes += "bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 opacity-60 hover:opacity-100 cursor-default";
+                        }
+                        
+                        if (isToday) {
+                            classes += " ring-2 ring-indigo-500 dark:ring-indigo-400 ring-offset-2 dark:ring-offset-slate-900";
+                        }
+                        
+                        let titleStr = '';
+                        if (isToday) titleStr += 'Today - ';
+                        if (isConfirmedOT) titleStr += 'Confirmed OT';
+                        else titleStr += isWorking ? 'Working Day' : 'Rest Day';
+
+                        html += `<div class="${classes}" title="${titleStr}">${day}</div>`;
+                    }
+                    calContainer.innerHTML = html;
+                }
+
+                document.getElementById('cal-prev-month')?.addEventListener('click', () => {
+                    currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+                    renderMiniCalendar();
+                });
+                document.getElementById('cal-next-month')?.addEventListener('click', () => {
+                    currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+                    renderMiniCalendar();
+                });
+
+                startInput.addEventListener('change', () => {
+                    if(startInput.value) {
+                        const parts = startInput.value.split('-');
+                        currentCalDate = new Date(parts[0], parts[1]-1, parts[2]);
+                        renderMiniCalendar();
+                    }
+                });
+
+                renderMiniCalendar();
+                // --- End Mini Calendar Logic ---
+
+                function saveAndRenderOT() {
+                    localStorage.setItem('myndarcOTRequests', JSON.stringify(generatedResults));
+                    tbody.innerHTML = '';
+                    
+                    if (generatedResults.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500 italic font-sans">No overtime requests tracked. Generate some to begin.</td></tr>`;
+                    } else {
+                        // Sort by actual date ascending
+                        generatedResults.sort((a,b) => {
+                            const partsA = a.date.split('/');
+                            const dateA = new Date(partsA[2], partsA[1]-1, partsA[0]);
+                            const partsB = b.date.split('/');
+                            const dateB = new Date(partsB[2], partsB[1]-1, partsB[0]);
+                            return dateA - dateB;
+                        });
+
+                        generatedResults.forEach((row, i) => {
+                            const tr = document.createElement('tr');
+                            tr.className = "hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group";
+                            tr.innerHTML = `
+                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold whitespace-nowrap">${row.date}</td>
+                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">${row.time}</td>
+                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${row.duties}</td>
+                                <td class="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-700 align-middle">
+                                    <button class="ot-status-btn px-2 py-1 rounded border ${row.confirmed ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400'} text-[10px] font-bold uppercase tracking-wider transition-all" data-index="${i}">
+                                        ${row.confirmed ? '✓ Confirmed' : 'Pending'}
+                                    </button>
+                                </td>
+                                <td class="px-3 py-3 text-center align-middle">
+                                    <button class="ot-delete-btn text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100" data-index="${i}" title="Delete Request">
+                                        <svg class="w-4 h-4 mx-auto pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                    
+                    // Update calendar to reflect confirmed shifts immediately
+                    renderMiniCalendar();
+                }
+
+                // Table Event Delegation (Toggle Status & Delete)
+                tbody.addEventListener('click', (e) => {
+                    const statusBtn = e.target.closest('.ot-status-btn');
+                    if (statusBtn) {
+                        const idx = statusBtn.dataset.index;
+                        generatedResults[idx].confirmed = !generatedResults[idx].confirmed;
+                        saveAndRenderOT();
+                    }
+                    
+                    const delBtn = e.target.closest('.ot-delete-btn');
+                    if (delBtn) {
+                        const idx = delBtn.dataset.index;
+                        generatedResults.splice(idx, 1);
+                        saveAndRenderOT();
+                    }
+                });
+
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', () => {
+                        if (confirm("Are you sure you want to clear all tracked OT requests?")) {
+                            generatedResults = [];
+                            saveAndRenderOT();
+                        }
+                    });
+                }
+
+                // Initial render from local storage
+                saveAndRenderOT();
 
                 btn.addEventListener('click', () => {
                     const startStr = startInput.value;
@@ -3520,7 +3715,7 @@
                     
                     const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
                                                 .map(b => b.dataset.duty)
-                                                .join(' | ');
+                                                .join(', ');
                     const dutiesStr = selectedDuties || "None";
                     
                     if (!startStr) {
@@ -3533,8 +3728,7 @@
                     let currentDateMs = startDate.getTime();
                     const endDateMs = currentDateMs + (weeks * 7 * msPerDay);
                     
-                    generatedResults = [];
-                    tbody.innerHTML = '';
+                    let addedCount = 0;
 
                     while (currentDateMs < endDateMs) {
                         const daysSinceBase = Math.floor((currentDateMs - baseWeekA_Monday) / msPerDay);
@@ -3556,27 +3750,26 @@
                             const pad = n => String(n).padStart(2, '0');
                             const formattedDate = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
                             
-                            generatedResults.push({
-                                date: formattedDate,
-                                time: timeStr,
-                                duties: dutiesStr
-                            });
-
-                            const tr = document.createElement('tr');
-                            tr.className = "hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors";
-                            tr.innerHTML = `
-                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold">${formattedDate}</td>
-                                <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">${timeStr}</td>
-                                <td class="px-4 py-3 text-slate-500 dark:text-slate-400">${dutiesStr}</td>
-                            `;
-                            tbody.appendChild(tr);
+                            // Prevent adding exact duplicate dates
+                            if (!generatedResults.some(r => r.date === formattedDate)) {
+                                generatedResults.push({
+                                    date: formattedDate,
+                                    time: timeStr,
+                                    duties: dutiesStr,
+                                    confirmed: false
+                                });
+                                addedCount++;
+                            }
                         }
                         
                         currentDateMs += msPerDay;
                     }
 
-                    if (generatedResults.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">No available overtime dates found in this range.</td></tr>`;
+                    if (addedCount === 0) {
+                        if (typeof showAlert === 'function') showAlert("No new dates found, or they already exist in the list.");
+                        else alert("No new dates found, or they already exist in the list.");
+                    } else {
+                        saveAndRenderOT();
                     }
                 });
 
@@ -3586,7 +3779,8 @@
                         else return alert("Generate some dates first before copying.");
                     }
 
-                    // Build HTML Table for Rich Text paste (Teams/Word/Excel) with explicit borders
+                    // Build HTML Table for Rich Text paste (Teams/Word/Excel)
+                    // Explicitly omits Status & Delete columns to match the request exactly
                     let htmlString = '<table style="border-collapse: collapse; border: 1px solid #94a3b8; font-family: sans-serif; text-align: left; width: 100%;">';
                     htmlString += '<thead><tr>';
                     htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">OT Request Date</th>';
