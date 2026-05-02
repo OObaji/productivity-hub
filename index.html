@@ -1037,9 +1037,10 @@
                                 <div id="ot-mini-calendar" class="grid grid-cols-7 gap-1.5">
                                     <!-- dynamically injected -->
                                 </div>
-                                <div class="flex items-center gap-4 mt-5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <div class="flex flex-wrap items-center gap-4 mt-5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span> Working</div>
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-300 shadow-[0_0_8px_rgba(250,204,21,0.5)]"></span> Confirmed OT</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500/20 border border-indigo-500/50 shadow-[0_0_8px_rgba(99,102,241,0.3)]"></span> Pending</div>
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></span> Rest</div>
                                 </div>
                             </div>
@@ -3592,15 +3593,18 @@
 
                         const isWorking = workingDaysCycle.includes(cycleDay);
                         const isConfirmedOT = generatedResults.some(r => r.date === formattedDate && r.confirmed);
+                        const isPendingOT = generatedResults.some(r => r.date === formattedDate && !r.confirmed);
                         const isToday = year === realToday.getFullYear() && month === realToday.getMonth() && day === realToday.getDate();
                         
-                        let classes = "aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition-all ";
+                        let classes = "day-cell aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition-all ";
                         if (isConfirmedOT) {
-                            classes += "bg-yellow-400 text-yellow-900 border border-yellow-300 shadow-[0_0_10px_rgba(250,204,21,0.3)] hover:scale-110 cursor-default";
+                            classes += "bg-yellow-400 text-yellow-900 border border-yellow-300 shadow-[0_0_10px_rgba(250,204,21,0.3)] hover:scale-110 cursor-pointer";
+                        } else if (isPendingOT) {
+                            classes += "bg-indigo-500/20 text-indigo-400 dark:text-indigo-300 border border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:scale-110 cursor-pointer";
                         } else if (isWorking) {
-                            classes += "bg-emerald-500 text-white border border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:scale-110 cursor-default";
+                            classes += "bg-emerald-500 text-white border border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)] cursor-not-allowed";
                         } else {
-                            classes += "bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 opacity-60 hover:opacity-100 cursor-default";
+                            classes += "bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 opacity-60 hover:opacity-100 cursor-pointer hover:ring-2 hover:ring-indigo-400";
                         }
                         
                         if (isToday) {
@@ -3609,10 +3613,11 @@
                         
                         let titleStr = '';
                         if (isToday) titleStr += 'Today - ';
-                        if (isConfirmedOT) titleStr += 'Confirmed OT';
-                        else titleStr += isWorking ? 'Working Day' : 'Rest Day';
+                        if (isConfirmedOT) titleStr += 'Confirmed OT (Click to toggle)';
+                        else if (isPendingOT) titleStr += 'Pending OT (Click to toggle)';
+                        else titleStr += isWorking ? 'Working Day' : 'Rest Day (Click to add OT)';
 
-                        html += `<div class="${classes}" title="${titleStr}">${day}</div>`;
+                        html += `<div class="${classes}" title="${titleStr}" data-date="${formattedDate}" data-working="${isWorking}">${day}</div>`;
                     }
                     calContainer.innerHTML = html;
                 }
@@ -3633,6 +3638,42 @@
                         renderMiniCalendar();
                     }
                 });
+
+                const calContainer = document.getElementById('ot-mini-calendar');
+                if (calContainer) {
+                    calContainer.addEventListener('click', (e) => {
+                        const dayEl = e.target.closest('.day-cell');
+                        if (!dayEl) return;
+                        
+                        if (dayEl.dataset.working === 'true') {
+                            if (typeof showAlert === 'function') showAlert("You are already scheduled to work on this day.");
+                            return;
+                        }
+
+                        const dateStr = dayEl.dataset.date;
+                        const existingIdx = generatedResults.findIndex(r => r.date === dateStr);
+                        
+                        if (existingIdx > -1) {
+                            // Toggle confirmed status
+                            generatedResults[existingIdx].confirmed = !generatedResults[existingIdx].confirmed;
+                        } else {
+                            // Instantly Add as confirmed OT
+                            const timeStr = document.getElementById('ot-gen-time').value || "19:00 - 05:00";
+                            const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
+                                                        .map(b => b.dataset.duty)
+                                                        .join(', ');
+                            const dutiesStr = selectedDuties || "None";
+                            
+                            generatedResults.push({
+                                date: dateStr,
+                                time: timeStr,
+                                duties: dutiesStr,
+                                confirmed: true
+                            });
+                        }
+                        saveAndRenderOT();
+                    });
+                }
 
                 renderMiniCalendar();
                 // --- End Mini Calendar Logic ---
