@@ -3435,33 +3435,31 @@
                         return;
                     }
 
-                    // Group timestamps into Start and End pairs
-                    for (let i = 0; i < matches.length; i += 2) {
-                        const start = matches[i];
-                        const end = matches[i+1] || 'Pending...';
+                    // Extract only the very first Start and the very last End
+                    const start = matches[0];
+                    const end = matches.length > 1 ? matches[matches.length - 1] : 'Pending...';
 
-                        const pairDiv = document.createElement('div');
-                        pairDiv.className = 'flex flex-col gap-2 p-3 bg-white/50 dark:bg-slate-900/30 rounded-xl border border-slate-200/50 dark:border-slate-600/50 shadow-sm';
-                        
-                        pairDiv.innerHTML = `
-                            <div class="flex items-center gap-2">
-                                <span class="w-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Start</span>
-                                <input type="text" readonly value="${start}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
-                                <button class="ts-copy-btn p-1.5 text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-colors border border-transparent hover:border-indigo-500/20" title="Copy Start Time">
-                                    <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                </button>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">End</span>
-                                <input type="text" readonly value="${end}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 focus:outline-none ${end === 'Pending...' ? 'text-slate-400 dark:text-slate-500 italic' : ''}">
-                                <button class="ts-copy-btn p-1.5 text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-colors border border-transparent hover:border-indigo-500/20" title="Copy End Time" ${end === 'Pending...' ? 'disabled' : ''}>
-                                    <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                </button>
-                            </div>
-                        `;
+                    const pairDiv = document.createElement('div');
+                    pairDiv.className = 'flex flex-col gap-2 p-3 bg-white/50 dark:bg-slate-900/30 rounded-xl border border-slate-200/50 dark:border-slate-600/50 shadow-sm';
+                    
+                    pairDiv.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Start</span>
+                            <input type="text" readonly value="${start}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
+                            <button class="ts-copy-btn p-1.5 text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-colors border border-transparent hover:border-indigo-500/20" title="Copy Start Time">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-16 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Final End</span>
+                            <input type="text" readonly value="${end}" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-200 focus:outline-none ${end === 'Pending...' ? 'text-slate-400 dark:text-slate-500 italic' : ''}">
+                            <button class="ts-copy-btn p-1.5 text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-colors border border-transparent hover:border-indigo-500/20" title="Copy End Time" ${end === 'Pending...' ? 'disabled' : ''}>
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
+                    `;
 
-                        outputContainer.appendChild(pairDiv);
-                    }
+                    outputContainer.appendChild(pairDiv);
 
                     // Attach Copy Handlers
                     outputContainer.querySelectorAll('.ts-copy-btn').forEach(btn => {
