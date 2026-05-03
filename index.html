@@ -787,9 +787,10 @@
                                         <input type="datetime-local" id="shift-end-time-input" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg appearance-none font-mono">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <button id="preset-normal-btn" class="p-4 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-2xl transition-all font-bold text-sm hover:scale-[1.02]">Normal (19:00 - 07:00)</button>
-                                    <button id="preset-overtime-btn" class="p-4 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-100 rounded-2xl transition-all font-bold text-sm hover:scale-[1.02]">Early (17:00 - 05:00)</button>
+                                <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                                    <button id="preset-normal-btn" class="p-3 sm:p-4 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-2xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">Normal (19:00 - 07:00)</button>
+                                    <button id="preset-early-btn" class="p-3 sm:p-4 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-100 rounded-2xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">Early (17:00 - 05:00)</button>
+                                    <button id="preset-ot-btn" class="p-3 sm:p-4 bg-indigo-500/10 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-100 rounded-2xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">OT (19:00 - 05:00)</button>
                                 </div>
                                 <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
                                     <div class="flex justify-between items-center mb-4">
@@ -4042,7 +4043,8 @@
                 const endInput = document.getElementById('shift-end-time-input');
                 
                 const presetNormal = document.getElementById('preset-normal-btn');
-                const presetOvertime = document.getElementById('preset-overtime-btn');
+                const presetEarly = document.getElementById('preset-early-btn');
+                const presetOT = document.getElementById('preset-ot-btn');
 
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
@@ -4271,7 +4273,8 @@
                 }
 
                 if(presetNormal) presetNormal.addEventListener('click', () => setTimes(19, 7));
-                if(presetOvertime) presetOvertime.addEventListener('click', () => setTimes(17, 5));
+                if(presetEarly) presetEarly.addEventListener('click', () => setTimes(17, 5));
+                if(presetOT) presetOT.addEventListener('click', () => setTimes(19, 5));
 
                 function renderTimeline(segments, startMs, endMs) {
                     const container = document.getElementById('shift-blocks-container');
@@ -4778,7 +4781,7 @@
                 // --- Automatic Shift Detection System ---
                 // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
                 function attemptAutoStartShift() {
-                    if (restoreActiveShift()) return; // Already running
+                    if (localStorage.getItem('activeShiftData')) return; // Already running
 
                     const now = new Date();
                     const currentHour = now.getHours();
@@ -4792,10 +4795,13 @@
                     }
                 }
                 
+                // Immediately restore the UI if a shift is already active
+                restoreActiveShift();
+
                 // Fire auto-start only once when dashboard fully initializes
                 setTimeout(attemptAutoStartShift, 1500);
 
-                if(!restoreActiveShift() && startBtn) {
+                if(startBtn) {
                     startBtn.addEventListener('click', () => {
                         const startVal = startInput.value;
                         const endVal = endInput.value;
