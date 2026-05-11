@@ -4127,12 +4127,34 @@
                 const planModal = document.getElementById('shift-plan-modal');
                 const planInputsContainer = document.getElementById('plan-inputs-container');
                 
+                function getVibeTimeRange(index) {
+                    let baseTimeMs;
+                    const savedShiftStr = localStorage.getItem('activeShiftData');
+                    const startInput = document.getElementById('shift-start-time-input');
+
+                    if (savedShiftStr) {
+                        baseTimeMs = JSON.parse(savedShiftStr).startMs;
+                    } else if (startInput && startInput.value) {
+                        baseTimeMs = new Date(startInput.value).getTime();
+                    } else {
+                        const now = new Date();
+                        now.setHours(19, 0, 0, 0);
+                        baseTimeMs = now.getTime();
+                    }
+
+                    const blockStart = new Date(baseTimeMs + index * 60 * 60 * 1000);
+                    const blockEnd = new Date(baseTimeMs + (index + 1) * 60 * 60 * 1000);
+                    const pad = (n) => String(n).padStart(2, '0');
+                    return `${pad(blockStart.getHours())}:${pad(blockStart.getMinutes())} - ${pad(blockEnd.getHours())}:${pad(blockEnd.getMinutes())}`;
+                }
+
                 function addVibeRow(vibe, index) {
+                    const timeRange = getVibeTimeRange(index);
                     const div = document.createElement('div');
                     div.className = 'vibe-row p-4 bg-black/20 rounded-2xl border border-white/5 space-y-3 relative group';
                     div.innerHTML = `
                         <div class="flex items-center gap-3 pr-8">
-                            <span class="phase-label text-xs font-bold text-slate-500 uppercase w-16 shrink-0">Phase ${index + 1}</span>
+                            <span class="phase-label text-xs font-bold text-slate-500 uppercase w-28 shrink-0 leading-tight">Phase ${index + 1}<br><span class="text-[9px] text-slate-400/70 font-mono normal-case tracking-widest">${timeRange}</span></span>
                             <input type="text" class="vibe-icon w-12 text-center p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none" value="${vibe.icon}" placeholder="Icon">
                             <input type="text" class="vibe-title flex-1 p-2.5 rounded-xl bg-black/40 text-white border border-white/10 focus:border-indigo-500 focus:outline-none font-bold" value="${vibe.title}" placeholder="Phase Title">
                         </div>
@@ -4145,7 +4167,7 @@
                         div.remove();
                         const rows = planInputsContainer.querySelectorAll('.vibe-row');
                         rows.forEach((row, i) => {
-                            row.querySelector('.phase-label').textContent = `Phase ${i + 1}`;
+                            row.querySelector('.phase-label').innerHTML = `Phase ${i + 1}<br><span class="text-[9px] text-slate-400/70 font-mono normal-case tracking-widest">${getVibeTimeRange(i)}</span>`;
                         });
                     });
                     
