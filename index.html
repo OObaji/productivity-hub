@@ -1416,7 +1416,7 @@
         }
 
         // --- Cloud Storage Engine ---
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound', 'myndarcOTRequests'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard'];
         
         async function syncToCloud(username) {
             if (!fbUser || !db || username === 'guest') return;
@@ -2848,15 +2848,29 @@
                 let noteCount = 0;
                 if(!board || !addBtn) return;
 
-                function createNote(x, y) {
-                    const colors = ['bg-yellow-200', 'bg-blue-200', 'bg-pink-200', 'bg-emerald-200'];
-                    const color = colors[noteCount % colors.length];
-                    noteCount++;
+                function saveNotes() {
+                    const notes = [];
+                    board.querySelectorAll('.sticky-note').forEach(note => {
+                        notes.push({
+                            x: note.style.left,
+                            y: note.style.top,
+                            w: note.style.width,
+                            h: note.style.height,
+                            color: note.dataset.color,
+                            text: note.querySelector('textarea').value
+                        });
+                    });
+                    localStorage.setItem('myndarcIdeaBoard', JSON.stringify(notes));
+                }
 
+                function createNote(x, y, color, text = '', w = '', h = '') {
                     const note = document.createElement('div');
                     note.className = `sticky-note absolute ${color} p-4 w-64 h-64 flex flex-col text-slate-800`;
-                    note.style.left = x + 'px';
-                    note.style.top = y + 'px';
+                    note.dataset.color = color;
+                    note.style.left = x;
+                    note.style.top = y;
+                    if (w) note.style.width = w;
+                    if (h) note.style.height = h;
                     
                     note.innerHTML = `
                         <div class="flex justify-between items-center mb-2 drag-handle cursor-grab border-b border-black/10 pb-2">
@@ -2865,6 +2879,16 @@
                         </div>
                         <textarea class="flex-1 bg-transparent border-none focus:ring-0 resize-none font-medium placeholder-black/30 outline-none" placeholder="Type your idea here..."></textarea>
                     `;
+                    
+                    const textarea = note.querySelector('textarea');
+                    textarea.value = text;
+                    
+                    // Auto-save on typing
+                    textarea.addEventListener('input', saveNotes);
+                    
+                    // Auto-save if note is resized (mouseup catches the end of a resize drag)
+                    note.addEventListener('mouseup', saveNotes);
+
                     board.appendChild(note);
 
                     const handle = note.querySelector('.drag-handle');
@@ -2883,14 +2907,32 @@
                     });
 
                     document.addEventListener('mouseup', () => {
-                        if(isDragging) { isDragging = false; note.classList.remove('dragging'); }
+                        if(isDragging) { 
+                            isDragging = false; 
+                            note.classList.remove('dragging'); 
+                            saveNotes(); // Save new position
+                        }
                     });
 
-                    note.querySelector('.delete-note').addEventListener('click', () => note.remove());
+                    note.querySelector('.delete-note').addEventListener('click', () => {
+                        note.remove();
+                        saveNotes(); // Save deletion
+                    });
                 }
 
+                // Load existing notes from persistent storage
+                const savedNotes = JSON.parse(localStorage.getItem('myndarcIdeaBoard')) || [];
+                savedNotes.forEach(n => {
+                    createNote(n.x, n.y, n.color, n.text, n.w, n.h);
+                    noteCount++;
+                });
+
                 addBtn.addEventListener('click', () => {
-                    createNote(Math.random() * (board.clientWidth - 260), Math.random() * (board.clientHeight - 260));
+                    const colors = ['bg-yellow-200', 'bg-blue-200', 'bg-pink-200', 'bg-emerald-200'];
+                    const color = colors[noteCount % colors.length];
+                    noteCount++;
+                    createNote((Math.random() * (Math.max(200, board.clientWidth - 260))) + 'px', (Math.random() * (Math.max(200, board.clientHeight - 260))) + 'px', color);
+                    saveNotes();
                 });
             }
 
