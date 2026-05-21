@@ -879,6 +879,29 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Shift Register Quick Actions -->
+                            <div class="w-full glass-panel rounded-[2rem] p-5 flex flex-col md:flex-row justify-between items-center gap-4 border border-white/10 z-10">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 border border-indigo-500/30 text-lg shadow-inner">📝</span>
+                                    <div class="text-left">
+                                        <h3 class="text-xs font-bold text-white uppercase tracking-widest">Shift Register</h3>
+                                        <p class="text-[10px] text-slate-400">Quick copy attendance status</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap justify-center gap-2">
+                                    <button class="shift-reg-btn px-4 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 text-xs font-bold transition-all border border-indigo-500/30 shadow-lg" data-text="Logged on - WFH">
+                                        Log On (WFH)
+                                    </button>
+                                    <button class="shift-reg-btn px-4 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 text-xs font-bold transition-all border border-indigo-500/30 shadow-lg" data-text="Logged on - Office">
+                                        Log On (Office)
+                                    </button>
+                                    <button class="shift-reg-btn px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 text-xs font-bold transition-all border border-rose-500/30 shadow-lg" data-text="Logged off">
+                                        Log Off
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- Timer & Break -->
                             <div class="w-full glass-panel rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden">
                                 <div class="flex items-baseline justify-center space-x-2 md:space-x-6 text-white drop-shadow-[0_0_35px_rgba(45,212,191,0.3)] z-10">
@@ -3257,13 +3280,14 @@
 
                     blocksContainer.querySelectorAll('.copy-breach').forEach(btn => {
                         btn.addEventListener('click', (e) => {
-                            const text = e.currentTarget.dataset.text;
+                            const targetBtn = e.currentTarget;
+                            const text = targetBtn.dataset.text;
                             navigator.clipboard.writeText(text).catch(() => {
                                 const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp);
                             });
-                            const originalHtml = e.currentTarget.innerHTML;
-                            e.currentTarget.innerHTML = '<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-                            setTimeout(() => { e.currentTarget.innerHTML = originalHtml; }, 1000);
+                            const originalHtml = targetBtn.innerHTML;
+                            targetBtn.innerHTML = '<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                            setTimeout(() => { targetBtn.innerHTML = originalHtml; }, 1000);
                         });
                     });
 
@@ -3526,9 +3550,10 @@
                     // Attach Copy Handlers
                     outputContainer.querySelectorAll('.ts-copy-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
-                            if (btn.hasAttribute('disabled')) return;
+                            const targetBtn = e.currentTarget;
+                            if (targetBtn.hasAttribute('disabled')) return;
                             
-                            const inputToCopy = e.currentTarget.previousElementSibling;
+                            const inputToCopy = targetBtn.previousElementSibling;
                             const val = inputToCopy.value;
                             if (!val || val === 'Pending...') return;
 
@@ -3541,9 +3566,9 @@
                                 document.body.removeChild(temp);
                             });
 
-                            const svgHtml = e.currentTarget.innerHTML;
-                            e.currentTarget.innerHTML = '<span class="text-[10px] font-bold text-emerald-500 px-1 uppercase">Copied</span>';
-                            setTimeout(() => { e.currentTarget.innerHTML = svgHtml; }, 1200);
+                            const svgHtml = targetBtn.innerHTML;
+                            targetBtn.innerHTML = '<span class="text-[10px] font-bold text-emerald-500 px-1 uppercase">Copied</span>';
+                            setTimeout(() => { targetBtn.innerHTML = svgHtml; }, 1200);
                         });
                     });
                     
@@ -5015,6 +5040,20 @@
                     if(endMessage) endMessage.classList.add('hidden');
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
+                });
+
+                // Shift Register Logic
+                document.querySelectorAll('.shift-reg-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const targetBtn = e.currentTarget;
+                        const text = targetBtn.dataset.text;
+                        navigator.clipboard.writeText(text).catch(() => {
+                            const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp);
+                        });
+                        const originalHtml = targetBtn.innerHTML;
+                        targetBtn.innerHTML = '<span class="text-emerald-400 flex items-center justify-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied</span>';
+                        setTimeout(() => { targetBtn.innerHTML = originalHtml; }, 1500);
+                    });
                 });
             }
 
