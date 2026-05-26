@@ -217,20 +217,6 @@
         </div>
     </div>
 
-    <!-- Vibe Shift Modal -->
-    <div id="vibe-shift-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[200] hidden items-center justify-center p-4 transition-all">
-        <div class="bg-gradient-to-br from-slate-900 to-[#0b1120] rounded-[3rem] shadow-[0_0_80px_rgba(14,165,233,0.3)] p-12 w-full max-w-lg text-center border border-[#0ea5e9]/50 transform scale-100 relative overflow-hidden">
-            <div class="absolute inset-0 bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none"></div>
-            <div class="relative z-10">
-                <div class="text-7xl mb-6 animate-bounce filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" id="vibe-shift-icon">🚀</div>
-                <h2 id="vibe-shift-label" class="text-xl font-bold text-amber-400 uppercase tracking-widest mb-2">Vibe Changing in 60s</h2>
-                <h3 id="vibe-shift-title" class="text-5xl font-black text-white mb-6 tracking-tight">Ignition</h3>
-                <p id="vibe-shift-desc" class="text-xl text-slate-300 mb-10 leading-relaxed font-medium">Clear the deck. Review priorities. Set the pace.</p>
-                <button id="vibe-shift-ack-btn" class="w-full px-8 py-5 bg-[#0ea5e9] hover:bg-[#38bdf8] text-slate-900 font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(56,189,248,0.6)] transition-all hover:scale-[1.02] focus:outline-none">Let's Go!</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Break Alert Modal -->
     <div id="break-alert-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[200] hidden items-center justify-center p-4 transition-all">
         <div id="break-alert-bg" class="bg-gradient-to-br from-slate-900 to-emerald-950 rounded-[3rem] shadow-[0_0_80px_rgba(16,185,129,0.3)] p-12 w-full max-w-lg text-center border border-emerald-500/50 transform scale-100 relative overflow-hidden">
@@ -4131,6 +4117,8 @@
                 const presetEarly = document.getElementById('preset-early-btn');
                 const presetOT = document.getElementById('preset-ot-btn');
 
+                const presetOvertime = document.getElementById('preset-overtime-btn');
+
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
 
@@ -4140,11 +4128,9 @@
                 let totalDuration;
                 let totalSegments = 0;
                 let currentVibeIndex = -1;
-                let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
                 let shiftVibeStatus = [];
                 let warnedBreaksStart = new Set();
-                let warnedBreaksEnd = new Set();
 
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
@@ -4500,20 +4486,6 @@
                     }
                 }
 
-                const vibeModal = document.getElementById('vibe-shift-modal');
-                const vibeModalTitle = document.getElementById('vibe-shift-title');
-                const vibeModalDesc = document.getElementById('vibe-shift-desc');
-                const vibeModalIcon = document.getElementById('vibe-shift-icon');
-                const vibeModalLabel = document.getElementById('vibe-shift-label');
-                const vibeModalAckBtn = document.getElementById('vibe-shift-ack-btn');
-
-                if(vibeModalAckBtn) {
-                    vibeModalAckBtn.addEventListener('click', () => {
-                        vibeModal.classList.add('hidden');
-                        vibeModal.classList.remove('flex');
-                    });
-                }
-
                 document.getElementById('break-alert-ack-btn')?.addEventListener('click', () => {
                     const breakModal = document.getElementById('break-alert-modal');
                     if (breakModal) {
@@ -4521,26 +4493,6 @@
                         breakModal.classList.remove('flex');
                     }
                 });
-
-                function triggerVibeShiftAlert(index, isUpcoming = false) {
-                    const vibe = shiftVibes[index % shiftVibes.length];
-                    
-                    if (vibeModalTitle) vibeModalTitle.textContent = vibe.title;
-                    if (vibeModalDesc) vibeModalDesc.textContent = vibe.desc;
-                    if (vibeModalIcon) vibeModalIcon.textContent = vibe.icon;
-                    
-                    if(vibeModalLabel) {
-                        vibeModalLabel.textContent = isUpcoming ? "Vibe Changing in 60s" : "New Phase Activated";
-                        vibeModalLabel.className = isUpcoming ? "text-xl font-bold text-amber-400 uppercase tracking-widest mb-2" : "text-xl font-bold text-[#0ea5e9] uppercase tracking-widest mb-2";
-                    }
-
-                    if (vibeModal) {
-                        vibeModal.classList.remove('hidden');
-                        vibeModal.classList.add('flex');
-                    }
-                    
-                    if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
-                }
 
                 function triggerBreakAlert(type, isHealthBreak = false) {
                     const modal = document.getElementById('break-alert-modal');
@@ -4700,24 +4652,8 @@
                         if (newIndex < 0) newIndex = 0;
 
                         if (newIndex !== currentVibeIndex) {
-                            const isInitialLoad = (currentVibeIndex === -1);
                             currentVibeIndex = newIndex;
                             updateVibeUI(currentVibeIndex);
-                            
-                            if (!isInitialLoad && nextVibeWarnedIndex !== currentVibeIndex) {
-                                 triggerVibeShiftAlert(currentVibeIndex, false);
-                                 nextVibeWarnedIndex = currentVibeIndex;
-                            }
-                        }
-
-                        // 60-second warning check for the next phase
-                        const msPerSegment = totalDuration / totalSegments;
-                        const currentSegmentEndMs = startTimeValue + (currentVibeIndex + 1) * msPerSegment;
-                        const msToNext = currentSegmentEndMs - now;
-
-                        if (msToNext <= 60000 && msToNext > 0 && currentVibeIndex < totalSegments - 1 && nextVibeWarnedIndex !== currentVibeIndex + 1) {
-                            nextVibeWarnedIndex = currentVibeIndex + 1;
-                            triggerVibeShiftAlert(currentVibeIndex + 1, true); // true = upcoming
                         }
                     }
 
@@ -4803,24 +4739,11 @@
                     // Break 60-second warning checks
                     shiftBreaks.forEach((brk, index) => {
                         const msToStart = brk.startMs - now;
-                        const msToEnd = brk.endMs - now;
 
-                        if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
+                        // ONLY nudge for Health Breaks 60 seconds before they start
+                        if (brk.isHealthBreak && msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
                             warnedBreaksStart.add(index);
-                            if (brk.isHealthBreak) {
-                                if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
-                            } else {
-                                triggerBreakAlert('start', false);
-                            }
-                        }
-
-                        if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
-                            warnedBreaksEnd.add(index);
-                            if (brk.isHealthBreak) {
-                                if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
-                            } else {
-                                triggerBreakAlert('end', false);
-                            }
+                            triggerBreakAlert('start', true);
                         }
                     });
                 }
@@ -4852,9 +4775,7 @@
                             shiftVibeStatus = savedShift.vibeStatus || new Array(totalSegments).fill(false);
                             renderTimeline(totalSegments, startTimeValue, endTime);
                             currentVibeIndex = -1;
-                            nextVibeWarnedIndex = -1;
                             warnedBreaksStart.clear();
-                            warnedBreaksEnd.clear();
 
                             if(setupView) setupView.classList.add('hidden');
                             if(countdownView) countdownView.classList.remove('hidden');
@@ -4978,9 +4899,7 @@
 
                         renderTimeline(totalSegments, startTimeValue, endTime);
                         currentVibeIndex = -1;
-                        nextVibeWarnedIndex = -1;
                         warnedBreaksStart.clear();
-                        warnedBreaksEnd.clear();
 
                         if(setupView) setupView.classList.add('hidden');
                         if(countdownView) countdownView.classList.remove('hidden');
@@ -5011,7 +4930,6 @@
                     clearInterval(shiftInterval);
                     localStorage.removeItem('activeShiftData');
                     warnedBreaksStart.clear();
-                    warnedBreaksEnd.clear();
                     shiftVibeStatus = [];
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
