@@ -231,6 +231,25 @@
         </div>
     </div>
 
+    <!-- Adherence Modal -->
+    <div id="adherence-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[250] hidden items-center justify-center p-4 transition-all">
+        <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[3rem] shadow-[0_0_80px_rgba(99,102,241,0.3)] p-10 w-full max-w-md text-center border border-indigo-500/50 relative overflow-hidden transform scale-100">
+            <div class="absolute inset-0 bg-[radial-gradient(currentColor_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none text-white"></div>
+            <div class="relative z-10">
+                <div class="text-6xl mb-4 animate-bounce filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">📝</div>
+                <h2 class="text-xl font-bold text-indigo-400 uppercase tracking-widest mb-2">Adherence Check</h2>
+                <h3 id="adherence-title" class="text-3xl font-black text-white mb-2 tracking-tight">Update Teams</h3>
+                <p id="adherence-desc" class="text-slate-300 mb-6 font-medium">Please log your status.</p>
+                
+                <div id="adherence-buttons-container" class="bg-black/40 border border-indigo-500/30 rounded-2xl p-6 mb-6 flex flex-col gap-3">
+                    <!-- Buttons injected by JS -->
+                </div>
+                
+                <button id="adherence-dismiss-btn" class="w-full px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-lg rounded-2xl transition-all border border-slate-700 shadow-lg">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Principle Details Modal -->
     <div id="principle-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-lg text-left relative transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-gray-700">
@@ -4128,9 +4147,12 @@
                 let totalDuration;
                 let totalSegments = 0;
                 let currentVibeIndex = -1;
+                let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
-                let shiftVibeStatus = [];
                 let warnedBreaksStart = new Set();
+                let warnedBreaksEnd = new Set();
+                let adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
+                let shiftVibeStatus = [];
 
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
@@ -4538,21 +4560,87 @@
                     if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
                 }
 
-                const markVibeDoneBtn = document.getElementById('mark-vibe-done-btn');
-                if (markVibeDoneBtn) {
-                    markVibeDoneBtn.addEventListener('click', () => {
-                        if (currentVibeIndex < 0 || currentVibeIndex >= totalSegments) return;
-                        shiftVibeStatus[currentVibeIndex] = !shiftVibeStatus[currentVibeIndex];
-                        
-                        const savedShiftStr = localStorage.getItem('activeShiftData');
-                        if (savedShiftStr) {
-                            const savedShift = JSON.parse(savedShiftStr);
-                            savedShift.vibeStatus = shiftVibeStatus;
-                            localStorage.setItem('activeShiftData', JSON.stringify(savedShift));
-                        }
-                        
-                        updateVibeUI(currentVibeIndex);
+                function triggerAdherenceModal(type, timeStr = "") {
+                    const modal = document.getElementById('adherence-modal');
+                    const container = document.getElementById('adherence-buttons-container');
+                    const titleEl = document.getElementById('adherence-title');
+                    
+                    if (!modal || !container) return;
+                    container.innerHTML = ''; 
+
+                    let mainText = "";
+                    let buttons = [];
+
+                    if (type === 'start') {
+                        titleEl.textContent = "Shift Started";
+                        mainText = "Log your attendance in Teams.";
+                        buttons = [
+                            { label: "Copy 'Logged on - WFH'", text: "Logged on - WFH", color: "indigo" },
+                            { label: "Copy 'Logged on - Office'", text: "Logged on - Office", color: "indigo" }
+                        ];
+                    } else if (type === 'break_start') {
+                        titleEl.textContent = "Break Time";
+                        mainText = "Update your status in Teams.";
+                        buttons = [
+                            { label: `Copy 'Break (${timeStr})'`, text: `Break (${timeStr})`, color: "emerald" }
+                        ];
+                    } else if (type === 'break_end') {
+                        titleEl.textContent = "Break Ended";
+                        mainText = "Update your status in Teams.";
+                        buttons = [
+                            { label: "Copy 'Back from Break'", text: "Back from Break", color: "emerald" }
+                        ];
+                    } else if (type === 'end') {
+                        titleEl.textContent = "Shift Ended";
+                        mainText = "Log off in Teams.";
+                        buttons = [
+                            { label: "Copy 'Logged off'", text: "Logged off", color: "rose" }
+                        ];
+                    }
+
+                    document.getElementById('adherence-desc').textContent = mainText;
+
+                    buttons.forEach(btnInfo => {
+                        const btn = document.createElement('button');
+                        const colorClass = btnInfo.color === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-500' : 
+                                           btnInfo.color === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-500' : 
+                                           'bg-rose-600 hover:bg-rose-500';
+
+                        btn.className = `w-full py-3 ${colorClass} text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 mt-3`;
+                        btn.innerHTML = `
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            ${btnInfo.label}
+                        `;
+                        btn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(btnInfo.text);
+                            const originalHtml = btn.innerHTML;
+                            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!`;
+                            setTimeout(() => { btn.innerHTML = originalHtml; }, 1500);
+                        });
+                        container.appendChild(btn);
                     });
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    if(typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
+                }
+
+                document.getElementById('adherence-dismiss-btn')?.addEventListener('click', () => {
+                    const modal = document.getElementById('adherence-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                });
+
+                function saveShiftData() {
+                    localStorage.setItem('activeShiftData', JSON.stringify({
+                        startMs: startTimeValue,
+                        endMs: endTime,
+                        breaks: shiftBreaks,
+                        adherence: adherenceFlags,
+                        vibeStatus: shiftVibeStatus
+                    }));
                 }
 
                 function updateDisplays(h, m, s, progress) {
@@ -4604,11 +4692,34 @@
                             const mTitle = document.getElementById('current-hour-title');
                             const mIcon = document.getElementById('current-hour-icon');
                             const mDesc = document.getElementById('current-hour-content');
-                            if(mTitle) mTitle.textContent = "Pre-Shift Prep";
-                            if(mIcon) mIcon.textContent = "⏳";
-                            if(mDesc) mDesc.innerHTML = `<p>Shift starts soon. Get your coffee, check your comms, and settle in.</p>`;
+                    const markDoneBtn = document.getElementById('mark-vibe-done-btn');
+                    const progCounter = document.getElementById('vibe-progress-counter');
 
-                            const dTitle = document.getElementById('dash-vibe-title');
+                    if(mTitle) {
+                        mTitle.textContent = vibe.title;
+                        if (shiftVibeStatus && shiftVibeStatus[index]) {
+                            mTitle.classList.add('opacity-50', 'line-through');
+                        } else {
+                            mTitle.classList.remove('opacity-50', 'line-through');
+                        }
+                    }
+                    if(mIcon) mIcon.textContent = vibe.icon;
+                    if(mDesc) mDesc.innerHTML = `<p>${vibe.desc}</p>`;
+
+                    if (markDoneBtn) {
+                        if (shiftVibeStatus && shiftVibeStatus[index]) {
+                            markDoneBtn.className = 'p-1.5 bg-emerald-500 text-white rounded-md transition-all border border-emerald-400 flex items-center justify-center cursor-pointer relative z-20 shadow-[0_0_10px_rgba(16,185,129,0.4)] scale-105 ml-1';
+                        } else {
+                            markDoneBtn.className = 'p-1.5 bg-white/5 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 rounded-md transition-all border border-white/10 flex items-center justify-center cursor-pointer relative z-20 group ml-1';
+                        }
+                    }
+
+                    if (progCounter && shiftVibeStatus) {
+                        const completedCount = shiftVibeStatus.filter(v => v).length;
+                        progCounter.textContent = `${completedCount} / ${totalSegments} Done`;
+                    }
+
+                    const dTitle = document.getElementById('dash-vibe-title');
                             const dIcon = document.getElementById('dash-vibe-icon');
                             const dTask = document.getElementById('dash-vibe-task');
                             if(dTitle) dTitle.textContent = "Pre-Shift Prep";
@@ -4618,6 +4729,13 @@
                     } else {
                         // NORMAL SHIFT MODE: Shift is active
                         const remaining = endTime - now;
+
+                        // Adherence: Shift End
+                        if (now >= endTime && !adherenceFlags.end) {
+                            adherenceFlags.end = true;
+                            saveShiftData();
+                            triggerAdherenceModal('end');
+                        }
 
                         if (remaining <= 0) {
                             clearInterval(shiftInterval);
@@ -4636,6 +4754,13 @@
                             const breachEnd = document.getElementById('breach-mini-timer-end');
                             if(breachEnd) breachEnd.textContent = endStr;
                             currentVibeIndex = -1; // Force vibe update
+                            
+                            // Adherence: Shift Start
+                            if (!adherenceFlags.start) {
+                                adherenceFlags.start = true;
+                                saveShiftData();
+                                triggerAdherenceModal('start');
+                            }
                         }
 
                         const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -4736,14 +4861,38 @@
                         if (breachMiniBreak) breachMiniBreak.textContent = "--:--";
                     }
 
-                    // Break 60-second warning checks
+                    // Break 60-second warning checks & Adherence
                     shiftBreaks.forEach((brk, index) => {
                         const msToStart = brk.startMs - now;
+                        const msToEnd = brk.endMs - now;
 
-                        // ONLY nudge for Health Breaks 60 seconds before they start
-                        if (brk.isHealthBreak && msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
+                        if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
                             warnedBreaksStart.add(index);
-                            triggerBreakAlert('start', true);
+                            triggerBreakAlert('start', brk.isHealthBreak);
+                        }
+
+                        if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
+                            warnedBreaksEnd.add(index);
+                            triggerBreakAlert('end', brk.isHealthBreak);
+                        }
+
+                        // Adherence: Standard Breaks
+                        if (!brk.isHealthBreak) {
+                            if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
+                                adherenceFlags.breakStarts.push(index);
+                                saveShiftData();
+                                const sDate = new Date(brk.startMs);
+                                const eDate = new Date(brk.endMs);
+                                const pad = n => String(n).padStart(2, '0');
+                                const timeStr = `${pad(sDate.getHours())}:${pad(sDate.getMinutes())}-${pad(eDate.getHours())}:${pad(eDate.getMinutes())}`;
+                                triggerAdherenceModal('break_start', timeStr);
+                            }
+
+                            if (now >= brk.endMs && !adherenceFlags.breakEnds.includes(index)) {
+                                adherenceFlags.breakEnds.push(index);
+                                saveShiftData();
+                                triggerAdherenceModal('break_end');
+                            }
                         }
                     });
                 }
@@ -4759,6 +4908,7 @@
                             endTime = savedShift.endMs;
                             totalDuration = endTime - startTimeValue;
                             shiftBreaks = savedShift.breaks || [];
+                            adherenceFlags = savedShift.adherence || { start: false, end: false, breakStarts: [], breakEnds: [] };
                             
                             if (startInput) {
                                 const sd = new Date(startTimeValue);
@@ -4888,14 +5038,10 @@
                         }
                         
                         shiftBreaks.sort((a, b) => a.startMs - b.startMs);
+                        adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                         shiftVibeStatus = new Array(totalSegments).fill(false);
 
-                        localStorage.setItem('activeShiftData', JSON.stringify({
-                            startMs: startTimeValue,
-                            endMs: endTime,
-                            breaks: shiftBreaks,
-                            vibeStatus: shiftVibeStatus
-                        }));
+                        saveShiftData();
 
                         renderTimeline(totalSegments, startTimeValue, endTime);
                         currentVibeIndex = -1;
@@ -4930,6 +5076,8 @@
                     clearInterval(shiftInterval);
                     localStorage.removeItem('activeShiftData');
                     warnedBreaksStart.clear();
+                    warnedBreaksEnd.clear();
+                    adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                     shiftVibeStatus = [];
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
@@ -4959,6 +5107,17 @@
                     if(countdownView) countdownView.classList.add('hidden');
                     if(setupView) setupView.classList.remove('hidden');
                 });
+
+                const markDoneBtn = document.getElementById('mark-vibe-done-btn');
+                if (markDoneBtn) {
+                    markDoneBtn.addEventListener('click', () => {
+                        if (currentVibeIndex !== -1 && shiftVibeStatus && shiftVibeStatus.length > 0) {
+                            shiftVibeStatus[currentVibeIndex] = !shiftVibeStatus[currentVibeIndex];
+                            saveShiftData();
+                            updateVibeUI(currentVibeIndex);
+                        }
+                    });
+                }
 
                 // Shift Register Logic
                 document.querySelectorAll('.shift-reg-btn').forEach(btn => {
