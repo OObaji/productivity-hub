@@ -801,7 +801,7 @@
                                     <div class="flex justify-between items-center mb-4">
                                         <h3 class="font-bold text-gray-200 text-xs uppercase tracking-widest">Breaks</h3>
                                         <div class="flex gap-2">
-                                            <button id="load-my-breaks-btn" class="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 rounded-lg border border-blue-500/20 transition-all">Defaults</button>
+                                            <button id="load-my-breaks-btn" class="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 rounded-lg border border-blue-500/20 transition-all">Template</button>
                                             <button id="add-break-btn" class="text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 bg-green-500/20 hover:bg-green-500/40 text-green-200 rounded-lg border border-green-500/20 transition-all">+ Add</button>
                                         </div>
                                     </div>
@@ -4317,34 +4317,52 @@
                 const addBreakBtn = document.getElementById('add-break-btn');
                 const loadBreaksBtn = document.getElementById('load-my-breaks-btn');
 
-                if(addBreakBtn) {
-                    addBreakBtn.addEventListener('click', () => {
-                        const div = document.createElement('div');
-                        div.className = 'flex gap-2 items-center break-row animate-[fadeIn_0.3s_ease-out]';
-                        div.innerHTML = `
+                function createBreakRow(labelText = 'Custom Break', durationMins = null) {
+                    const div = document.createElement('div');
+                    div.className = 'flex flex-col gap-1.5 break-row animate-[fadeIn_0.3s_ease-out] bg-black/20 p-3 rounded-xl border border-white/5';
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center"><span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">${labelText}</span></div>
+                        <div class="flex gap-2 items-center">
                             <input type="time" class="break-start w-full p-2.5 rounded-lg bg-black/40 text-white border border-white/10 text-sm font-mono focus:ring-2 focus:ring-emerald-500/50">
                             <span class="text-white/50">-</span>
                             <input type="time" class="break-end w-full p-2.5 rounded-lg bg-black/40 text-white border border-white/10 text-sm font-mono focus:ring-2 focus:ring-emerald-500/50">
-                            <button class="remove-break text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 p-2 rounded-lg transition-colors">✕</button>
-                        `;
-                        div.querySelector('.remove-break').addEventListener('click', () => div.remove());
-                        breaksContainer.appendChild(div);
-                    });
+                            <button type="button" class="remove-break text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 p-2 rounded-lg transition-colors flex shrink-0 items-center justify-center">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                    
+                    div.querySelector('.remove-break').addEventListener('click', () => div.remove());
+                    
+                    // Auto-calculate end time if a duration is specified
+                    if (durationMins) {
+                        const startIn = div.querySelector('.break-start');
+                        const endIn = div.querySelector('.break-end');
+                        startIn.addEventListener('change', () => {
+                            if(startIn.value) {
+                                const [h, m] = startIn.value.split(':').map(Number);
+                                const end = new Date(0, 0, 0, h, m + durationMins);
+                                const pad = n => String(n).padStart(2, '0');
+                                endIn.value = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+                            }
+                        });
+                    }
+                    
+                    breaksContainer.appendChild(div);
+                }
+
+                if(addBreakBtn) {
+                    addBreakBtn.addEventListener('click', () => createBreakRow());
                 }
 
                 if(loadBreaksBtn) {
                     loadBreaksBtn.addEventListener('click', () => {
                         if(breaksContainer) breaksContainer.innerHTML = '';
-                        const defaults = [['22:00', '22:10'], ['00:00', '00:10'], ['03:30', '04:00'], ['05:00', '05:10']];
-                        defaults.forEach(times => {
-                            if(addBreakBtn) addBreakBtn.click();
-                            const rows = breaksContainer.querySelectorAll('.break-row');
-                            const lastRow = rows[rows.length - 1];
-                            if(lastRow) {
-                                lastRow.querySelector('.break-start').value = times[0];
-                                lastRow.querySelector('.break-end').value = times[1];
-                            }
-                        });
+                        createBreakRow('Break 1 (10m)', 10);
+                        createBreakRow('Break 2 (10m)', 10);
+                        createBreakRow('Lunch Break (30m)', 30);
+                        createBreakRow('Break 3 (10m)', 10);
                     });
                 }
 
@@ -4861,21 +4879,8 @@
                         if (breachMiniBreak) breachMiniBreak.textContent = "--:--";
                     }
 
-                    // Break 60-second warning checks & Adherence
+                    // Break Adherence Check
                     shiftBreaks.forEach((brk, index) => {
-                        const msToStart = brk.startMs - now;
-                        const msToEnd = brk.endMs - now;
-
-                        if (msToStart > 0 && msToStart <= 60000 && !warnedBreaksStart.has(index)) {
-                            warnedBreaksStart.add(index);
-                            triggerBreakAlert('start', brk.isHealthBreak);
-                        }
-
-                        if (msToEnd > 0 && msToEnd <= 60000 && !warnedBreaksEnd.has(index)) {
-                            warnedBreaksEnd.add(index);
-                            triggerBreakAlert('end', brk.isHealthBreak);
-                        }
-
                         // Adherence: Standard Breaks
                         if (!brk.isHealthBreak) {
                             if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
