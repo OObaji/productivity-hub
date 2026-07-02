@@ -444,6 +444,10 @@
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                     Breach List
                 </a>
+                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="tag-battery-view">
+                    <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2zm14 2v4m-2-4v4"></path></svg>
+                    Tag Battery
+                </a>
                 <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="idea-board">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21h6m-3-3v3m-5-8a5 5 0 1110 0c0 2.21-1.34 4-3 5.46V18H9v-.54C7.34 16 6 14.21 6 12z"></path></svg>
                     Idea Board
@@ -1318,28 +1322,28 @@
                         </div>
                     </div>
 
-                    <!-- Breach Copilot -->
-                    <div id="breach-copilot-container" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
-                        <!-- Panel -->
-                        <div id="breach-copilot-panel" class="mb-4 bg-[#0b1120] rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-[#1e293b] w-80 h-[30rem] max-h-[75vh] flex flex-col transition-all duration-300 scale-95 opacity-0 origin-bottom-right pointer-events-auto hidden overflow-hidden">
-                            <div class="p-5 border-b border-[#1e293b] bg-[#0f172a] flex justify-between items-center shrink-0">
-                                <h3 class="font-bold text-white flex items-center gap-2 text-[15px]">
-                                    <span class="w-6 h-6 rounded-full bg-[#0ea5e9]/20 flex items-center justify-center text-xs shadow-inner border border-[#0ea5e9]/50">🤖</span>
-                                    Quick Comments
-                                </h3>
-                                <button id="close-copilot-btn" class="text-slate-400 hover:text-white bg-[#1e293b] rounded-full p-1.5 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </button>
+                    <!-- Tag Battery View -->
+                    <div id="tag-battery-view" class="page-view container mx-auto px-6 py-10 max-w-2xl">
+                        <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Tag Battery Check</h1>
+                        <div class="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center">
+                            <div class="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner border border-emerald-500/20 text-5xl">🔋</div>
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">Calculate Remaining Life</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm max-w-md">Enter the current tag percentage to calculate exactly how many hours and minutes are left based on a 24-hour full capacity.</p>
+                            
+                            <div class="w-full max-w-xs mb-8">
+                                <label class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3 text-center">Current Charge (%)</label>
+                                <input type="number" id="tag-battery-input" min="0" max="100" class="w-full px-6 py-5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 text-4xl font-black dark:text-white transition-all text-center placeholder-slate-300 shadow-inner" placeholder="e.g. 45">
                             </div>
-                            <div class="p-3 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-2" id="copilot-comments-list">
-                                <!-- JS Injected Buttons -->
+                            
+                            <div class="w-full bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 text-center relative overflow-hidden">
+                                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
+                                <p class="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Remaining Time</p>
+                                <p id="tag-battery-output" class="relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300">-- h -- m</p>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Chat Head & Bubble -->
-                        <div class="flex items-center gap-5 pointer-events-auto">
-                            <!-- Bubble -->
-                            <div id="copilot-speech-bubble" class="bg-white text-slate-700 px-5 py-4 rounded-2xl shadow-xl border border-slate-100 relative text-sm font-medium transition-all duration-500 max-w-[240px] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                    <!-- Settings -->
                                 Hey there, I'm here to assist you with your breach comments.
                                 <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-800 border-r border-t border-slate-100 dark:border-slate-700 transform rotate-45 rounded-sm"></div>
                             </div>
@@ -2124,6 +2128,7 @@
                 setupSettings();
                 setupBreachList();
                 setupTimestampExtractor();
+                setupTagBattery();
                 setupOTGenerator();
                 setupShiftTimer();
                 setupSoundscapes();
@@ -3493,6 +3498,39 @@
                     
                     // Clear the input area to be ready for the next paste
                     input.value = '';
+                });
+            }
+
+            function setupTagBattery() {
+                const input = document.getElementById('tag-battery-input');
+                const output = document.getElementById('tag-battery-output');
+                
+                if(!input || !output) return;
+                
+                input.addEventListener('input', (e) => {
+                    let val = parseInt(e.target.value);
+                    if(isNaN(val)) {
+                        output.textContent = '-- h -- m';
+                        output.className = 'relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300';
+                        return;
+                    }
+                    if(val > 100) { val = 100; input.value = 100; }
+                    if(val < 0) { val = 0; input.value = 0; }
+                    
+                    // 100% = 24 hours. 1% = 0.24 hours.
+                    const totalHours = val * 0.24; 
+                    const hrs = Math.floor(totalHours);
+                    const mins = Math.round((totalHours - hrs) * 60);
+                    
+                    output.textContent = `${hrs}h ${mins}m`;
+                    
+                    if (val <= 15) {
+                        output.className = 'relative z-10 text-6xl font-black text-rose-500 tracking-tight transition-colors duration-300 drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]';
+                    } else if (val <= 30) {
+                        output.className = 'relative z-10 text-6xl font-black text-amber-500 tracking-tight transition-colors duration-300 drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]';
+                    } else {
+                        output.className = 'relative z-10 text-6xl font-black text-emerald-500 tracking-tight transition-colors duration-300 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]';
+                    }
                 });
             }
 
