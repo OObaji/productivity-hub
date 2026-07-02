@@ -1264,102 +1264,67 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Overtime Generator -->
-                    <div id="ot-generator" class="page-view container mx-auto px-6 py-10 max-w-6xl">
-                        <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Overtime Generator</h1>
-                        <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl">Automatically calculates available dates based on your bi-weekly schedule (Week A: Mon, Tue, Thu, Sat | Week B: Wed, Thu, Sat). It ensures a maximum of 6 working days per week and permanently reserves Sunday as a rest day.</p>
+                <!-- Tag Battery View -->
+                <div id="tag-battery-view" class="page-view container mx-auto px-6 py-10 max-w-2xl">
+                    <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Tag Battery Check</h1>
+                    <div class="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center">
+                        <div class="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner border border-emerald-500/20 text-5xl">🔋</div>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">Calculate Remaining Life</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm max-w-md">Enter the current tag percentage to calculate exactly how many hours and minutes are left based on a 24-hour full capacity.</p>
                         
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <!-- Controls -->
-                            <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 h-fit space-y-6">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Start Date</label>
-                                    <input type="date" id="ot-gen-start" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Weeks to Generate</label>
-                                    <input type="number" id="ot-gen-weeks" value="4" min="1" max="12" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Shift Time</label>
-                                    <input type="text" id="ot-gen-time" value="19:00 - 05:00" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-white transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Duties Trained On</label>
-                                    <input type="text" id="ot-gen-duties" value="PD/ Incoming calls | AL13 | AL105 | AL106" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-white transition-all">
-                                </div>
-                                <button id="ot-gen-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Generate Requests</button>
-                            </div>
-                            
-                            <!-- Output Table -->
-                            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col">
-                                <div class="flex justify-between items-center mb-6">
-                                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
-                                    <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
-                                        <span>Copy Table</span>
-                                    </button>
-                                </div>
-                                
-                                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-600 flex-1">
-                                    <table class="w-full text-left text-sm text-slate-800 dark:text-slate-300">
-                                        <thead class="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-600">
-                                            <tr>
-                                                <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">OT Request Date</th>
-                                                <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">Time</th>
-                                                <th class="px-4 py-3 font-bold">Duties Trained on</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="ot-gen-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800/50 font-mono text-xs">
-                                            <tr>
-                                                <td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">Click "Generate Requests" to calculate dates.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <div class="w-full max-w-xs mb-8">
+                            <label class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3 text-center">Current Charge (%)</label>
+                            <input type="number" id="tag-battery-input" min="0" max="100" class="w-full px-6 py-5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 text-4xl font-black dark:text-white transition-all text-center placeholder-slate-300 shadow-inner" placeholder="e.g. 45">
                         </div>
-                    </div>
-
-                    <!-- Tag Battery View -->
-                    <div id="tag-battery-view" class="page-view container mx-auto px-6 py-10 max-w-2xl">
-                        <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Tag Battery Check</h1>
-                        <div class="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center">
-                            <div class="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner border border-emerald-500/20 text-5xl">🔋</div>
-                            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">Calculate Remaining Life</h2>
-                            <p class="text-slate-500 dark:text-slate-400 text-center mb-8 text-sm max-w-md">Enter the current tag percentage to calculate exactly how many hours and minutes are left based on a 24-hour full capacity.</p>
-                            
-                            <div class="w-full max-w-xs mb-8">
-                                <label class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3 text-center">Current Charge (%)</label>
-                                <input type="number" id="tag-battery-input" min="0" max="100" class="w-full px-6 py-5 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 text-4xl font-black dark:text-white transition-all text-center placeholder-slate-300 shadow-inner" placeholder="e.g. 45">
-                            </div>
-                            
-                            <div class="w-full bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 text-center relative overflow-hidden">
-                                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
-                                <p class="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Remaining Time</p>
-                                <p id="tag-battery-output" class="relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300">-- h -- m</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Settings -->
-                                Hey there, I'm here to assist you with your breach comments.
-                                <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-800 border-r border-t border-slate-100 dark:border-slate-700 transform rotate-45 rounded-sm"></div>
-                            </div>
-                            
-                            <!-- Avatar -->
-                            <button id="breach-copilot-btn" class="relative w-16 h-16 rounded-full bg-slate-800 shadow-2xl flex items-center justify-center hover:scale-105 transition-transform border-[3px] border-slate-100 dark:border-slate-700 focus:outline-none cursor-pointer">
-                                <div class="w-10 h-10 rounded-full bg-[#fcd34d] flex items-center justify-center shadow-inner relative overflow-hidden">
-                                    <div class="w-6 h-6 border-b-[3px] border-slate-800 rounded-full absolute bottom-2"></div>
-                                </div>
-                                <!-- Badge -->
-                                <span id="copilot-badge" class="absolute -top-1 -left-1 w-6 h-6 bg-[#dc2626] border-2 border-white dark:border-slate-800 rounded-full text-[10px] font-bold text-white flex items-center justify-center shadow-sm">1</span>
-                            </button>
+                        
+                        <div class="w-full bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
+                            <p class="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Remaining Time</p>
+                            <p id="tag-battery-output" class="relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300">-- h -- m</p>
                         </div>
                     </div>
                 </div>
 
+            </div> <!-- End of main-content-wrapper -->
+
+            <!-- Global Breach Copilot Widget -->
+            <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
+                <!-- Copilot Panel -->
+                <div id="breach-copilot-panel" class="hidden pointer-events-auto w-80 bg-[#0f172a]/95 backdrop-blur-xl border border-[#1e293b] rounded-3xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300 origin-bottom-right">
+                    <div class="p-5 border-b border-[#1e293b] flex justify-between items-center bg-[#020617]/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <span class="font-bold text-white tracking-wide">Quick Comments</span>
+                        </div>
+                        <button id="close-copilot-btn" class="text-slate-400 hover:text-white transition-colors p-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="p-3 max-h-[400px] overflow-y-auto custom-scrollbar flex flex-col gap-2" id="copilot-comments-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pointer-events-auto">
+                    <!-- Speech Bubble -->
+                    <div id="copilot-speech-bubble" class="relative bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm font-bold px-4 py-2.5 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 animate-bounce cursor-pointer">
+                        Hey there, I'm here to assist you with your breach comments.
+                        <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-800 border-r border-t border-slate-100 dark:border-slate-700 transform rotate-45 rounded-sm"></div>
+                    </div>
+                    
+                    <!-- Avatar -->
+                    <button id="breach-copilot-btn" class="relative w-16 h-16 rounded-full bg-slate-800 shadow-2xl flex items-center justify-center hover:scale-105 transition-transform border-[3px] border-slate-100 dark:border-slate-700 focus:outline-none cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-[#fcd34d] flex items-center justify-center shadow-inner relative overflow-hidden">
+                            <div class="w-6 h-6 border-b-[3px] border-slate-800 rounded-full absolute bottom-2"></div>
+                        </div>
+                        <!-- Badge -->
+                        <span id="copilot-badge" class="absolute -top-1 -left-1 w-6 h-6 bg-[#dc2626] border-2 border-white dark:border-slate-800 rounded-full text-[10px] font-bold text-white flex items-center justify-center shadow-sm">1</span>
+                    </button>
+                </div>
             </div>
         </main>
     </div>
