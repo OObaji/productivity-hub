@@ -1283,6 +1283,20 @@
                             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent opacity-50"></div>
                             <p class="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Estimated Remaining Time</p>
                             <p id="tag-battery-output" class="relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300">-- h -- m</p>
+                            <div id="tag-death-time" class="relative z-10 text-lg font-bold text-slate-500 dark:text-slate-400 mt-4 opacity-0 transition-opacity duration-300">
+                                Depletes: <span id="tag-death-time-val" class="text-slate-800 dark:text-slate-200">--:--</span>
+                            </div>
+                            <div id="tag-charge-time" class="relative z-10 flex flex-col gap-1.5 text-sm font-bold text-slate-500 dark:text-slate-400 mt-4 opacity-0 transition-opacity duration-300 bg-white/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 mx-auto w-full max-w-[240px] shadow-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] uppercase tracking-widest">Charge Time</span>
+                                    <span id="tag-charge-duration-val" class="text-indigo-600 dark:text-indigo-400 font-black">--</span>
+                                </div>
+                                <div class="w-full h-px bg-slate-200 dark:bg-slate-700"></div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] uppercase tracking-widest">100% At</span>
+                                    <span id="tag-charge-time-val" class="text-slate-800 dark:text-slate-200 font-bold">--:--</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3469,6 +3483,12 @@
             function setupTagBattery() {
                 const input = document.getElementById('tag-battery-input');
                 const output = document.getElementById('tag-battery-output');
+                const deathTimeContainer = document.getElementById('tag-death-time');
+                const deathTimeVal = document.getElementById('tag-death-time-val');
+                
+                const chargeTimeContainer = document.getElementById('tag-charge-time');
+                const chargeTimeVal = document.getElementById('tag-charge-time-val');
+                const chargeDurationVal = document.getElementById('tag-charge-duration-val');
                 
                 if(!input || !output) return;
                 
@@ -3477,6 +3497,8 @@
                     if(isNaN(val)) {
                         output.textContent = '-- h -- m';
                         output.className = 'relative z-10 text-6xl font-black text-slate-400 dark:text-slate-500 tracking-tight transition-colors duration-300';
+                        if(deathTimeContainer) deathTimeContainer.classList.add('opacity-0');
+                        if(chargeTimeContainer) chargeTimeContainer.classList.add('opacity-0');
                         return;
                     }
                     if(val > 100) { val = 100; input.value = 100; }
@@ -3488,6 +3510,48 @@
                     const mins = Math.round((totalHours - hrs) * 60);
                     
                     output.textContent = `${hrs}h ${mins}m`;
+
+                    if(deathTimeContainer && deathTimeVal) {
+                        const now = new Date();
+                        const deathDate = new Date(now.getTime() + (totalHours * 60 * 60 * 1000));
+                        const pad = n => String(n).padStart(2, '0');
+                        const timeStr = `${pad(deathDate.getHours())}:${pad(deathDate.getMinutes())}`;
+                        
+                        const isTomorrow = deathDate.getDate() !== now.getDate();
+                        const dayLabel = isTomorrow ? 'Tomorrow at ' : 'Today at ';
+                        
+                        deathTimeVal.textContent = dayLabel + timeStr;
+                        deathTimeContainer.classList.remove('opacity-0');
+                    }
+                    
+                    // Charging logic: 100% = 2 hours (120 mins). 1% = 1.2 mins.
+                    if (chargeTimeContainer && chargeTimeVal && chargeDurationVal) {
+                        if (val >= 100) {
+                            chargeTimeContainer.classList.add('opacity-0');
+                        } else {
+                            const missingPercent = 100 - val;
+                            const chargeMins = missingPercent * 1.2;
+                            
+                            const cHrs = Math.floor(chargeMins / 60);
+                            const cMins = Math.round(chargeMins % 60);
+                            
+                            let durText = '';
+                            if (cHrs > 0) durText += `${cHrs}h `;
+                            durText += `${cMins}m`;
+                            chargeDurationVal.textContent = durText;
+
+                            const now = new Date();
+                            const chargeDate = new Date(now.getTime() + (chargeMins * 60 * 1000));
+                            const pad = n => String(n).padStart(2, '0');
+                            const timeStr = `${pad(chargeDate.getHours())}:${pad(chargeDate.getMinutes())}`;
+                            
+                            const isTomorrow = chargeDate.getDate() !== now.getDate();
+                            const dayLabel = isTomorrow ? 'Tomorrow at ' : 'Today at ';
+                            
+                            chargeTimeVal.textContent = dayLabel + timeStr;
+                            chargeTimeContainer.classList.remove('opacity-0');
+                        }
+                    }
                     
                     if (val <= 15) {
                         output.className = 'relative z-10 text-6xl font-black text-rose-500 tracking-tight transition-colors duration-300 drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]';
