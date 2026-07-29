@@ -518,6 +518,12 @@
                 </button>
             </header>
             
+            <!-- Sync Status Indicator -->
+            <div id="sync-status-indicator" class="fixed top-4 right-4 z-[100] hidden items-center gap-2 bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg transition-all duration-300">
+                <span class="sync-dot w-2 h-2 rounded-full bg-slate-500"></span>
+                <span class="sync-text">Connecting...</span>
+            </div>
+            
             <div id="main-content-wrapper" class="h-full">
                 <!-- Dashboard Home -->
                 <div id="dashboard-home" class="page-view active container mx-auto px-6 py-10 max-w-7xl">
@@ -1357,45 +1363,108 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- Cloud Storage Engine (Supabase) ---
         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
-        let isSyncingFromServer = false; // Flag to prevent infinite sync loops
+        let isSyncingFromServer = false; 
         let realtimeSubscription = null;
-        const cloudDataStore = {}; // In-memory store replacing localStorage for synced data
+        const cloudDataStore = {}; 
+        
+        let syncTimeout = null; // Debounce timer
+        let lastKnownCloudStateStr = ""; // Prevent infinite loop of sending what we just received
 
-        async function syncToCloud(username) {
-            if (!supabase || username === 'guest' || isSyncingFromServer) return;
-            const dataToSave = {};
-            syncKeys.forEach(k => {
-                if (cloudDataStore[k] !== undefined) {
-                    dataToSave[k] = cloudDataStore[k];
-                }
-            });
+        // Sync Status UI update helper
+        function updateSyncStatus(status, text) {
+            const indicator = document.getElementById('sync-status-indicator');
+            const dot = indicator?.querySelector('.sync-dot');
+            const textEl = indicator?.querySelector('.sync-text');
+            if (!indicator || !dot || !textEl) return;
             
-            try {
-                const { error } = await supabase
-                    .from('user_data')
-                    .upsert({ username: username, data: dataToSave });
-                
-                if (error) throw error;
-            } catch (e) {
-                console.error("Cloud sync failed", e);
+            indicator.classList.remove('hidden');
+            indicator.classList.add('flex');
+            textEl.textContent = text;
+            
+            dot.className = 'sync-dot w-2 h-2 rounded-full transition-colors';
+            if (status === 'syncing') dot.classList.add('bg-yellow-400', 'animate-pulse');
+            else if (status === 'connected') dot.classList.add('bg-emerald-400');
+            else if (status === 'error') dot.classList.add('bg-rose-500');
+            else dot.classList.add('bg-slate-500');
+
+            if (status === 'connected') {
+                setTimeout(() => {
+                    indicator.classList.add('opacity-0');
+                    setTimeout(() => indicator.classList.add('hidden', 'opacity-100'), 300);
+                }, 2000);
             }
         }
 
+        async function syncToCloud(username) {
+            if (!supabase || username === 'guest' || isSyncingFromServer) return;
+            
+            // Debounce the save to prevent hammering the Supabase API on rapid changes (like typing)
+            if (syncTimeout) clearTimeout(syncTimeout);
+            
+            updateSyncStatus('syncing', 'Saving to cloud...');
+            
+            syncTimeout = setTimeout(async () => {
+                const dataToSave = {};
+                syncKeys.forEach(k => {
+                    if (cloudDataStore[k] !== undefined) {
+                        dataToSave[k] = cloudDataStore[k];
+                    }
+                });
+                
+                // Prevent echoing the exact same state back if we just downloaded it
+                const currentStateStr = JSON.stringify(dataToSave);
+                if (currentStateStr === lastKnownCloudStateStr) {
+                    updateSyncStatus('connected', 'Synced');
+                    return;
+                }
+                
+                try {
+                    const { error } = await supabase
+                        .from('user_data')
+                        .upsert({ username: username, data: dataToSave }, { onConflict: 'username' });
+                    
+                    if (error) throw error;
+                    lastKnownCloudStateStr = currentStateStr; // Update last known state
+                    updateSyncStatus('connected', 'Cloud Synced');
+                    console.log("Cloud sync successful");
+                } catch (e) {
+                    console.error("Cloud sync failed", e);
+                    updateSyncStatus('error', 'Sync Failed');
+                }
+            }, 1000); // Wait 1 second after changes stop before pushing
+        }
+
         function applyCloudDataToLocal(cloudData) {
-            isSyncingFromServer = true; // Prevent local updates from triggering cloud saves
+            isSyncingFromServer = true; 
+            let hasChanges = false;
+            
+            // Record this as the latest cloud state so we don't accidentally send it right back
+            lastKnownCloudStateStr = JSON.stringify(cloudData);
+            
             syncKeys.forEach(k => {
                 if (cloudData[k] !== undefined) {
-                    cloudDataStore[k] = cloudData[k];
+                    // Only update if the data actually changed to prevent UI flashing
+                    if (cloudDataStore[k] !== cloudData[k]) {
+                        cloudDataStore[k] = cloudData[k];
+                        hasChanges = true;
+                    }
                 } else {
-                    delete cloudDataStore[k];
+                    if (cloudDataStore[k] !== undefined) {
+                        delete cloudDataStore[k];
+                        hasChanges = true;
+                    }
                 }
             });
+            
             isSyncingFromServer = false;
             
-            // Dispatch event to update UI
-            window.dispatchEvent(new Event('cloudDataSynced'));
+            // Dispatch event to update UI only if real changes occurred
+            if (hasChanges) {
+                console.log("Applying incoming cloud changes to UI...");
+                updateSyncStatus('connected', 'Live Updated');
+                window.dispatchEvent(new Event('cloudDataSynced'));
+            }
         }
 
         async function fetchLatestCloudData(username) {
@@ -1413,59 +1482,71 @@
         function setupRealtimeSubscription(username) {
             if (username === 'guest') return;
             
-            // Clean up existing subscription if any
             if (realtimeSubscription) {
                 supabase.removeChannel(realtimeSubscription);
             }
 
-            realtimeSubscription = supabase.channel('custom-update-channel')
+            updateSyncStatus('syncing', 'Connecting Realtime...');
+
+            realtimeSubscription = supabase.channel(`user-${username}`)
                 .on(
                     'postgres_changes',
-                    { event: 'UPDATE', schema: 'public', table: 'user_data', filter: `username=eq.${username}` },
+                    // Listen for all events (*), filtering strictly by the string username
+                    { event: '*', schema: 'public', table: 'user_data', filter: `username=eq.${username}` },
                     (payload) => {
-                        console.log('Received realtime update from another device');
+                        console.log("Realtime payload received", payload);
                         if (payload.new && payload.new.data) {
                             applyCloudDataToLocal(payload.new.data);
                         }
                     }
                 )
-                .subscribe();
+                .subscribe((status, err) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log("Realtime sync connected.");
+                        updateSyncStatus('connected', 'Live Sync Active');
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        console.error('Realtime connection error:', status, err);
+                        updateSyncStatus('error', 'Live Sync Disconnected');
+                        // Crucial diagnostic message for the user:
+                        console.warn("If data is saving but not pushing to other devices, ensure Row Level Security (RLS) allows SELECT for the 'anon' role, AND that Realtime is turned on for the user_data table in Supabase.");
+                    }
+                });
         }
 
-        // Intercept LocalStorage to use in-memory store and auto-sync to Supabase directly
+        // Intercept LocalStorage safely
         const originalSetItem = localStorage.setItem;
         const originalGetItem = localStorage.getItem;
         const originalRemoveItem = localStorage.removeItem;
 
         localStorage.setItem = function(key, value) {
             if (syncKeys.includes(key)) {
-                cloudDataStore[key] = value; // Save to memory only
+                cloudDataStore[key] = value; 
                 if (!isSyncingFromServer) {
-                    const currentUser = originalGetItem.call(localStorage, 'currentUser');
+                    const currentUser = originalGetItem.call(window.localStorage, 'currentUser');
                     if (currentUser) syncToCloud(currentUser);
                 }
             } else {
-                originalSetItem.apply(this, arguments); // Standard keys like theme/session
+                originalSetItem.call(window.localStorage, key, value); 
             }
         };
 
         localStorage.getItem = function(key) {
             if (syncKeys.includes(key)) {
-                return cloudDataStore[key] !== undefined ? cloudDataStore[key] : null; // Read from memory
+                return cloudDataStore[key] !== undefined ? cloudDataStore[key] : null; 
             } else {
-                return originalGetItem.apply(this, arguments);
+                return originalGetItem.call(window.localStorage, key);
             }
         };
 
         localStorage.removeItem = function(key) {
             if (syncKeys.includes(key)) {
-                delete cloudDataStore[key]; // Erase from memory
+                delete cloudDataStore[key]; 
                 if (!isSyncingFromServer) {
-                    const currentUser = originalGetItem.call(localStorage, 'currentUser');
+                    const currentUser = originalGetItem.call(window.localStorage, 'currentUser');
                     if (currentUser) syncToCloud(currentUser);
                 }
             } else {
-                originalRemoveItem.apply(this, arguments);
+                originalRemoveItem.call(window.localStorage, key);
             }
         };
 
