@@ -1359,9 +1359,11 @@
 
         // --- Cloud Storage Engine (Supabase) ---
         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
-        
+        let isSyncingFromServer = false; // Flag to prevent infinite sync loops
+        let realtimeSubscription = null;
+
         async function syncToCloud(username) {
-            if (!supabase || username === 'guest') return;
+            if (!supabase || username === 'guest' || isSyncingFromServer) return;
             const dataToSave = {};
             syncKeys.forEach(k => {
                 const val = localStorage.getItem(k);
@@ -1379,11 +1381,60 @@
             }
         }
 
+        function applyCloudDataToLocal(cloudData) {
+            isSyncingFromServer = true; // Prevent local updates from triggering cloud saves
+            syncKeys.forEach(k => {
+                if (cloudData[k] !== undefined) {
+                    originalSetItem.call(localStorage, k, cloudData[k]);
+                } else {
+                    originalRemoveItem.call(localStorage, k);
+                }
+            });
+            isSyncingFromServer = false;
+            
+            // Dispatch event to update UI
+            window.dispatchEvent(new Event('cloudDataSynced'));
+        }
+
+        async function fetchLatestCloudData(username) {
+            if (username === 'guest') return;
+            try {
+                const { data, error } = await supabase.from('user_data').select('data').eq('username', username).single();
+                if (data && data.data) {
+                    applyCloudDataToLocal(data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching latest data on load:", error);
+            }
+        }
+
+        function setupRealtimeSubscription(username) {
+            if (username === 'guest') return;
+            
+            // Clean up existing subscription if any
+            if (realtimeSubscription) {
+                supabase.removeChannel(realtimeSubscription);
+            }
+
+            realtimeSubscription = supabase.channel('custom-update-channel')
+                .on(
+                    'postgres_changes',
+                    { event: 'UPDATE', schema: 'public', table: 'user_data', filter: `username=eq.${username}` },
+                    (payload) => {
+                        console.log('Received realtime update from another device');
+                        if (payload.new && payload.new.data) {
+                            applyCloudDataToLocal(payload.new.data);
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
         // Intercept LocalStorage to auto-sync to Supabase
         const originalSetItem = localStorage.setItem;
         localStorage.setItem = function(key, value) {
             originalSetItem.apply(this, arguments);
-            if (syncKeys.includes(key)) {
+            if (!isSyncingFromServer && syncKeys.includes(key)) {
                 const currentUser = localStorage.getItem('currentUser');
                 if (currentUser) syncToCloud(currentUser);
             }
@@ -1392,7 +1443,7 @@
         const originalRemoveItem = localStorage.removeItem;
         localStorage.removeItem = function(key) {
             originalRemoveItem.apply(this, arguments);
-            if (syncKeys.includes(key)) {
+            if (!isSyncingFromServer && syncKeys.includes(key)) {
                 const currentUser = localStorage.getItem('currentUser');
                 if (currentUser) syncToCloud(currentUser);
             }
@@ -2167,6 +2218,9 @@
                 
                 // Dispatch event so that scoped functions (timer, list) can react and reload cloud state
                 window.dispatchEvent(new Event('cloudDataSynced'));
+                
+                // Set up realtime sync
+                setupRealtimeSubscription(username);
             }
 
             if(registerForm) registerForm.addEventListener('submit', async (e) => {
@@ -2228,14 +2282,7 @@
                         
                         // Load cloud data into localStorage silently
                         const cloudData = data.data || {};
-                        
-                        syncKeys.forEach(k => {
-                            if (cloudData[k] !== undefined) {
-                                originalSetItem.call(localStorage, k, cloudData[k]);
-                            } else {
-                                originalRemoveItem.call(localStorage, k);
-                            }
-                        });
+                        applyCloudDataToLocal(cloudData);
                         
                         loginSuccess(user);
                     } else {
@@ -2256,6 +2303,11 @@
                 localStorage.removeItem('appEntered');
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('lastActiveView');
+                
+                if (realtimeSubscription) {
+                    supabase.removeChannel(realtimeSubscription);
+                    realtimeSubscription = null;
+                }
                 
                 if (userInfoContainer) {
                     userInfoContainer.classList.add('hidden');
@@ -5085,12 +5137,18 @@
                 landingPage.style.display = 'none';
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
-                initializeDashboard();
                 
-                const lastView = localStorage.getItem('lastActiveView');
-                if (lastView) {
-                    navigateToView(lastView);
-                }
+                // Fetch the absolute latest data from the server before initializing
+                fetchLatestCloudData(username).then(() => {
+                    initializeDashboard();
+                    
+                    const lastView = localStorage.getItem('lastActiveView');
+                    if (lastView) {
+                        navigateToView(lastView);
+                    }
+                    
+                    setupRealtimeSubscription(username);
+                });
             }
         };
 
