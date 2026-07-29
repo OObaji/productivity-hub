@@ -1361,13 +1361,15 @@
         const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
         let isSyncingFromServer = false; // Flag to prevent infinite sync loops
         let realtimeSubscription = null;
+        const cloudDataStore = {}; // In-memory store replacing localStorage for synced data
 
         async function syncToCloud(username) {
             if (!supabase || username === 'guest' || isSyncingFromServer) return;
             const dataToSave = {};
             syncKeys.forEach(k => {
-                const val = localStorage.getItem(k);
-                if (val !== null) dataToSave[k] = val;
+                if (cloudDataStore[k] !== undefined) {
+                    dataToSave[k] = cloudDataStore[k];
+                }
             });
             
             try {
@@ -1385,9 +1387,9 @@
             isSyncingFromServer = true; // Prevent local updates from triggering cloud saves
             syncKeys.forEach(k => {
                 if (cloudData[k] !== undefined) {
-                    originalSetItem.call(localStorage, k, cloudData[k]);
+                    cloudDataStore[k] = cloudData[k];
                 } else {
-                    originalRemoveItem.call(localStorage, k);
+                    delete cloudDataStore[k];
                 }
             });
             isSyncingFromServer = false;
@@ -1430,22 +1432,40 @@
                 .subscribe();
         }
 
-        // Intercept LocalStorage to auto-sync to Supabase
+        // Intercept LocalStorage to use in-memory store and auto-sync to Supabase directly
         const originalSetItem = localStorage.setItem;
+        const originalGetItem = localStorage.getItem;
+        const originalRemoveItem = localStorage.removeItem;
+
         localStorage.setItem = function(key, value) {
-            originalSetItem.apply(this, arguments);
-            if (!isSyncingFromServer && syncKeys.includes(key)) {
-                const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) syncToCloud(currentUser);
+            if (syncKeys.includes(key)) {
+                cloudDataStore[key] = value; // Save to memory only
+                if (!isSyncingFromServer) {
+                    const currentUser = originalGetItem.call(localStorage, 'currentUser');
+                    if (currentUser) syncToCloud(currentUser);
+                }
+            } else {
+                originalSetItem.apply(this, arguments); // Standard keys like theme/session
             }
         };
 
-        const originalRemoveItem = localStorage.removeItem;
+        localStorage.getItem = function(key) {
+            if (syncKeys.includes(key)) {
+                return cloudDataStore[key] !== undefined ? cloudDataStore[key] : null; // Read from memory
+            } else {
+                return originalGetItem.apply(this, arguments);
+            }
+        };
+
         localStorage.removeItem = function(key) {
-            originalRemoveItem.apply(this, arguments);
-            if (!isSyncingFromServer && syncKeys.includes(key)) {
-                const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) syncToCloud(currentUser);
+            if (syncKeys.includes(key)) {
+                delete cloudDataStore[key]; // Erase from memory
+                if (!isSyncingFromServer) {
+                    const currentUser = originalGetItem.call(localStorage, 'currentUser');
+                    if (currentUser) syncToCloud(currentUser);
+                }
+            } else {
+                originalRemoveItem.apply(this, arguments);
             }
         };
 
@@ -2247,7 +2267,8 @@
                         
                         // Clear any old local data
                         syncKeys.forEach(k => {
-                            originalRemoveItem.call(localStorage, k);
+                            delete cloudDataStore[k];
+                            originalRemoveItem.call(localStorage, k); // Ensure legacy local data is also erased
                         });
                         
                         loginSuccess(user);
@@ -2301,6 +2322,9 @@
                 localStorage.removeItem('appEntered');
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('lastActiveView');
+                
+                // Clear in-memory cloud data completely
+                Object.keys(cloudDataStore).forEach(k => delete cloudDataStore[k]);
                 
                 if (realtimeSubscription) {
                     supabase.removeChannel(realtimeSubscription);
