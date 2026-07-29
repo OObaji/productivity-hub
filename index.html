@@ -1350,46 +1350,18 @@
     </div>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        let app, auth, db;
-        let appId = 'default-app-id';
-        let fbUser = null;
+        // Supabase Initialization
+        const SUPABASE_URL = 'https://hfpgcqtbtgfmmbsgqdaa.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Define initAuth globally so bootApp can access it
-        async function initAuth() {
-            if (!auth) return; // Safely skip if Firebase isn't initialized (Netlify mode)
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        }
-
-        try {
-            // Only initialize Firebase if the environment provides the config (e.g., in the Hub)
-            if (typeof __firebase_config !== 'undefined') {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-                onAuthStateChanged(auth, (user) => { fbUser = user; });
-            } else {
-                console.log("Running in standalone mode (Netlify). Cloud sync disabled, using LocalStorage.");
-            }
-        } catch (e) {
-            console.warn("Firebase initialization skipped:", e);
-        }
-
-        // --- Cloud Storage Engine ---
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard'];
+        // --- Cloud Storage Engine (Supabase) ---
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
         
         async function syncToCloud(username) {
-            if (!fbUser || !db || username === 'guest') return;
+            if (!supabase || username === 'guest') return;
             const dataToSave = {};
             syncKeys.forEach(k => {
                 const val = localStorage.getItem(k);
@@ -1397,13 +1369,17 @@
             });
             
             try {
-                const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', username);
-                await setDoc(agentRef, { data: dataToSave }, { merge: true });
+                const { error } = await supabase
+                    .from('user_data')
+                    .upsert({ username: username, data: dataToSave });
+                
+                if (error) throw error;
             } catch (e) {
                 console.error("Cloud sync failed", e);
             }
         }
 
+        // Intercept LocalStorage to auto-sync to Supabase
         const originalSetItem = localStorage.setItem;
         localStorage.setItem = function(key, value) {
             originalSetItem.apply(this, arguments);
@@ -1843,8 +1819,6 @@
         ];
 
         const bootApp = async () => {
-            await initAuth(); // Wait for cloud authentication to initialize
-            
             const landingPage = document.getElementById('landing-page');
             const appLayout = document.getElementById('app-layout');
             const logoutBtn = document.getElementById('logout-btn');
@@ -2205,44 +2179,21 @@
                 btn.textContent = "Securing Credentials...";
                 btn.disabled = true;
 
-                // Fallback to LocalStorage Auth if deployed on Netlify without Firebase
-                if (!db) {
-                    let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                    if (users[user]) {
-                        err.textContent = "Email address already exists.";
-                        err.classList.remove('hidden');
-                    } else {
-                        users[user] = pass;
-                        localStorage.setItem('myndarcUsers', JSON.stringify(users));
-                        err.classList.add('hidden');
-                        loginSuccess(user);
-                    }
-                    btn.textContent = "Register";
-                    btn.disabled = false;
-                    return;
-                }
-
-                if (!fbUser) {
-                    err.textContent = "Cloud connection initializing, please wait...";
-                    err.classList.remove('hidden');
-                    btn.textContent = "Register";
-                    btn.disabled = false;
-                    return;
-                }
-
                 try {
-                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
-                    const snap = await getDoc(agentRef);
+                    // Check if user exists in Supabase
+                    const { data, error: selectError } = await supabase.from('user_data').select('username').eq('username', user).single();
                     
-                    if (snap.exists()) {
+                    if (data) {
                         err.textContent = "Email address already exists.";
                         err.classList.remove('hidden');
                     } else {
-                        await setDoc(agentRef, { password: pass, data: {} });
+                        // Insert new user to Supabase
+                        const { error: insertError } = await supabase.from('user_data').insert({ username: user, password: pass, data: {} });
+                        if (insertError) throw insertError;
+
                         err.classList.add('hidden');
                         
                         // Clear any old local data
-                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
                         syncKeys.forEach(k => {
                             originalRemoveItem.call(localStorage, k);
                         });
@@ -2268,39 +2219,15 @@
                 btn.textContent = "Authenticating...";
                 btn.disabled = true;
 
-                // Fallback to LocalStorage Auth if deployed on Netlify without Firebase
-                if (!db) {
-                    let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                    if (users[user] && users[user] === pass) {
-                        err.classList.add('hidden');
-                        loginSuccess(user);
-                    } else {
-                        err.textContent = "Invalid Email address or Password.";
-                        err.classList.remove('hidden');
-                    }
-                    btn.textContent = "Login";
-                    btn.disabled = false;
-                    return;
-                }
-
-                if (!fbUser) {
-                    err.textContent = "Cloud connection initializing, please wait...";
-                    err.classList.remove('hidden');
-                    btn.textContent = "Login";
-                    btn.disabled = false;
-                    return;
-                }
-
                 try {
-                    const agentRef = doc(db, 'artifacts', appId, 'public', 'data', 'agents', user);
-                    const snap = await getDoc(agentRef);
+                    // Fetch user from Supabase
+                    const { data, error } = await supabase.from('user_data').select('*').eq('username', user).single();
                     
-                    if (snap.exists() && snap.data().password === pass) {
+                    if (data && data.password === pass) {
                         err.classList.add('hidden');
                         
                         // Load cloud data into localStorage silently
-                        const cloudData = snap.data().data || {};
-                        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'breakGameHighScore'];
+                        const cloudData = data.data || {};
                         
                         syncKeys.forEach(k => {
                             if (cloudData[k] !== undefined) {
@@ -5172,208 +5099,6 @@
         } else {
             bootApp();
         }
-    </script>
-
-    <!-- Supabase integration replaced Firebase -->
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-        // ⚠️ PASTE YOUR SUPABASE CREDENTIALS HERE ⚠️
-        const SUPABASE_URL = 'https://hfpgcqtbtgfmmbsgqdaa.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
-        
-        // Initialize Supabase only if keys are provided
-        let supabase = null;
-        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.warn("Supabase is not configured. Running in LocalStorage-only mode.");
-        }
-
-        // --- Cloud Storage Engine (Supabase) ---
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
-        
-        async function syncToCloud(username) {
-            if (!supabase || username === 'guest') return;
-            const dataToSave = {};
-            syncKeys.forEach(k => {
-                const val = localStorage.getItem(k);
-                if (val !== null) dataToSave[k] = val;
-            });
-            
-            try {
-                const { error } = await supabase
-                    .from('user_data')
-                    .upsert({ username: username, data: dataToSave });
-                
-                if (error) throw error;
-            } catch (e) {
-                console.error("Cloud sync failed", e);
-            }
-        }
-
-        // Intercept LocalStorage to auto-sync to Supabase
-        const originalSetItem = localStorage.setItem;
-        localStorage.setItem = function(key, value) {
-            originalSetItem.apply(this, arguments);
-            if (syncKeys.includes(key)) {
-                const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) syncToCloud(currentUser);
-            }
-        };
-
-        const originalRemoveItem = localStorage.removeItem;
-        localStorage.removeItem = function(key) {
-            originalRemoveItem.apply(this, arguments);
-            if (syncKeys.includes(key)) {
-                const currentUser = localStorage.getItem('currentUser');
-                if (currentUser) syncToCloud(currentUser);
-            }
-        };
-
-        // --- Supabase Authentication Override ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const landingPage = document.getElementById('landing-page');
-            const appLayout = document.getElementById('app-layout');
-            const userInfoContainer = document.getElementById('user-info-container');
-            const userIdDisplay = document.getElementById('user-id-display');
-
-            function loginSuccess(username) {
-                localStorage.setItem('appEntered', 'true');
-                localStorage.setItem('currentUser', username);
-                
-                if (userInfoContainer && userIdDisplay) {
-                    userInfoContainer.classList.remove('hidden');
-                    userIdDisplay.textContent = username.toUpperCase();
-                }
-
-                landingPage.style.display = 'none';
-                appLayout.classList.remove('hidden-fade');
-                appLayout.classList.add('visible-fade');
-                
-                // Trigger a re-render of dynamic components
-                window.dispatchEvent(new Event('cloudDataSynced'));
-                // Force page reload to safely boot with new credentials in standard environment
-                window.location.reload(); 
-            }
-
-            // Override Register
-            if(registerForm) {
-                const clone = registerForm.cloneNode(true);
-                registerForm.parentNode.replaceChild(clone, registerForm);
-                clone.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const user = document.getElementById('reg-username').value.trim().toLowerCase();
-                    const pass = document.getElementById('reg-password').value;
-                    const err = document.getElementById('reg-error');
-                    const btn = clone.querySelector('button[type="submit"]');
-                    
-                    btn.textContent = "Securing Credentials...";
-                    btn.disabled = true;
-
-                    if (!supabase) {
-                        let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                        if (users[user]) {
-                            err.textContent = "Email address already exists.";
-                            err.classList.remove('hidden');
-                        } else {
-                            users[user] = pass;
-                            localStorage.setItem('myndarcUsers', JSON.stringify(users));
-                            err.classList.add('hidden');
-                            loginSuccess(user);
-                        }
-                        btn.textContent = "Register";
-                        btn.disabled = false;
-                        return;
-                    }
-
-                    try {
-                        // Check if user exists
-                        const { data, error } = await supabase.from('user_data').select('username').eq('username', user).single();
-                        
-                        if (data) {
-                            err.textContent = "Email address already exists.";
-                            err.classList.remove('hidden');
-                        } else {
-                            // Insert new user
-                            const { error: insertError } = await supabase.from('user_data').insert({ username: user, password: pass, data: {} });
-                            if (insertError) throw insertError;
-
-                            err.classList.add('hidden');
-                            syncKeys.forEach(k => originalRemoveItem.call(localStorage, k)); // Clear local data for new user
-                            loginSuccess(user);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        err.textContent = "Connection error. Try again.";
-                        err.classList.remove('hidden');
-                    }
-                    btn.textContent = "Register";
-                    btn.disabled = false;
-                });
-            }
-
-            // Override Login
-            if(loginForm) {
-                const clone = loginForm.cloneNode(true);
-                loginForm.parentNode.replaceChild(clone, loginForm);
-                clone.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const user = document.getElementById('login-username').value.trim().toLowerCase();
-                    const pass = document.getElementById('login-password').value;
-                    const err = document.getElementById('login-error');
-                    const btn = clone.querySelector('button[type="submit"]');
-                    
-                    btn.textContent = "Authenticating...";
-                    btn.disabled = true;
-
-                    if (!supabase) {
-                        let users = JSON.parse(localStorage.getItem('myndarcUsers')) || {};
-                        if (users[user] && users[user] === pass) {
-                            err.classList.add('hidden');
-                            loginSuccess(user);
-                        } else {
-                            err.textContent = "Invalid Email address or Password.";
-                            err.classList.remove('hidden');
-                        }
-                        btn.textContent = "Login";
-                        btn.disabled = false;
-                        return;
-                    }
-
-                    try {
-                        const { data, error } = await supabase.from('user_data').select('*').eq('username', user).single();
-                        
-                        if (data && data.password === pass) {
-                            err.classList.add('hidden');
-                            
-                            // Load cloud data into localStorage
-                            const cloudData = data.data || {};
-                            syncKeys.forEach(k => {
-                                if (cloudData[k] !== undefined) {
-                                    originalSetItem.call(localStorage, k, cloudData[k]);
-                                } else {
-                                    originalRemoveItem.call(localStorage, k);
-                                }
-                            });
-                            
-                            loginSuccess(user);
-                        } else {
-                            err.textContent = "Invalid Email address or Password.";
-                            err.classList.remove('hidden');
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        err.textContent = "Connection error. Try again.";
-                        err.classList.remove('hidden');
-                    }
-                    btn.textContent = "Login";
-                    btn.disabled = false;
-                });
-            }
-        });
     </script>
 </body>
 </html>
