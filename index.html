@@ -1989,9 +1989,7 @@
             };
 
             // Custom events for Cloud sync reactivity
-            window.addEventListener('cloudDataSynced', () => {
-                if(typeof renderList === 'function') renderList();
-            });
+            // Component updates are handled via event listeners inside their respective setup functions.
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
@@ -2864,12 +2862,25 @@
                     });
                 }
 
-                // Load existing notes from persistent storage
-                const savedNotes = JSON.parse(localStorage.getItem('myndarcIdeaBoard')) || [];
-                savedNotes.forEach(n => {
-                    createNote(n.x, n.y, n.color, n.text, n.w, n.h);
-                    noteCount++;
-                });
+                function renderBoard() {
+                    // Prevent re-rendering if the user is actively typing or dragging a note to avoid interruptions
+                    if (board.querySelector('.dragging') || board.contains(document.activeElement)) {
+                        return; 
+                    }
+                    
+                    board.innerHTML = '';
+                    const savedNotes = JSON.parse(localStorage.getItem('myndarcIdeaBoard')) || [];
+                    savedNotes.forEach(n => {
+                        createNote(n.x, n.y, n.color, n.text, n.w, n.h);
+                        noteCount++;
+                    });
+                }
+
+                // Initial load
+                renderBoard();
+
+                // Listen for cloud updates from other devices
+                window.addEventListener('cloudDataSynced', renderBoard);
 
                 addBtn.addEventListener('click', () => {
                     const colors = ['bg-yellow-200', 'bg-blue-200', 'bg-pink-200', 'bg-emerald-200'];
@@ -3398,6 +3409,12 @@
                         if (e.key === 'Enter') addBtn.click();
                     });
                 }
+
+                window.addEventListener('cloudDataSynced', () => {
+                    renderList();
+                    if(typeof renderBreachCompletionTable === 'function') renderBreachCompletionTable();
+                    if(typeof renderBreachStats === 'function') renderBreachStats();
+                });
 
                 renderList();
             }
