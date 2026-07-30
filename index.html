@@ -1451,7 +1451,13 @@
             let hasChanges = false;
             
             // Record this as the latest cloud state so we don't accidentally send it right back
-            lastKnownCloudStateStr = JSON.stringify(cloudData);
+            const incomingStateStr = JSON.stringify(cloudData);
+            if (incomingStateStr === lastKnownCloudStateStr) {
+                 isSyncingFromServer = false;
+                 return; // No actual changes
+            }
+            
+            lastKnownCloudStateStr = incomingStateStr;
             
             syncKeys.forEach(k => {
                 if (cloudData[k] !== undefined) {
@@ -1495,18 +1501,40 @@
         function setupRealtimeSubscription(username) {
             if (username === 'guest') return;
             
-            // Due to Canvas restrictions blocking WebSockets, we use Polling as a fallback.
-            console.log("WebSockets restricted. Falling back to 3-second HTTP polling for live sync.");
-            updateSyncStatus('connected', 'Live Sync (Polling)');
-            
+            if (realtimeSubscription) supabase.removeChannel(realtimeSubscription);
             if (pollingInterval) clearInterval(pollingInterval);
             
-            pollingInterval = setInterval(() => {
-                // Don't poll if we are actively sending data to prevent race conditions
-                if (!syncTimeout) {
-                    fetchLatestCloudData(username);
-                }
-            }, 3000); 
+            const startPollingFallback = () => {
+                console.log("Using HTTP polling for Live Sync...");
+                updateSyncStatus('connected', 'Live Sync (Polling)');
+                pollingInterval = setInterval(() => {
+                    if (!syncTimeout) fetchLatestCloudData(username);
+                }, 3000);
+            };
+            
+            try {
+                // Attempt to use Supabase Realtime (WebSockets) - works in deployed environments
+                realtimeSubscription = supabase.channel(`public:user_data:username=eq.${username}`)
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'user_data', filter: `username=eq.${username}` },
+                        (payload) => {
+                            if (payload.new && payload.new.data) {
+                                applyCloudDataToLocal(payload.new.data);
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log("Realtime WebSockets connected!");
+                            updateSyncStatus('connected', 'Live Sync Active');
+                        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                            startPollingFallback();
+                        }
+                    });
+            } catch (e) {
+                startPollingFallback();
+            }
         }
 
         // Intercept LocalStorage safely
@@ -3916,7 +3944,10 @@
 
                 function saveAndRenderOT() {
                     localStorage.setItem('myndarcOTRequests', JSON.stringify(generatedResults));
-                    
+                    renderOT();
+                }
+
+                function renderOT() {
                     if (tbody) {
                         tbody.innerHTML = '';
                         
@@ -3986,6 +4017,11 @@
                         }
                     });
                 }
+
+                window.addEventListener('cloudDataSynced', () => {
+                    generatedResults = JSON.parse(localStorage.getItem('myndarcOTRequests')) || [];
+                    renderOT();
+                });
 
                 // Initial render from local storage
                 saveAndRenderOT();
@@ -5148,8 +5184,47 @@
                             localStorage.removeItem('activeShiftData');
                         }
                     }
+                    
+                    // If we reach here, there is no active shift. Clean up if one was running locally.
+                    if (shiftInterval) {
+                        clearInterval(shiftInterval);
+                        shiftInterval = null;
+                        warnedBreaksStart.clear();
+                        warnedBreaksEnd.clear();
+                        adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
+                        shiftVibeStatus = [];
+                        if(countdownView) countdownView.classList.add('hidden');
+                        if(setupView) setupView.classList.remove('hidden');
+                        updateDisplays(0, 0, 0, 0);
+                        
+                        const progCounter = document.getElementById('vibe-progress-counter');
+                        if (progCounter) progCounter.textContent = '0 / 0 Done';
+                        
+                        const resets = [
+                            { t: 'dash-vibe-title', i: 'dash-vibe-icon', m: 'dash-vibe-task', sub: 'Start a shift to see your vibe.' },
+                            { t: 'breach-vibe-title', i: 'breach-vibe-icon', m: 'breach-vibe-task', sub: 'Start a shift to begin.' }
+                        ];
+
+                        resets.forEach(r => {
+                            const tEl = document.getElementById(r.t);
+                            const iEl = document.getElementById(r.i);
+                            const mEl = document.getElementById(r.m);
+                            if(tEl) tEl.textContent = "Offline";
+                            if(iEl) iEl.textContent = "💤";
+                            if(mEl) mEl.textContent = r.sub;
+                        });
+                    }
                     return false;
                 }
+
+                window.addEventListener('cloudDataSynced', () => {
+                    const newVibes = JSON.parse(localStorage.getItem('customShiftVibes'));
+                    if (newVibes) {
+                        shiftVibes = newVibes;
+                        if (currentVibeIndex !== -1) updateVibeUI(currentVibeIndex);
+                    }
+                    restoreActiveShift();
+                });
 
                 // --- Automatic Shift Detection System ---
                 // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
