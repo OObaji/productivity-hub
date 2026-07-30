@@ -829,6 +829,11 @@
                                             </button>
                                         </div>
                                         
+                                        <!-- NEW: Pop Out Timer Button -->
+                                        <button id="pip-btn" class="p-3 bg-teal-500/20 text-teal-200 hover:text-white rounded-xl hover:bg-teal-500/40 transition-all border border-teal-500/20 shadow-lg backdrop-blur-sm" title="Pop Out Timer (Picture-in-Picture)">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                        </button>
+
                                         <div id="break-alert-banner" class="hidden py-2 px-6 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-full animate-pulse font-mono text-sm font-bold flex items-center gap-2">
                                             <span class="text-xl">🌱</span> RECHARGE MODE ACTIVE
                                         </div>
@@ -1355,6 +1360,10 @@
         </main>
     </div>
     
+    <!-- Hidden Elements for Picture-in-Picture Engine -->
+    <canvas id="pip-canvas" width="500" height="250" class="hidden"></canvas>
+    <video id="pip-video" autoplay muted playsinline class="hidden"></video>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -1370,6 +1379,7 @@
         
         let syncTimeout = null; // Debounce timer
         let lastKnownCloudStateStr = ""; // Prevent infinite loop of sending what we just received
+        let pollingInterval = null; // Interval for fallback polling
 
         // Sync Status UI update helper
         function updateSyncStatus(status, text) {
@@ -1471,46 +1481,31 @@
             if (username === 'guest') return;
             try {
                 const { data, error } = await supabase.from('user_data').select('data').eq('username', username).single();
+                if (error && error.code !== 'PGRST116') throw error; // Ignore "Row not found"
                 if (data && data.data) {
                     applyCloudDataToLocal(data.data);
                 }
             } catch (error) {
-                console.error("Error fetching latest data on load:", error);
+                console.error("Error fetching latest data:", error);
+                updateSyncStatus('error', 'Fetch Failed');
             }
         }
 
         function setupRealtimeSubscription(username) {
             if (username === 'guest') return;
             
-            if (realtimeSubscription) {
-                supabase.removeChannel(realtimeSubscription);
-            }
-
-            updateSyncStatus('syncing', 'Connecting Realtime...');
-
-            realtimeSubscription = supabase.channel(`user-${username}`)
-                .on(
-                    'postgres_changes',
-                    // Listen for all events (*), filtering strictly by the string username
-                    { event: '*', schema: 'public', table: 'user_data', filter: `username=eq.${username}` },
-                    (payload) => {
-                        console.log("Realtime payload received", payload);
-                        if (payload.new && payload.new.data) {
-                            applyCloudDataToLocal(payload.new.data);
-                        }
-                    }
-                )
-                .subscribe((status, err) => {
-                    if (status === 'SUBSCRIBED') {
-                        console.log("Realtime sync connected.");
-                        updateSyncStatus('connected', 'Live Sync Active');
-                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                        console.error('Realtime connection error:', status, err);
-                        updateSyncStatus('error', 'Live Sync Disconnected');
-                        // Crucial diagnostic message for the user:
-                        console.warn("If data is saving but not pushing to other devices, ensure Row Level Security (RLS) allows SELECT for the 'anon' role, AND that Realtime is turned on for the user_data table in Supabase.");
-                    }
-                });
+            // Due to Canvas restrictions blocking WebSockets, we use Polling as a fallback.
+            console.log("WebSockets restricted. Falling back to 3-second HTTP polling for live sync.");
+            updateSyncStatus('connected', 'Live Sync (Polling)');
+            
+            if (pollingInterval) clearInterval(pollingInterval);
+            
+            pollingInterval = setInterval(() => {
+                // Don't poll if we are actively sending data to prevent race conditions
+                if (!syncTimeout) {
+                    fetchLatestCloudData(username);
+                }
+            }, 3000); 
         }
 
         // Intercept LocalStorage safely
@@ -2382,6 +2377,10 @@
                         
                         // Load cloud data into localStorage silently
                         const cloudData = data.data || {};
+                        
+                        // Set the last known state string BEFORE applying to prevent immediate re-sync
+                        lastKnownCloudStateStr = JSON.stringify(cloudData);
+                        
                         applyCloudDataToLocal(cloudData);
                         
                         loginSuccess(user);
@@ -2410,6 +2409,11 @@
                 if (realtimeSubscription) {
                     supabase.removeChannel(realtimeSubscription);
                     realtimeSubscription = null;
+                }
+                
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
                 }
                 
                 if (userInfoContainer) {
@@ -4147,6 +4151,73 @@
                 let adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                 let shiftVibeStatus = [];
 
+                // --- PiP Engine Setup ---
+                const pipBtn = document.getElementById('pip-btn');
+                const pipCanvas = document.getElementById('pip-canvas');
+                const pipVideo = document.getElementById('pip-video');
+
+                function drawPiP(h, m, s, progress, label, isBreak) {
+                    if (!pipCanvas) return;
+                    const ctx = pipCanvas.getContext('2d');
+                    if (!ctx) return;
+
+                    // Clear & Background
+                    ctx.fillStyle = isBreak ? '#064e3b' : '#0f172a'; // emerald-950 or slate-900
+                    ctx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+
+                    // Draw Label (Vibe or Break Status)
+                    ctx.fillStyle = isBreak ? '#34d399' : '#94a3b8'; // emerald-400 or slate-400
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText((label || '').toUpperCase(), pipCanvas.width / 2, 30);
+
+                    // Draw Timer
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 90px monospace';
+                    ctx.textBaseline = 'middle';
+                    const pad = n => String(n).padStart(2, '0');
+                    let timeText = '';
+                    if (h > 0) timeText += `${pad(h)}:`;
+                    timeText += `${pad(m)}:${pad(s)}`;
+                    ctx.fillText(timeText, pipCanvas.width / 2, pipCanvas.height / 2 + 10);
+
+                    // Draw Progress Bar
+                    const barWidth = pipCanvas.width - 80;
+                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                    ctx.beginPath();
+                    ctx.roundRect(40, pipCanvas.height - 40, barWidth, 12, 6);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = isBreak ? '#10b981' : '#2dd4bf'; // emerald-500 or teal-400
+                    ctx.beginPath();
+                    ctx.roundRect(40, pipCanvas.height - 40, barWidth * Math.max(0, Math.min(1, progress)), 12, 6);
+                    ctx.fill();
+                }
+
+                if (pipBtn) {
+                    pipBtn.addEventListener('click', async () => {
+                        if (document.pictureInPictureElement) {
+                            await document.exitPictureInPicture();
+                        } else {
+                            if (pipVideo && pipCanvas) {
+                                // Initialize the video stream from the canvas at 10fps (plenty for a timer)
+                                if (!pipVideo.srcObject) {
+                                    pipVideo.srcObject = pipCanvas.captureStream(10); 
+                                    await pipVideo.play();
+                                }
+                                try {
+                                    await pipVideo.requestPictureInPicture();
+                                } catch (err) {
+                                    if (typeof showAlert === 'function') showAlert("Picture-in-Picture is blocked or unsupported in this browser.");
+                                    console.error("PiP Error:", err);
+                                }
+                            }
+                        }
+                    });
+                }
+                // --- End PiP Engine Setup ---
+
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
                     { title: "Momentum", icon: "⚡", desc: "Build your rhythm. Handle quick wins and urgent comms." },
@@ -4922,6 +4993,34 @@
                             }
                         }
                     });
+
+                    // Update Picture-in-Picture Canvas Frame
+                    if (pipVideo && document.pictureInPictureElement === pipVideo) {
+                        if (now < startTimeValue) {
+                            const startsIn = startTimeValue - now;
+                            const h = Math.floor((startsIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const m = Math.floor((startsIn % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((startsIn % (1000 * 60)) / 1000);
+                            drawPiP(h, m, s, 0, "PRE-SHIFT", false);
+                        } else if (activeBreak) {
+                            const breakRemaining = activeBreak.endMs - now;
+                            const bh = Math.floor(breakRemaining / 3600000);
+                            const bm = Math.floor((breakRemaining % 3600000) / 60000);
+                            const bs = Math.floor((breakRemaining % 60000) / 1000);
+                            const label = activeBreak.isHealthBreak ? "Health Break" : "Break Time";
+                            const breakProgress = (now - activeBreak.startMs) / (activeBreak.endMs - activeBreak.startMs);
+                            drawPiP(bh, bm, bs, breakProgress, label, true);
+                        } else {
+                            const remaining = endTime - now;
+                            const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((remaining % (1000 * 60)) / 1000);
+                            const elapsed = now - startTimeValue;
+                            const progress = elapsed / totalDuration;
+                            const vibeLabel = shiftVibes[currentVibeIndex] ? shiftVibes[currentVibeIndex].title : 'Shift Active';
+                            drawPiP(h, m, s, progress, vibeLabel, false);
+                        }
+                    }
                 }
 
                 function restoreActiveShift() {
