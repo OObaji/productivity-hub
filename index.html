@@ -1432,7 +1432,8 @@
                 try {
                     const { error } = await supabase
                         .from('user_data')
-                        .upsert({ username: username, data: dataToSave }, { onConflict: 'username' });
+                        .update({ data: dataToSave })
+                        .eq('username', username);
                     
                     if (error) throw error;
                     lastKnownCloudStateStr = currentStateStr; // Update last known state
