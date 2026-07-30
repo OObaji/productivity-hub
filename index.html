@@ -4151,12 +4151,32 @@
                 let adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                 let shiftVibeStatus = [];
 
+                // --- Native Notifications ---
+                function showBrowserNotification(title, body) {
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        try {
+                            new Notification(title, { 
+                                body: body, 
+                                icon: "https://img.icons8.com/fluency/96/brain.png",
+                                requireInteraction: true
+                            });
+                        } catch (e) {
+                            console.log("Notification error:", e);
+                        }
+                    }
+                }
+
                 // --- PiP Engine Setup ---
                 const pipBtn = document.getElementById('pip-btn');
                 const pipCanvas = document.getElementById('pip-canvas');
                 const pipVideo = document.getElementById('pip-video');
 
-                function drawPiP(h, m, s, progress, label, isBreak) {
+                // Request Notification Permission on load
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+
+                function drawPiP(h, m, s, progress, label, isBreak, extraInfo = "") {
                     if (!pipCanvas) return;
                     const ctx = pipCanvas.getContext('2d');
                     if (!ctx) return;
@@ -4181,6 +4201,13 @@
                     if (h > 0) timeText += `${pad(h)}:`;
                     timeText += `${pad(m)}:${pad(s)}`;
                     ctx.fillText(timeText, pipCanvas.width / 2, pipCanvas.height / 2 + 10);
+
+                    // Draw Extra Subtitle Info (e.g. Next break or Shift remaining)
+                    if (extraInfo) {
+                        ctx.fillStyle = isBreak ? '#a7f3d0' : '#64748b'; // emerald-200 or slate-500
+                        ctx.font = 'bold 16px Inter, sans-serif';
+                        ctx.fillText(extraInfo, pipCanvas.width / 2, pipCanvas.height - 70);
+                    }
 
                     // Draw Progress Bar
                     const barWidth = pipCanvas.width - 80;
@@ -4972,8 +4999,28 @@
                         if (breachMiniBreak) breachMiniBreak.textContent = "--:--";
                     }
 
-                    // Break Adherence Check
+                    // Break Adherence Check & Notifications
                     shiftBreaks.forEach((brk, index) => {
+                        // 60-second warning before break starts
+                        if (now >= brk.startMs - 60000 && now < brk.startMs && !warnedBreaksStart.has(index)) {
+                            warnedBreaksStart.add(index);
+                            triggerBreakAlert('start', brk.isHealthBreak);
+                            showBrowserNotification(
+                                brk.isHealthBreak ? "Health Break Approaching" : "Break Approaching",
+                                "Wrap up! Break starts in 60 seconds."
+                            );
+                        }
+                        
+                        // 60-second warning before break ends
+                        if (now >= brk.endMs - 60000 && now < brk.endMs && !warnedBreaksEnd.has(index)) {
+                            warnedBreaksEnd.add(index);
+                            triggerBreakAlert('end', brk.isHealthBreak);
+                            showBrowserNotification(
+                                brk.isHealthBreak ? "Health Break Ending" : "Break Ending",
+                                "Get ready! Break ends in 60 seconds."
+                            );
+                        }
+
                         // Adherence: Standard Breaks
                         if (!brk.isHealthBreak) {
                             if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
@@ -4984,24 +5031,40 @@
                                 const pad = n => String(n).padStart(2, '0');
                                 const timeStr = `${pad(sDate.getHours())}:${pad(sDate.getMinutes())}-${pad(eDate.getHours())}:${pad(eDate.getMinutes())}`;
                                 triggerAdherenceModal('break_start', timeStr);
+                                showBrowserNotification("Break Started", "Time to rest and recharge.");
                             }
 
                             if (now >= brk.endMs && !adherenceFlags.breakEnds.includes(index)) {
                                 adherenceFlags.breakEnds.push(index);
                                 saveShiftData();
                                 triggerAdherenceModal('break_end');
+                                showBrowserNotification("Break Ended", "Welcome back! Let's get to it.");
+                            }
+                        } else {
+                            // Notify silently for health breaks when they start
+                            if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
+                                adherenceFlags.breakStarts.push(index);
+                                saveShiftData();
+                                showBrowserNotification("Health Break", "Take 5 minutes to stretch and rest your eyes.");
                             }
                         }
                     });
 
                     // Update Picture-in-Picture Canvas Frame
                     if (pipVideo && document.pictureInPictureElement === pipVideo) {
+                        const remaining = endTime - now;
+                        const shiftH = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const shiftM = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                        const shiftS = Math.floor((remaining % (1000 * 60)) / 1000);
+                        const pad = (n) => String(n).padStart(2, '0');
+                        const shiftTimeStr = `${pad(shiftH)}:${pad(shiftM)}:${pad(shiftS)}`;
+
                         if (now < startTimeValue) {
                             const startsIn = startTimeValue - now;
                             const h = Math.floor((startsIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                             const m = Math.floor((startsIn % (1000 * 60 * 60)) / (1000 * 60));
                             const s = Math.floor((startsIn % (1000 * 60)) / 1000);
-                            drawPiP(h, m, s, 0, "PRE-SHIFT", false);
+                            drawPiP(h, m, s, 0, "PRE-SHIFT", false, `Shift starts soon`);
                         } else if (activeBreak) {
                             const breakRemaining = activeBreak.endMs - now;
                             const bh = Math.floor(breakRemaining / 3600000);
@@ -5009,16 +5072,21 @@
                             const bs = Math.floor((breakRemaining % 60000) / 1000);
                             const label = activeBreak.isHealthBreak ? "Health Break" : "Break Time";
                             const breakProgress = (now - activeBreak.startMs) / (activeBreak.endMs - activeBreak.startMs);
-                            drawPiP(bh, bm, bs, breakProgress, label, true);
+                            drawPiP(bh, bm, bs, breakProgress, label, true, `Shift Remaining: ${shiftTimeStr}`);
                         } else {
-                            const remaining = endTime - now;
-                            const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                            const s = Math.floor((remaining % (1000 * 60)) / 1000);
                             const elapsed = now - startTimeValue;
                             const progress = elapsed / totalDuration;
                             const vibeLabel = shiftVibes[currentVibeIndex] ? shiftVibes[currentVibeIndex].title : 'Shift Active';
-                            drawPiP(h, m, s, progress, vibeLabel, false);
+                            
+                            let nextBreakStr = "No more breaks";
+                            if (nextBreak) {
+                                const msToNextBrk = nextBreak.startMs - now;
+                                const nh = Math.floor(msToNextBrk / 3600000);
+                                const nm = Math.floor((msToNextBrk % 3600000) / 60000);
+                                nextBreakStr = `Next Break in ${nh > 0 ? nh + 'h ' : ''}${nm}m`;
+                            }
+                            
+                            drawPiP(shiftH, shiftM, shiftS, progress, vibeLabel, false, nextBreakStr);
                         }
                     }
                 }
