@@ -5208,6 +5208,18 @@
                         const now = new Date().getTime();
                         
                         if (savedShift.endMs > now) {
+                            // Check if this is just an update to the CURRENTLY running shift (e.g., syncing from another device)
+                            if (startTimeValue === savedShift.startMs && endTime === savedShift.endMs) {
+                                shiftBreaks = savedShift.breaks || [];
+                                adherenceFlags = savedShift.adherence || { start: false, end: false, breakStarts: [], breakEnds: [] };
+                                shiftVibeStatus = savedShift.vibeStatus || new Array(totalSegments).fill(false);
+                                if (currentVibeIndex !== -1) {
+                                    updateVibeUI(currentVibeIndex); // Soft update to prevent full UI flash
+                                }
+                                return true;
+                            }
+
+                            // Completely new or different shift, rebuild fully
                             startTimeValue = savedShift.startMs;
                             endTime = savedShift.endMs;
                             totalDuration = endTime - startTimeValue;
@@ -5307,12 +5319,12 @@
                     const now = new Date();
                     const currentHour = now.getHours();
                     
-                    // Trigger auto-shift if between 16:00 and 07:00 based on standard schedule
+                    // Pre-fill shift if between 16:00 and 07:00 based on standard schedule
+                    // CRITICAL: We DO NOT auto-start the timer here anymore, to prevent race conditions 
+                    // where a new device logs in and overwrites an active cloud shift before it finishes downloading.
                     if (currentHour >= 16 || currentHour < 7) {
                         setTimes(19, 7); // Default logic to 19:00 - 07:00
-                        
                         if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click(); // Load default breaks
-                        if (startBtn) startBtn.click(); // Trigger shift start securely
                     }
                 }
                 
