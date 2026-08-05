@@ -1253,6 +1253,32 @@
                                     <!-- Results injected here -->
                                 </div>
                             </div>
+                            
+                            <!-- Email Templates & Signatures -->
+                            <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700/60 backdrop-blur-md flex flex-col shrink-0">
+                                <div class="flex items-center justify-between mb-4">
+                                    <p class="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest">Quick Emails</p>
+                                    <span class="text-lg">📧</span>
+                                </div>
+                                
+                                <!-- Template -->
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-1.5 px-1">
+                                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Template</label>
+                                        <button id="copy-email-template-btn" class="text-[10px] text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold uppercase tracking-wider transition-colors">Copy</button>
+                                    </div>
+                                    <textarea id="email-template-input" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs font-mono dark:text-white transition-all resize-none h-28 placeholder-slate-400 custom-scrollbar" placeholder="Enter your email template here..."></textarea>
+                                </div>
+
+                                <!-- Signature -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-1.5 px-1">
+                                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rich Signature</label>
+                                        <button id="copy-email-signature-btn" class="text-[10px] text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold uppercase tracking-wider transition-colors">Copy</button>
+                                    </div>
+                                    <div id="email-signature-input" contenteditable="true" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-300 bg-white text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all h-36 overflow-y-auto custom-scrollbar" style="color-scheme: light;" title="Edit your signature directly here"></div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Right Panel: The List & History -->
@@ -1372,7 +1398,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature'];
         let isSyncingFromServer = false; 
         let realtimeSubscription = null;
         const cloudDataStore = {}; 
@@ -2261,6 +2287,7 @@
                 setupSettings();
                 setupBreachList();
                 setupTimestampExtractor();
+                setupEmailTemplates();
                 setupTagBattery();
                 setupOTGenerator();
                 setupShiftTimer();
@@ -3629,6 +3656,102 @@
                     // Clear the input area to be ready for the next paste
                     input.value = '';
                 });
+            }
+
+            function setupEmailTemplates() {
+                const templateInput = document.getElementById('email-template-input');
+                const signatureInput = document.getElementById('email-signature-input');
+                const copyTemplateBtn = document.getElementById('copy-email-template-btn');
+                const copySignatureBtn = document.getElementById('copy-email-signature-btn');
+
+                if (!templateInput || !signatureInput) return;
+
+                function loadTemplates() {
+                    if (document.activeElement !== templateInput) {
+                        templateInput.value = localStorage.getItem('myndarcEmailTemplate') || '';
+                    }
+                    if (document.activeElement !== signatureInput) {
+                        const savedSig = localStorage.getItem('myndarcEmailSignature');
+                        // Inject the saved signature if it exists and contains HTML, else inject the custom Serco default
+                        if (savedSig && savedSig.includes('<')) {
+                            signatureInput.innerHTML = savedSig;
+                        } else {
+                            // Generate Exact Serco Signature Based on Provided Layout
+                            signatureInput.innerHTML = `
+                                <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #666666; line-height: 1.3;">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Serco_Logo.svg/256px-Serco_Logo.svg.png" alt="Serco" width="110" style="margin-bottom: 10px; display: block; border: none;">
+                                    <div style="border-left: 2px solid #b3b3b3; padding-left: 10px; margin-left: 2px;">
+                                        <div style="font-weight: bold; color: #333333; font-size: 14px; margin-bottom: 2px;">Ololade Obaji</div>
+                                        <div style="font-size: 13px; margin-bottom: 6px;">Operational Support Officer</div>
+                                        <div style="font-size: 13px;">EMS Justice &amp; Immigration</div>
+                                        <div style="font-size: 13px;">Serco Group plc</div>
+                                    </div>
+                                </div>
+                            `;
+                            localStorage.setItem('myndarcEmailSignature', signatureInput.innerHTML);
+                        }
+                    }
+                }
+
+                // Auto-save on input (triggers Supabase debounce automatically via custom LocalStorage interceptor)
+                templateInput.addEventListener('input', (e) => {
+                    localStorage.setItem('myndarcEmailTemplate', e.target.value);
+                });
+
+                // Detect rich text edits
+                signatureInput.addEventListener('input', (e) => {
+                    localStorage.setItem('myndarcEmailSignature', e.target.innerHTML);
+                });
+
+                function handleCopy(btn, inputElement) {
+                    const isRichText = inputElement.tagName.toLowerCase() === 'div';
+                    
+                    if (isRichText) {
+                        // Rich Text HTML Copy Logic
+                        const selection = window.getSelection();
+                        const range = document.createRange();
+                        range.selectNodeContents(inputElement);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        
+                        try {
+                            document.execCommand('copy');
+                        } catch (err) {
+                            console.error('Failed to copy rich text: ', err);
+                        }
+                        selection.removeAllRanges();
+                    } else {
+                        // Plain Text Copy Logic
+                        const text = inputElement.value;
+                        if (!text) return;
+                        navigator.clipboard.writeText(text).catch(() => {
+                            const temp = document.createElement('textarea');
+                            temp.value = text;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(temp);
+                        });
+                    }
+                    
+                    // Visual Feedback
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('text-emerald-500', 'dark:text-emerald-400');
+                    btn.classList.remove('text-indigo-500', 'dark:text-indigo-400', 'hover:text-indigo-600', 'dark:hover:text-indigo-300');
+                    
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove('text-emerald-500', 'dark:text-emerald-400');
+                        btn.classList.add('text-indigo-500', 'dark:text-indigo-400', 'hover:text-indigo-600', 'dark:hover:text-indigo-300');
+                    }, 1500);
+                }
+
+                if (copyTemplateBtn) copyTemplateBtn.addEventListener('click', () => handleCopy(copyTemplateBtn, templateInput));
+                if (copySignatureBtn) copySignatureBtn.addEventListener('click', () => handleCopy(copySignatureBtn, signatureInput));
+
+                window.addEventListener('cloudDataSynced', loadTemplates);
+                loadTemplates();
             }
 
             function setupTagBattery() {
