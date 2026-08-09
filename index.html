@@ -2255,6 +2255,13 @@
             }
             const fmtMoney = (num) => '£' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
+            // The new part-time job's default shift runs 19:00-00:00 (vs. the old job's 19:00-05:00),
+            // effective from the Sept 7 2026 schedule cutover.
+            const OT_SCHEDULE_CUTOVER_MS = new Date('2026-09-07T00:00:00').getTime();
+            function defaultOtTimeRange(dateMs = Date.now()) {
+                return dateMs >= OT_SCHEDULE_CUTOVER_MS ? '19:00 - 00:00' : '19:00 - 05:00';
+            }
+
             function renderFinanceStats() {
                 const badge = document.getElementById('finance-month-badge');
                 const earnedEl = document.getElementById('finance-current-earned');
@@ -3954,6 +3961,11 @@
                 const localISOTime = (new Date(Date.now() - offset)).toISOString().split('T')[0];
                 startInput.value = localISOTime;
 
+                const otTimeInput = document.getElementById('ot-gen-time');
+                if (otTimeInput && (otTimeInput.value === '19:00 - 05:00' || otTimeInput.value === '19:00 - 00:00' || !otTimeInput.value)) {
+                    otTimeInput.value = defaultOtTimeRange();
+                }
+
                 const dutiesContainer = document.getElementById('ot-gen-duties-container');
                 if (dutiesContainer) {
                     dutiesContainer.addEventListener('click', (e) => {
@@ -4277,7 +4289,9 @@
                                 delete generatedResults[existingIdx].actualEnd;
                             }
                         } else {
-                            const timeStr = document.getElementById('ot-gen-time').value || "19:00 - 05:00";
+                            const [dd, mm, yyyy] = dateStr.split('/');
+                            const cellDateMs = new Date(yyyy, mm - 1, dd).getTime();
+                            const timeStr = document.getElementById('ot-gen-time').value || defaultOtTimeRange(cellDateMs);
                             const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
                                                         .map(b => b.dataset.duty)
                                                         .join(', ');
@@ -4562,7 +4576,7 @@
                 btn.addEventListener('click', () => {
                     const startStr = startInput.value;
                     const weeks = parseInt(document.getElementById('ot-gen-weeks').value) || 4;
-                    const timeStr = document.getElementById('ot-gen-time').value || "19:00 - 05:00";
+                    const timeStr = document.getElementById('ot-gen-time').value || defaultOtTimeRange(startStr ? new Date(startStr).getTime() : undefined);
                     
                     const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
                                                 .map(b => b.dataset.duty)
@@ -5109,9 +5123,11 @@
                     
                     suggestedDatesForOT.forEach(dateStr => {
                         if (!otRequests.some(r => r.date === dateStr)) {
+                            const [dd, mm, yyyy] = dateStr.split('/');
+                            const rowDateMs = new Date(yyyy, mm - 1, dd).getTime();
                             otRequests.push({
                                 date: dateStr,
-                                time: "19:00 - 05:00",
+                                time: defaultOtTimeRange(rowDateMs),
                                 duties: "Target Goal Auto-Fill",
                                 confirmed: false
                             });
@@ -5589,7 +5605,8 @@
 
                 if(presetNormal) presetNormal.addEventListener('click', () => setTimes(19, 7));
                 if(presetEarly) presetEarly.addEventListener('click', () => setTimes(17, 5));
-                if(presetOT) presetOT.addEventListener('click', () => setTimes(19, 5));
+                if(presetOT) presetOT.addEventListener('click', () => setTimes(19, Date.now() >= OT_SCHEDULE_CUTOVER_MS ? 0 : 5));
+                if(presetOT) presetOT.textContent = `OT (${defaultOtTimeRange()})`;
 
                 function renderTimeline(segments, startMs, endMs) {
                     const container = document.getElementById('shift-blocks-container');
