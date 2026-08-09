@@ -141,64 +141,85 @@
         }
         .animate-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
-        /* --- Modern iOS / Pro Widget Theme --- */
+        /* --- High-Contrast Refined Theme --- */
         body { 
-            background-color: #f2f2f7 !important; /* Apple light grey */
+            background-color: #f2f2f7 !important;
             background-image: none !important; 
         }
-        
         html.dark body { 
-            background-color: #000000 !important; /* True pitch black */
+            background-color: #000000 !important;
             background-image: none !important;
         }
-        
         #main-container { background-color: transparent !important; }
-
-        /* Hide the old messy ambient blobs to prevent visual clutter */
         .ambient-bg { display: none !important; }
 
-        /* Solidify Cards for Maximum Readability and Crisp Contrast */
-        html:not(.dark) div.bg-white:not(button):not(#qrcode-container):not(.sticky-note), 
-        html:not(.dark) section.bg-white:not(.landing-page),
-        html:not(.dark) .glass-panel {
+        /* Solid cards, stronger borders for clearer separation
+           (.glass-panel is deliberately excluded: it's used for immersive
+           always-dark screens like Shift Setup, whose children use
+           bg-black/40 + text-white and need a dark parent for contrast) */
+        html:not(.dark) div.bg-white:not(button):not(#qrcode-container):not(.sticky-note),
+        html:not(.dark) section.bg-white:not(.landing-page) {
             background-color: #ffffff !important;
-            border: 1px solid rgba(0,0,0,0.04) !important;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0,0,0,0.02) !important;
+            border: 1px solid rgba(15, 23, 42, 0.10) !important;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
             backdrop-filter: none !important;
-            border-radius: 28px !important; /* Apple-style continuous curve look */
+            border-radius: 28px !important;
         }
-        
-        html.dark div.dark\:bg-gray-800:not(button):not(#qrcode-container):not(.sticky-note), 
+        html.dark div.dark\:bg-gray-800:not(button):not(#qrcode-container):not(.sticky-note),
         html.dark section.dark\:bg-gray-800,
-        html.dark div.dark\:bg-slate-800:not(button):not(#qrcode-container):not(.sticky-note), 
+        html.dark div.dark\:bg-slate-800:not(button):not(#qrcode-container):not(.sticky-note),
         html.dark section.dark\:bg-slate-800,
-        html.dark div.bg-white:not(button):not(#qrcode-container):not(.sticky-note),
-        html.dark .glass-panel {
-            background-color: #1c1c1e !important; /* Apple elevated dark grey */
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        html.dark div.bg-white:not(button):not(#qrcode-container):not(.sticky-note) {
+            background-color: #1c1c1e !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
             box-shadow: none !important;
             backdrop-filter: none !important;
             border-radius: 28px !important;
         }
 
-        /* Sidebar Styling */
+        /* Primary body text: force strong contrast everywhere */
+        html:not(.dark) body { color: #0f172a; }
+        html.dark body { color: #f1f5f9; }
+
+        /* Muted / secondary text utilities: brought up to WCAG-AA contrast */
+        html:not(.dark) .text-slate-400 { color: #52525b !important; }
+        html:not(.dark) .text-slate-500 { color: #3f3f46 !important; }
+        html:not(.dark) .text-gray-400  { color: #52525b !important; }
+        html:not(.dark) .text-gray-500  { color: #3f3f46 !important; }
+        html.dark .text-slate-400 { color: #cbd5e1 !important; }
+        html.dark .text-slate-500 { color: #e2e8f0 !important; }
+        html.dark .text-gray-400  { color: #cbd5e1 !important; }
+        html.dark .text-gray-500  { color: #e2e8f0 !important; }
+
+        /* Placeholders: previously near-invisible on light inputs */
+        html:not(.dark) input::placeholder,
+        html:not(.dark) textarea::placeholder { color: #71717a !important; opacity: 1 !important; }
+
+        /* Semi-transparent white text on dark/glass panels (Pomodoro, Mindfulness, Shift Timer) */
+        .text-white\/50, .text-white\/60, .text-white\/70, .text-white\/80,
+        .text-teal-200\/50, .text-teal-400\/70, .text-indigo-300\/90, .text-indigo-400\/60,
+        .text-slate-300\/90 {
+            color: rgba(255, 255, 255, 0.92) !important;
+        }
+        .placeholder-white\/30::placeholder { color: rgba(255, 255, 255, 0.55) !important; }
+
+        /* Sidebar: darkened link/icon color so it reads clearly against the light background */
         html:not(.dark) #sidebar {
             background-color: #f2f2f7 !important;
-            border-right: 1px solid rgba(0,0,0,0.05) !important;
-            color: #3a3a3c !important; 
+            border-right: 1px solid rgba(0,0,0,0.08) !important;
+            color: #1c1c1e !important; 
         }
-        html:not(.dark) #sidebar .border-slate-800 { border-color: rgba(0,0,0,0.1) !important; }
-        html:not(.dark) #sidebar .text-white { color: #000000 !important; } /* Make active titles dark */
-        html:not(.dark) #sidebar .text-slate-300, html:not(.dark) #sidebar .text-slate-400 { color: #8e8e93 !important; } /* Darken icons/links */
+        html:not(.dark) #sidebar .border-slate-800 { border-color: rgba(0,0,0,0.12) !important; }
+        html:not(.dark) #sidebar .text-white { color: #000000 !important; }
+        html:not(.dark) #sidebar .text-slate-300, html:not(.dark) #sidebar .text-slate-400 { color: #3f3f46 !important; }
         html:not(.dark) #sidebar .hover\:bg-slate-800\/50:hover,
         html:not(.dark) #sidebar .active { 
-            background-color: #e5e5ea !important; /* Standard iOS hover grey */
+            background-color: #e4e4e9 !important;
             border-left: none !important;
         }
-        
         html.dark #sidebar {
             background-color: #000000 !important; 
-            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: none !important;
         }
         html.dark #sidebar .hover\:bg-slate-800\/50:hover,
@@ -207,15 +228,15 @@
             border-left: none !important;
         }
         
-        /* Header Overrides */
+        /* Header overrides */
         html:not(.dark) header.bg-white\/80 { 
-            background-color: rgba(242, 242, 247, 0.85) !important; 
-            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+            background-color: rgba(242, 242, 247, 0.92) !important; 
+            border-bottom: 1px solid rgba(0,0,0,0.08) !important;
             backdrop-filter: blur(20px);
         }
         html.dark header.dark\:bg-slate-900\/80 { 
-            background-color: rgba(0, 0, 0, 0.85) !important; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background-color: rgba(0, 0, 0, 0.9) !important; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(20px);
         }
     </style>
@@ -325,6 +346,39 @@
         </div>
     </div>
 
+    <!-- Log Overtime Modal -->
+    <div id="log-overtime-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[80] hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-slate-100 dark:border-slate-700">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Log Overtime</h3>
+            <p id="log-ot-date-label" class="text-sm text-slate-500 dark:text-slate-400 mb-6 font-mono"></p>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Start Time</label>
+                        <input type="time" id="log-ot-start" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-sm font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">End Time</label>
+                        <input type="time" id="log-ot-end" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-sm font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Rate for This Shift (£/hr)</label>
+                    <input type="number" id="log-ot-rate" step="0.01" min="0" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-sm font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-[9px] text-slate-400 mt-1.5 ml-1">Adjust this for enhanced rates, e.g. double time on Sundays.</p>
+                </div>
+                <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Hours &middot; Amount</span>
+                    <span id="log-ot-preview" class="text-sm font-black text-emerald-700 dark:text-emerald-400">0.0h &middot; £0.00</span>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button id="log-ot-cancel-btn" class="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Cancel</button>
+                <button id="log-ot-save-btn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all">Save Log</button>
+            </div>
+        </div>
+    </div>
+
     <section id="landing-page" class="landing-page h-[100dvh] w-full flex items-center justify-center text-center p-4 relative bg-transparent">
         <div class="absolute inset-0 bg-slate-900/30 dark:bg-slate-900/40 backdrop-blur-[2px] z-0"></div>
         <div class="relative z-10 max-w-md w-full glass-panel p-8 md:p-10 rounded-[3rem] border border-white/20 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
@@ -421,7 +475,7 @@
             <div class="flex-1 min-h-0 overflow-y-auto space-y-1 custom-scrollbar pr-2 pb-4">
                 <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-2">Main</p>
                 
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 active text-sm font-medium" data-view="dashboard-home">
+                <a href="#dashboard-home" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 active text-sm font-medium" data-view="dashboard-home">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     Dashboard
                 </a>
@@ -442,45 +496,45 @@
 
                 <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">Focus zone</p>
 
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="mindfulness">
+                <a href="#mindfulness" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="mindfulness">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Meditation
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="pomodoro">
+                <a href="#pomodoro" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="pomodoro">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Pomodoro
                 </a>
 
                 <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">Work zone</p>
 
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="shift-timer">
+                <a href="#shift-timer" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="shift-timer">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Shift Timer
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="ot-generator">
+                <a href="#ot-generator" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="ot-generator">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     OT Manager & Log
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="income-calculator">
+                <a href="#income-calculator" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="income-calculator">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Income Calculator
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="breach-list">
+                <a href="#breach-list" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="breach-list">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                     Breach List
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="tag-battery-view">
+                <a href="#tag-battery-view" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="tag-battery-view">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2zm14 2v4m-2-4v4"></path></svg>
                     Tag Battery
                 </a>
-                <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="idea-board">
+                <a href="#idea-board" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="idea-board">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21h6m-3-3v3m-5-8a5 5 0 1110 0c0 2.21-1.34 4-3 5.46V18H9v-.54C7.34 16 6 14.21 6 12z"></path></svg>
                     Idea Board
                 </a>
             </div>
             
             <div class="shrink-0 border-t border-slate-800 pt-6 mt-4">
-                 <a href="#" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium text-slate-400 hover:text-white transition-colors" data-view="settings">
+                 <a href="#settings" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium text-slate-400 hover:text-white transition-colors" data-view="settings">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     Settings
                 </a>
@@ -1056,14 +1110,20 @@
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-300 shadow-[0_0_8px_rgba(250,204,21,0.5)]"></span> Confirmed</div>
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500/20 border border-indigo-500/50 shadow-[0_0_8px_rgba(99,102,241,0.3)]"></span> Pending</div>
                                     <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></span> Rest</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Full-Time</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Part-Time</div>
                                 </div>
+                                <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-3">From 7 Sep 2026: every day is open for overtime (max 12h/shift) — the dots just show your contracted Full-Time/Part-Time hours.</p>
                             </div>
                         </div>
                         
                         <!-- Output Table -->
                         <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
+                            <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+                                <div class="flex items-center gap-3">
+                                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
+                                    <span id="ot-gen-month-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full"></span>
+                                </div>
                                 <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
                                     <span>Copy Table</span>
@@ -1088,12 +1148,81 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Overtime Stats & Log -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+                        <div class="lg:col-span-1 grid grid-cols-2 gap-4">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">Hours This Month</p>
+                                <p id="ot-stats-hours" class="text-3xl font-black text-slate-900 dark:text-white mt-1 tracking-tighter">0</p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">OT Earnings</p>
+                                <p id="ot-stats-earnings" class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tighter">£0</p>
+                            </div>
+                            <div class="col-span-2 bg-white dark:bg-gray-800 p-6 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">Toward Monthly Target</p>
+                                    <span id="ot-stats-target-percent" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                                    <div id="ot-stats-target-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                                </div>
+                                <p id="ot-stats-target-label" class="text-[10px] text-slate-400 dark:text-slate-500 mt-2">Set a target in the Income Calculator.</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Overtime Log</h2>
+                                <span id="ot-log-month-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full"></span>
+                            </div>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 -mt-4 mb-6">Use the &lt; / &gt; arrows on the Shift Pattern calendar to browse other months.</p>
+                            <div id="ot-log-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-1">
+                                <p class="text-center py-8 text-slate-400 italic text-sm">No completed overtime logged yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actual Monthly Pay Breakdown -->
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 mt-8">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Actual Pay Breakdown</h2>
+                            <span id="ot-actual-month-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Fixed basic pay + overtime worked last month (OT is paid a month behind), with tax/NI/pension worked out. Set basic pay defaults in the Income Calculator.</p>
+                        <p id="ot-actual-target-label" class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-6">No monthly target set.</p>
+
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Gross</p>
+                                <p id="ot-actual-gross" class="text-lg font-black text-slate-800 dark:text-white tracking-tight">£0.00</p>
+                                <p id="ot-actual-gross-sub" class="text-[10px] text-slate-400 mt-1 font-medium"></p>
+                            </div>
+                            <div class="bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-800/30">
+                                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">Tax</p>
+                                <p id="ot-actual-tax" class="text-lg font-black text-rose-600 dark:text-rose-400 tracking-tight">£0.00</p>
+                            </div>
+                            <div class="bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-800/30">
+                                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">NI</p>
+                                <p id="ot-actual-ni" class="text-lg font-black text-rose-600 dark:text-rose-400 tracking-tight">£0.00</p>
+                            </div>
+                            <div class="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30">
+                                <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Pension</p>
+                                <p id="ot-actual-pension" class="text-lg font-black text-amber-600 dark:text-amber-400 tracking-tight">£0.00</p>
+                            </div>
+                            <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30">
+                                <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Take-Home</p>
+                                <p id="ot-actual-net" class="text-lg font-black text-emerald-700 dark:text-emerald-400 tracking-tight">£0.00</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Income Calculator View -->
                 <div id="income-calculator" class="page-view container mx-auto px-6 py-10 max-w-6xl">
                     <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-8 tracking-tight">Income & OT Target Calculator</h1>
-                    <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl">Calculate your net take-home pay based on UK Tax (20%), NI (8%), and your custom Pension (4% over £520). Set a target monthly income to see exactly how many overtime shifts you need.</p>
+                    <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl">Set your monthly income target and see the <span class="font-bold">potential</span> pay it would take to hit it, based on UK Tax (20%), NI (8%), and your custom Pension (4% over £520). For your actual confirmed pay each month, see the Pay Breakdown in the OT Manager.</p>
                     
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                         <!-- Configuration -->
@@ -1101,15 +1230,60 @@
                             <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">Pay Details</h2>
                             
                             <div>
-                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Basic Monthly Pay (£)</label>
-                                <input type="number" id="inc-basic-pay" placeholder="e.g. 2500" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Current Full-Time Pay (£) — until Sept 7</label>
+                                <input type="number" id="inc-basic-pay" placeholder="e.g. 2206" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                <button type="button" id="ft-sched-toggle-btn" class="mt-2 text-[10px] font-bold text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-300 uppercase tracking-widest flex items-center gap-1">
+                                    📅 Set From Weekly Schedule
+                                </button>
+                                <div id="ft-sched-panel" class="hidden mt-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                                    <div id="ft-schedule-rows" class="space-y-1.5"></div>
+                                    <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                        <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Hourly Rate (£)</label>
+                                        <input type="number" id="ft-sched-rate" step="0.01" placeholder="e.g. 14.42" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <p id="ft-sched-preview" class="text-[10px] text-slate-500 dark:text-slate-400 font-mono"></p>
+                                    <button type="button" id="ft-sched-apply-btn" class="w-full py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 text-xs">Apply to Basic Monthly Pay</button>
+                                </div>
                             </div>
-                            
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-2 ml-1">New Full-Time Pay (£) — from Sept 7</label>
+                                <input type="number" id="inc-basic-pay-new" placeholder="e.g. 2585" class="w-full px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold text-emerald-700 dark:text-emerald-400 transition-all">
+                                <p class="text-[9px] text-slate-400 leading-relaxed mt-1.5">Your new full-time job starts Sept 7 — this figure is used automatically for that month onward, both here and in the OT Manager.</p>
+                            </div>
+
                             <div>
                                 <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Overtime Hourly Rate (£)</label>
                                 <input type="number" id="inc-ot-rate" placeholder="e.g. 18.50" step="0.01" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
                             </div>
-                            
+
+                            <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label for="inc-parttime-toggle" class="text-sm font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none">Part-Time / 2nd Job</label>
+                                    <div class="relative inline-block w-12 mr-1 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+                                        <input type="checkbox" id="inc-parttime-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-6 checked:border-indigo-500"/>
+                                        <label for="inc-parttime-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 dark:bg-slate-700 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div id="inc-parttime-fields" class="hidden space-y-2">
+                                    <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2 ml-1">Part-Time Monthly Pay (£) — from Sept 7</label>
+                                    <input type="number" id="inc-parttime-pay" placeholder="e.g. 650" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold dark:text-white transition-all">
+                                    <p class="text-[9px] text-slate-400 leading-relaxed">Taxed at Basic Rate (20%) with no Personal Allowance, plus its own NI &amp; Pension — the default HMRC treatment for a second job.</p>
+                                    <button type="button" id="pt-sched-toggle-btn" class="mt-1 text-[10px] font-bold text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-300 uppercase tracking-widest flex items-center gap-1">
+                                        📅 Set From Weekly Schedule
+                                    </button>
+                                    <div id="pt-sched-panel" class="hidden mt-1 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                                        <div id="pt-schedule-rows" class="space-y-1.5"></div>
+                                        <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                            <label class="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Hourly Rate (£)</label>
+                                            <input type="number" id="pt-sched-rate" step="0.01" placeholder="e.g. 12.00" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <p id="pt-sched-preview" class="text-[10px] text-slate-500 dark:text-slate-400 font-mono"></p>
+                                        <button type="button" id="pt-sched-apply-btn" class="w-full py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 text-xs">Apply to Part-Time Monthly Pay</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
                                 <label class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-2 ml-1">📅 Target Month</label>
                                 <input type="month" id="inc-target-month" class="w-full px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold text-emerald-700 dark:text-emerald-400 transition-all mb-4">
@@ -1126,22 +1300,19 @@
 
                             <button id="calc-income-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] mt-6">Calculate Pay & Targets</button>
                         </div>
-                            </div>
-
-                            <button id="calc-income-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02]">Calculate Pay & Targets</button>
-                        </div>
                         
                         <!-- Output / Breakdown -->
                         <div class="xl:col-span-2 space-y-8 flex flex-col">
                             <!-- Pay Breakdown -->
                             <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
                                 <div class="absolute -right-20 -top-20 w-60 h-60 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6 relative z-10">Monthly Pay Breakdown</h2>
+                                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6 relative z-10">Potential Monthly Pay Breakdown</h2>
                                 
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 relative z-10">
                                     <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Gross Pay</p>
                                         <p id="inc-out-gross" class="text-xl font-black text-slate-800 dark:text-white tracking-tight">£0.00</p>
+                                        <p id="inc-out-gross-sub" class="text-[10px] text-slate-400 mt-1 font-medium"></p>
                                     </div>
                                     <div class="bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-800/30">
                                         <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">Tax (20%)</p>
@@ -1190,9 +1361,36 @@
                                             <p class="text-xs text-slate-400 mt-2">Assuming 10 hours of paid OT per shift.</p>
                                         </div>
                                     </div>
-                                    
-                                    <div class="pt-6 border-t border-slate-100 dark:border-slate-700">
-                                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 uppercase tracking-widest">Suggested OT Dates (This Month)</h3>
+
+                                    <div class="pt-6 mt-2 border-t border-slate-100 dark:border-slate-700">
+                                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 uppercase tracking-widest">Projected Pay With This Overtime</h3>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Gross</p>
+                                                <p id="inc-proj-gross" class="text-lg font-black text-slate-800 dark:text-white tracking-tight">£0.00</p>
+                                            </div>
+                                            <div class="bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-800/30">
+                                                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">Tax</p>
+                                                <p id="inc-proj-tax" class="text-lg font-black text-rose-600 dark:text-rose-400 tracking-tight">£0.00</p>
+                                            </div>
+                                            <div class="bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-800/30">
+                                                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">NI</p>
+                                                <p id="inc-proj-ni" class="text-lg font-black text-rose-600 dark:text-rose-400 tracking-tight">£0.00</p>
+                                            </div>
+                                            <div class="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30">
+                                                <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Pension</p>
+                                                <p id="inc-proj-pension" class="text-lg font-black text-amber-600 dark:text-amber-400 tracking-tight">£0.00</p>
+                                            </div>
+                                        </div>
+                                        <div class="bg-emerald-50 dark:bg-emerald-900/20 p-6 rounded-2xl border border-emerald-200 dark:border-emerald-500/30 flex justify-between items-center">
+                                            <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Projected Take-Home</p>
+                                            <p id="inc-proj-net" class="text-3xl md:text-4xl font-black text-emerald-700 dark:text-emerald-400 tracking-tighter">£0.00</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-6 mt-6 border-t border-slate-100 dark:border-slate-700">
+                                        <h3 id="inc-suggested-dates-heading" class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1 uppercase tracking-widest">Suggested OT Dates</h3>
+                                        <p class="text-[10px] text-slate-400 mb-4">Overtime is paid a month behind, so it needs to be worked the month before your target month.</p>
                                         <div id="inc-suggested-dates" class="flex flex-wrap gap-2">
                                             <!-- Dynamically injected -->
                                         </div>
@@ -1203,13 +1401,13 @@
                                     </div>
                                 </div>
                                 <div id="inc-target-empty" class="text-center py-10">
-                        <span class="text-4xl opacity-50 mb-3 block">🎯</span>
-                        <p class="text-slate-500 font-medium">Set a target net income and overtime rate to generate an action plan.</p>
+                                    <span class="text-4xl opacity-50 mb-3 block">🎯</span>
+                                    <p class="text-slate-500 font-medium">Set a target net income and overtime rate to generate an action plan.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Settings -->
     <div id="settings" class="page-view container mx-auto px-4 sm:px-6 py-10 max-w-6xl">
@@ -1247,7 +1445,7 @@
                         <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
                             <div>
                                 <label for="dark-mode-toggle" class="font-bold text-lg text-slate-800 dark:text-slate-200 block mb-1">Dark Mode</label>
-                                <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm">Switch between the Light iOS-style and the Dark AMOLED-style theme.</p>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm">Switch between the Light and Dark theme.</p>
                             </div>
                             <button id="theme-toggle" type="button" class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 focus:outline-none rounded-2xl p-4 transition-colors shadow-inner border border-slate-200 dark:border-slate-600 shrink-0">
                                 <svg id="theme-toggle-dark-icon" class="hidden w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -1275,7 +1473,7 @@
                             </div>
                             <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto shrink-0">
                                 <button id="test-sound-btn" class="flex-1 sm:flex-none text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-5 py-3.5 rounded-2xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800/50">Test</button>
-                                <select id="notification-sound-select" class="flex-1 sm:w-48 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer transition-colors shadow-inner">
+                                <select id="notification-sound-select" class="flex-1 sm:w-48 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer transition-colors">
                                     <option value="beep">Gentle Beep</option>
                                     <option value="chime">Synth Chime (Loud)</option>
                                     <option value="bell">Soft Bell</option>
@@ -1337,7 +1535,7 @@
         </div>
     </div>
 
-    <!-- Idea Board -->
+                <!-- Idea Board -->
                 <div id="idea-board" class="page-view h-full relative overflow-hidden">
                     <div id="idea-board-container" class="w-full h-full"></div>
                     <button id="add-note-btn" class="absolute bottom-8 right-8 px-8 py-4 bg-yellow-400 text-yellow-900 font-bold rounded-full shadow-2xl hover:bg-yellow-300 hover:scale-110 transition-all z-20 flex items-center gap-2">
@@ -1578,10 +1776,9 @@
                             </div>
                             <span class="font-bold text-white tracking-wide">Quick Comments</span>
                         </div>
-                    <button type="button" id="guest-reg-btn" class="w-full py-3.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-sm font-bold transition-all flex items-center justify-center gap-2 rounded-xl border border-white/10 backdrop-blur-md">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        Continue as Guest
-                    </button>
+                        <button id="close-copilot-btn" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-full">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                     </div>
                     <div class="p-3 max-h-[400px] overflow-y-auto custom-scrollbar flex flex-col gap-2" id="copilot-comments-list">
                         <!-- Populated by JS -->
@@ -1620,7 +1817,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcOtRate'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcBasicPayNew', 'myndarcOtRate', 'myndarcPartTimePay', 'myndarcPartTimeEnabled'];
         let isSyncingFromServer = false; 
         let realtimeSubscription = null;
         const cloudDataStore = {}; 
@@ -1657,7 +1854,6 @@
         async function syncToCloud(username) {
             if (!supabase || username === 'guest' || isSyncingFromServer) return;
             
-            // Debounce the save to prevent hammering the Supabase API on rapid changes (like typing)
             if (syncTimeout) clearTimeout(syncTimeout);
             
             updateSyncStatus('syncing', 'Saving to cloud...');
@@ -1670,7 +1866,6 @@
                     }
                 });
                 
-                // Prevent echoing the exact same state back if we just downloaded it
                 const currentStateStr = JSON.stringify(dataToSave);
                 if (currentStateStr === lastKnownCloudStateStr) {
                     updateSyncStatus('connected', 'Synced');
@@ -1684,32 +1879,30 @@
                         .eq('username', username);
                     
                     if (error) throw error;
-                    lastKnownCloudStateStr = currentStateStr; // Update last known state
+                    lastKnownCloudStateStr = currentStateStr;
                     updateSyncStatus('connected', 'Cloud Synced');
                     console.log("Cloud sync successful");
                 } catch (e) {
                     console.error("Cloud sync failed", e);
                     updateSyncStatus('error', 'Sync Failed');
                 }
-            }, 1000); // Wait 1 second after changes stop before pushing
+            }, 1000);
         }
 
         function applyCloudDataToLocal(cloudData) {
             isSyncingFromServer = true; 
             let hasChanges = false;
             
-            // Record this as the latest cloud state so we don't accidentally send it right back
             const incomingStateStr = JSON.stringify(cloudData);
             if (incomingStateStr === lastKnownCloudStateStr) {
                  isSyncingFromServer = false;
-                 return; // No actual changes
+                 return;
             }
             
             lastKnownCloudStateStr = incomingStateStr;
             
             syncKeys.forEach(k => {
                 if (cloudData[k] !== undefined) {
-                    // Only update if the data actually changed to prevent UI flashing
                     if (cloudDataStore[k] !== cloudData[k]) {
                         cloudDataStore[k] = cloudData[k];
                         hasChanges = true;
@@ -1724,7 +1917,6 @@
             
             isSyncingFromServer = false;
             
-            // Dispatch event to update UI only if real changes occurred
             if (hasChanges) {
                 console.log("Applying incoming cloud changes to UI...");
                 updateSyncStatus('connected', 'Live Updated');
@@ -1736,7 +1928,7 @@
             if (username === 'guest') return;
             try {
                 const { data, error } = await supabase.from('user_data').select('data').eq('username', username).single();
-                if (error && error.code !== 'PGRST116') throw error; // Ignore "Row not found"
+                if (error && error.code !== 'PGRST116') throw error;
                 if (data && data.data) {
                     applyCloudDataToLocal(data.data);
                 }
@@ -1761,7 +1953,6 @@
             };
             
             try {
-                // Attempt to use Supabase Realtime (WebSockets) - works in deployed environments
                 realtimeSubscription = supabase.channel(`public:user_data:username=eq.${username}`)
                     .on(
                         'postgres_changes',
@@ -1865,18 +2056,15 @@
             const openSidebarBtn = document.getElementById('open-sidebar-btn');
             const closeSidebarBtn = document.getElementById('close-sidebar-btn');
             const sidebar = document.getElementById('sidebar');
-            const landingCanvas = document.getElementById('landing-canvas');
             
             const grid = document.getElementById('curriculum-grid');
 
-            // Modal elements
             const alertModal = document.getElementById('alert-modal');
             const alertMessage = document.getElementById('alert-message');
             const alertCloseBtn = document.getElementById('alert-close-btn');
 
             let dashboardInitialized = false;
 
-            // --- Generic Modal Functions ---
             function showAlert(message) {
                 alertMessage.textContent = message;
                 alertModal.classList.remove('hidden');
@@ -1889,9 +2077,7 @@
             }
 
             alertCloseBtn.addEventListener('click', hideAlert);
-            // --- End Modal Functions ---
 
-            // Global Notification Sound System
             window.playVibeAlertSound = function() {
                 try {
                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1958,7 +2144,6 @@
                         };
                         for(let i=0; i<4; i++) playWatch(ctx.currentTime + i*0.15);
                     } else {
-                        // default 'beep'
                         const playBeep = (time) => {
                             const osc = ctx.createOscillator();
                             const gain = ctx.createGain();
@@ -1976,9 +2161,6 @@
                     }
                 } catch(e) { console.error('Audio context failed', e); }
             };
-
-            // Custom events for Cloud sync reactivity
-            // Component updates are handled via event listeners inside their respective setup functions.
 
             function renderBreachCompletionTable() {
                 const container = document.getElementById('breach-log-container');
@@ -2001,7 +2183,6 @@
                     return;
                 }
 
-                // Sort by time
                 todayItems.sort((a,b) => new Date(b.completedAt) - new Date(a.completedAt));
 
                 todayItems.forEach(item => {
@@ -2028,7 +2209,7 @@
                 const currentShiftItems = breachItems.filter(i => new Date(i.createdAt) >= shiftStart);
                 
                 const completedToday = currentShiftItems.filter(item => item.completed).length;
-                const dailyTarget = Math.max(10, currentShiftItems.length); // Dynamic target
+                const dailyTarget = Math.max(10, currentShiftItems.length);
 
                 const els = {
                     total: document.getElementById('breach-stats-total'),
@@ -2038,7 +2219,6 @@
                     badge: document.querySelector('#breach-stats-card .bg-indigo-100')
                 };
 
-                // Update simple stats
                 if(els.completed) els.completed.textContent = completedToday;
                 if(els.total) els.total.textContent = dailyTarget;
                 if(els.badge) els.badge.textContent = 'Current Shift';
@@ -2047,6 +2227,33 @@
                 if(els.bar) els.bar.style.width = `${percentage}%`;
                 if(els.percent) els.percent.textContent = `${Math.round(percentage)}%`;
             }
+
+            // Shared across renderFinanceStats / Income Calculator / OT Manager.
+            // Uses the per-shift hours+rate logged via the Log Overtime modal; falls back
+            // to a flat 10h at the given rate for older records logged before that existed.
+            function getOtRecordAmount(record, fallbackRate) {
+                if (record.hours != null && record.rate != null) {
+                    return { hours: record.hours, rate: record.rate, amount: record.hours * record.rate };
+                }
+                return { hours: 10, rate: fallbackRate, amount: 10 * fallbackRate };
+            }
+
+            // Shared UK PAYE deduction calc (Tax 20%, NI 8%, workplace Pension 4%).
+            // A second/part-time job gets no Personal Allowance (HMRC default BR tax code).
+            const taxFreeAllowance = 1047.50;
+            const niThreshold = 1048.00;
+            const pensionThreshold = 520.00;
+            function calculateDeductions(gross, isSecondaryJob = false) {
+                const taxable = Math.max(0, gross - (isSecondaryJob ? 0 : taxFreeAllowance));
+                const tax = taxable * 0.20;
+                const niable = Math.max(0, gross - niThreshold);
+                const ni = niable * 0.08;
+                const pensionable = Math.max(0, gross - pensionThreshold);
+                const pension = pensionable * 0.04;
+                const net = gross - tax - ni - pension;
+                return { tax, ni, pension, net };
+            }
+            const fmtMoney = (num) => '£' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
             function renderFinanceStats() {
                 const badge = document.getElementById('finance-month-badge');
@@ -2064,51 +2271,38 @@
                 const monthName = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 badge.textContent = monthName;
 
-                // Load Data
                 const targets = JSON.parse(localStorage.getItem('myndarcMonthlyTargets')) || {};
                 const targetAmount = targets[currentMonthKey] || 0;
                 
-                const basicPay = parseFloat(localStorage.getItem('myndarcBasicPay')) || 0;
+                // New full-time job (and old job going part-time) starts Sept 7 2026
+                const isPostCutoverMonth = currentMonthKey >= '2026-09';
+                const basicPay = isPostCutoverMonth
+                    ? (parseFloat(localStorage.getItem('myndarcBasicPayNew')) || 0)
+                    : (parseFloat(localStorage.getItem('myndarcBasicPay')) || 0);
                 const otRate = parseFloat(localStorage.getItem('myndarcOtRate')) || 0;
-                
-                // Calculate Net Pay from base
-                let baseNet = 0;
-                if (basicPay > 0) {
-                    const taxFreeAllowance = 1047.50;
-                    const niThreshold = 1048.00;
-                    const pensionThreshold = 520.00;
-                    
-                    const tax = Math.max(0, basicPay - taxFreeAllowance) * 0.20;
-                    const ni = Math.max(0, basicPay - niThreshold) * 0.08;
-                    const pension = Math.max(0, basicPay - pensionThreshold) * 0.04;
-                    baseNet = basicPay - tax - ni - pension;
-                }
 
-                // Sum completed OT
                 const otRequests = JSON.parse(localStorage.getItem('myndarcOTRequests')) || [];
-                let totalCompletedOTHours = 0;
-                
+                let totalCompletedOTGross = 0;
+
                 otRequests.forEach(req => {
                     const status = req.status || (req.confirmed ? 'confirmed' : 'pending');
                     if (status === 'completed' && req.date) {
-                        const parts = req.date.split('/'); // DD/MM/YYYY
+                        const parts = req.date.split('/');
                         if (parts.length === 3) {
                             const reqMonthKey = `${parts[2]}-${parts[1]}`;
                             if (reqMonthKey === currentMonthKey) {
-                                totalCompletedOTHours += 10; // Defaulting to 10hrs per standard shift
+                                totalCompletedOTGross += getOtRecordAmount(req, otRate).amount;
                             }
                         }
                     }
                 });
 
-                // Calculate Net with OT
-                let totalEarnedNet = baseNet;
-                if (otRate > 0 && totalCompletedOTHours > 0) {
-                    const newGross = basicPay + (totalCompletedOTHours * otRate);
-                    const tax = Math.max(0, newGross - 1047.50) * 0.20;
-                    const ni = Math.max(0, newGross - 1048.00) * 0.08;
-                    const pension = Math.max(0, newGross - 520.00) * 0.04;
-                    totalEarnedNet = newGross - tax - ni - pension;
+                let totalEarnedNet = calculateDeductions(basicPay + totalCompletedOTGross).net;
+
+                const partTimeEnabled = isPostCutoverMonth && localStorage.getItem('myndarcPartTimeEnabled') === 'true';
+                const partTimePay = parseFloat(localStorage.getItem('myndarcPartTimePay')) || 0;
+                if (partTimeEnabled && partTimePay > 0) {
+                    totalEarnedNet += calculateDeductions(partTimePay, true).net;
                 }
 
                 targetEl.textContent = `£${Math.round(targetAmount).toLocaleString()}`;
@@ -2195,7 +2389,6 @@
             const userInfoContainer = document.getElementById('user-info-container');
             const userIdDisplay = document.getElementById('user-id-display');
 
-            // Password Toggle Logic
             document.querySelectorAll('.toggle-password').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetInput = document.getElementById(btn.dataset.target);
@@ -2249,12 +2442,10 @@
                 landingPage.style.display = 'none';
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
-                navigateToView('dashboard-home');
+                navigateToView(location.hash ? location.hash.slice(1) : 'dashboard-home');
                 
-                // Dispatch event so that scoped functions (timer, list) can react and reload cloud state
                 window.dispatchEvent(new Event('cloudDataSynced'));
                 
-                // Set up realtime sync
                 setupRealtimeSubscription(username);
             }
 
@@ -2269,23 +2460,20 @@
                 btn.disabled = true;
 
                 try {
-                    // Check if user exists in Supabase
                     const { data, error: selectError } = await supabase.from('user_data').select('username').eq('username', user).single();
                     
                     if (data) {
                         err.textContent = "Email address already exists.";
                         err.classList.remove('hidden');
                     } else {
-                        // Insert new user to Supabase
                         const { error: insertError } = await supabase.from('user_data').insert({ username: user, password: pass, data: {} });
                         if (insertError) throw insertError;
 
                         err.classList.add('hidden');
                         
-                        // Clear any old local data
                         syncKeys.forEach(k => {
                             delete cloudDataStore[k];
-                            originalRemoveItem.call(localStorage, k); // Ensure legacy local data is also erased
+                            originalRemoveItem.call(localStorage, k);
                         });
                         
                         loginSuccess(user);
@@ -2310,16 +2498,13 @@
                 btn.disabled = true;
 
                 try {
-                    // Fetch user from Supabase
                     const { data, error } = await supabase.from('user_data').select('*').eq('username', user).single();
                     
                     if (data && data.password === pass) {
                         err.classList.add('hidden');
                         
-                        // Load cloud data into localStorage silently
                         const cloudData = data.data || {};
                         
-                        // Set the last known state string BEFORE applying to prevent immediate re-sync
                         lastKnownCloudStateStr = JSON.stringify(cloudData);
                         
                         applyCloudDataToLocal(cloudData);
@@ -2344,7 +2529,6 @@
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('lastActiveView');
                 
-                // Clear in-memory cloud data completely
                 Object.keys(cloudDataStore).forEach(k => delete cloudDataStore[k]);
                 
                 if (realtimeSubscription) {
@@ -2373,6 +2557,7 @@
                     if(loginErr) loginErr.classList.add('hidden');
                     if(regErr) regErr.classList.add('hidden');
                     
+                    history.replaceState(null, '', location.pathname + location.search);
                     landingPage.style.display = 'flex';
                     setTimeout(() => {
                         landingPage.style.opacity = 1;
@@ -2386,6 +2571,9 @@
                 const sidebarLinks = document.querySelectorAll('.sidebar-link');
                 const mainContentWrapper = document.getElementById('main-content-wrapper');
                 const copilotWidget = document.getElementById('global-copilot-widget');
+
+                const validViewIds = Array.from(pageViews).map(p => p.id);
+                if (!validViewIds.includes(viewId)) viewId = 'dashboard-home';
 
                 pageViews.forEach(page => {
                     page.classList.toggle('active', page.id === viewId);
@@ -2412,7 +2600,21 @@
                 }
 
                 localStorage.setItem('lastActiveView', viewId);
+
+                // Give each feature a real, bookmarkable/shareable URL (#/view) without
+                // breaking the shared live state (timers, sync) that a full page-per-file split would.
+                if (location.hash.slice(1) !== viewId) {
+                    history.pushState({ view: viewId }, '', '#' + viewId);
+                }
+
+                mainContentWrapper.scrollTop = 0;
             }
+            window.addEventListener('popstate', () => {
+                const hashView = location.hash ? location.hash.slice(1) : 'dashboard-home';
+                if (appLayout.classList.contains('visible-fade')) {
+                    navigateToView(hashView);
+                }
+            });
             
             function setupNavigation() {
                 const navLinks = document.querySelectorAll('.nav-link');
@@ -2716,10 +2918,8 @@
                 
                 async function fetchWeatherData(lat, lon, locationLabel) {
                     try { 
-                        // Start both requests in parallel
                         const weatherPromise = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                         
-                        // Attempt to get city name if we are using local coordinates
                         let displayLabel = locationLabel;
                         if (locationLabel === "Local Weather") {
                             try {
@@ -2744,11 +2944,10 @@
 
                 function fetchWeather() { 
                     if (navigator.geolocation) {
-                        // Show loading state
                         if(weatherEl) weatherEl.innerHTML = `<div class="animate-pulse flex gap-2 items-center"><div class="h-6 w-6 bg-white/30 rounded-full animate-bounce"></div><div class="h-4 w-12 bg-white/30 rounded"></div></div>`;
                         navigator.geolocation.getCurrentPosition(
                             (position) => fetchWeatherData(position.coords.latitude, position.coords.longitude, "Local Weather"),
-                            () => fetchWeatherData(53.4808, -2.2426, "Manchester") // Fallback location
+                            () => fetchWeatherData(53.4808, -2.2426, "Manchester")
                         );
                     } else {
                         fetchWeatherData(53.4808, -2.2426, "Manchester");
@@ -2831,7 +3030,7 @@
                 if(clearBtn) clearBtn.addEventListener('click', () => { container.innerHTML = ''; createRow(); calculate(); });
                 const printBtn = document.getElementById('print-time-btn');
                 if(printBtn) printBtn.addEventListener('click', () => window.print());
-                    if(qAuthor) qAuthor.textContent = `— ${q.author}`;
+                createRow();
             }
 
             function setupIdeaBoard() {
@@ -2875,10 +3074,7 @@
                     const textarea = note.querySelector('textarea');
                     textarea.value = text;
                     
-                    // Auto-save on typing
                     textarea.addEventListener('input', saveNotes);
-                    
-                    // Auto-save if note is resized (mouseup catches the end of a resize drag)
                     note.addEventListener('mouseup', saveNotes);
 
                     board.appendChild(note);
@@ -2902,18 +3098,17 @@
                         if(isDragging) { 
                             isDragging = false; 
                             note.classList.remove('dragging'); 
-                            saveNotes(); // Save new position
+                            saveNotes();
                         }
                     });
 
                     note.querySelector('.delete-note').addEventListener('click', () => {
                         note.remove();
-                        saveNotes(); // Save deletion
+                        saveNotes();
                     });
                 }
 
                 function renderBoard() {
-                    // Prevent re-rendering if the user is actively typing or dragging a note to avoid interruptions
                     if (board.querySelector('.dragging') || board.contains(document.activeElement)) {
                         return; 
                     }
@@ -2926,10 +3121,7 @@
                     });
                 }
 
-                // Initial load
                 renderBoard();
-
-                // Listen for cloud updates from other devices
                 window.addEventListener('cloudDataSynced', renderBoard);
 
                 addBtn.addEventListener('click', () => {
@@ -2965,7 +3157,6 @@
                     });
                 }
 
-                // Tabs Logic
                 const tabBtns = document.querySelectorAll('.settings-tab-btn');
                 const panels = document.querySelectorAll('.settings-panel');
                 
@@ -2986,28 +3177,23 @@
                     });
                 });
 
-                // Display Username
                 const usernameDisplay = document.getElementById('settings-username-display');
                 if (usernameDisplay) {
                     const currentUser = localStorage.getItem('currentUser') || 'GUEST';
                     usernameDisplay.textContent = currentUser.toUpperCase();
                 }
 
-                // Clear Cache
                 const clearDataBtn = document.getElementById('clear-local-data-btn');
                 if (clearDataBtn) {
                     clearDataBtn.addEventListener('click', () => {
                         if (confirm("Are you sure you want to clear the local cache? You will be logged out.")) {
                             localStorage.clear();
-                            // Keep theme
                             if (document.documentElement.classList.contains('dark')) localStorage.setItem('color-theme', 'dark');
-                            // Reload page to reset state
                             window.location.reload();
                         }
                     });
                 }
 
-                // Notification Sound Settings
                 const soundSelect = document.getElementById('notification-sound-select');
                 const testBtn = document.getElementById('test-sound-btn');
                 
@@ -3423,9 +3609,9 @@
                             let score = 0;
                             currentItems.forEach(item => {
                                 if (item.completed) {
-                                    score += item.passedOn ? 0.5 : 1; // 50% credit if late/carried over
+                                    score += item.passedOn ? 0.5 : 1;
                                 } else {
-                                    score += item.passedOn ? -0.2 : 0; // Extra penalty if carried over & still incomplete
+                                    score += item.passedOn ? -0.2 : 0;
                                 }
                             });
                             
@@ -3531,7 +3717,7 @@
                     }
 
                     const startMatch = matches[0];
-                    const fullStart = startMatch[0]; // e.g., "28/06/2026 00:12"
+                    const fullStart = startMatch[0];
                     
                     let fullEnd = 'Pending...';
                     if (matches.length > 1) { 
@@ -3555,7 +3741,6 @@
 
                     if(outputContainer) {
                         outputContainer.appendChild(pairDiv);
-                        // Attach Copy Handlers
                         outputContainer.querySelectorAll('.ts-copy-btn').forEach(btn => {
                             btn.addEventListener('click', (e) => {
                                 const targetBtn = e.currentTarget;
@@ -3581,7 +3766,6 @@
                         });
                     }
                     
-                    // Clear the input area to be ready for the next paste
                     input.value = '';
                 });
             }
@@ -3600,11 +3784,9 @@
                     }
                     if (document.activeElement !== signatureInput) {
                         const savedSig = localStorage.getItem('myndarcEmailSignature');
-                        // Inject the saved signature if it exists and contains HTML, else inject the custom Serco default
                         if (savedSig && savedSig.includes('<')) {
                             signatureInput.innerHTML = savedSig;
                         } else {
-                            // Generate Exact Serco Signature Based on Provided Layout
                             signatureInput.innerHTML = `
                                 <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #666666; line-height: 1.3;">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Serco_Logo.svg/256px-Serco_Logo.svg.png" alt="Serco" width="110" style="margin-bottom: 10px; display: block; border: none;">
@@ -3621,12 +3803,10 @@
                     }
                 }
 
-                // Auto-save on input (triggers Supabase debounce automatically via custom LocalStorage interceptor)
                 templateInput.addEventListener('input', (e) => {
                     localStorage.setItem('myndarcEmailTemplate', e.target.value);
                 });
 
-                // Detect rich text edits
                 signatureInput.addEventListener('input', (e) => {
                     localStorage.setItem('myndarcEmailSignature', e.target.innerHTML);
                 });
@@ -3635,7 +3815,6 @@
                     const isRichText = inputElement.tagName.toLowerCase() === 'div';
                     
                     if (isRichText) {
-                        // Rich Text HTML Copy Logic
                         const selection = window.getSelection();
                         const range = document.createRange();
                         range.selectNodeContents(inputElement);
@@ -3649,7 +3828,6 @@
                         }
                         selection.removeAllRanges();
                     } else {
-                        // Plain Text Copy Logic
                         const text = inputElement.value;
                         if (!text) return;
                         navigator.clipboard.writeText(text).catch(() => {
@@ -3662,7 +3840,6 @@
                         });
                     }
                     
-                    // Visual Feedback
                     const originalText = btn.textContent;
                     btn.textContent = 'Copied!';
                     btn.classList.add('text-emerald-500', 'dark:text-emerald-400');
@@ -3706,7 +3883,6 @@
                     if(val > 100) { val = 100; input.value = 100; }
                     if(val < 0) { val = 0; input.value = 0; }
                     
-                    // 100% = 24 hours. 1% = 0.24 hours.
                     const totalHours = val * 0.24; 
                     const hrs = Math.floor(totalHours);
                     const mins = Math.round((totalHours - hrs) * 60);
@@ -3726,7 +3902,6 @@
                         deathTimeContainer.classList.remove('opacity-0');
                     }
                     
-                    // Charging logic: 100% = 2 hours (120 mins). 1% = 1.2 mins.
                     if (chargeTimeContainer && chargeTimeVal && chargeDurationVal) {
                         if (val >= 100) {
                             chargeTimeContainer.classList.add('opacity-0');
@@ -3774,16 +3949,13 @@
                 
                 if (!startInput || !btn) return;
                 
-                // Default to today
                 const today = new Date();
                 const offset = today.getTimezoneOffset() * 60000;
                 const localISOTime = (new Date(Date.now() - offset)).toISOString().split('T')[0];
                 startInput.value = localISOTime;
 
-                // Duty Toggles Logic (with persistent custom duties)
                 const dutiesContainer = document.getElementById('ot-gen-duties-container');
                 if (dutiesContainer) {
-                    // Event delegation for toggling
                     dutiesContainer.addEventListener('click', (e) => {
                         const toggleBtn = e.target.closest('.duty-toggle');
                         if (!toggleBtn) return;
@@ -3798,7 +3970,6 @@
                         }
                     });
 
-                    // Manage custom duties
                     const newDutyInput = document.getElementById('ot-new-duty-input');
                     const addDutyBtn = document.getElementById('ot-add-duty-btn');
 
@@ -3835,7 +4006,7 @@
                             const existing = Array.from(dutiesContainer.querySelectorAll('.duty-toggle')).map(b => b.dataset.duty.toLowerCase());
                             if (existing.includes(dutyName.toLowerCase())) {
                                 newDutyInput.value = '';
-                                return; // Skip duplicates
+                                return;
                             }
 
                             const customBtn = document.createElement('button');
@@ -3859,14 +4030,28 @@
                     }
                 }
 
-                // Base Reference Date: Monday, April 27, 2026 (Start of Week A)
                 const baseWeekA_Monday = new Date('2026-04-27T00:00:00').getTime();
                 const msPerDay = 1000 * 60 * 60 * 24;
-                
-                // Track generated results globally so the calendar can read them
+                // From this date, the old bi-weekly rotation ends and the new dual-job
+                // schedule (Full-Time Mon-Fri + Part-Time Fri-Sun) takes over. Overtime can
+                // be logged on ANY day after this date (up to 12h/shift), so days are no
+                // longer blocked — the Full-Time/Part-Time dots are informational only.
+                const scheduleCutoverDate = new Date('2026-09-07T00:00:00').getTime();
+                const defaultFtSchedule = [
+                    { working: true,  start: '09:00', end: '17:00' }, { working: true,  start: '09:00', end: '17:00' },
+                    { working: true,  start: '09:00', end: '17:00' }, { working: true,  start: '09:00', end: '17:00' },
+                    { working: true,  start: '09:00', end: '17:00' }, { working: false, start: '09:00', end: '17:00' },
+                    { working: false, start: '09:00', end: '17:00' },
+                ];
+                const defaultPtSchedule = [
+                    { working: false, start: '19:00', end: '00:00' }, { working: false, start: '19:00', end: '00:00' },
+                    { working: false, start: '19:00', end: '00:00' }, { working: false, start: '19:00', end: '00:00' },
+                    { working: true,  start: '19:00', end: '00:00' }, { working: true,  start: '19:00', end: '05:00' },
+                    { working: true,  start: '19:00', end: '00:00' },
+                ];
+
                 let generatedResults = JSON.parse(localStorage.getItem('myndarcOTRequests')) || [];
-                
-                // --- Mini Calendar Logic ---
+
                 const workingDaysCycle = [0, 1, 3, 5, 9, 10, 12];
                 let currentCalDate = new Date();
                 if(startInput.value) {
@@ -3887,21 +4072,16 @@
                     const lastDayOfMonth = new Date(year, month + 1, 0);
                     const realToday = new Date();
 
-                    let startingBlankDays = firstDayOfMonth.getDay() - 1; // 0 is Sunday, 1 is Monday.
-                    if (startingBlankDays < 0) startingBlankDays = 6; // Sunday becomes 6
+                    let startingBlankDays = firstDayOfMonth.getDay() - 1;
+                    if (startingBlankDays < 0) startingBlankDays = 6;
 
                     let html = '';
-                    // Blanks
                     for (let i = 0; i < startingBlankDays; i++) {
                         html += `<div class="aspect-square"></div>`;
                     }
 
-                    // Days
                     for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
                         const dateObj = new Date(year, month, day, 0, 0, 0);
-                        const daysSinceBase = Math.floor((dateObj.getTime() - baseWeekA_Monday) / msPerDay);
-                        let cycleDay = daysSinceBase % 14;
-                        if (cycleDay < 0) cycleDay += 14;
 
                         const pad = n => String(n).padStart(2, '0');
                         const formattedDate = `${pad(day)}/${pad(month + 1)}/${year}`;
@@ -3909,13 +4089,30 @@
                         const otReq = generatedResults.find(r => r.date === formattedDate);
                         const status = otReq ? (otReq.status || (otReq.confirmed ? 'confirmed' : 'pending')) : null;
 
-                        const isWorking = workingDaysCycle.includes(cycleDay);
+                        let isWorking, ftScheduled = false, ptScheduled = false;
+                        if (dateObj.getTime() < scheduleCutoverDate) {
+                            // Legacy bi-weekly rotation — working days block new OT entries
+                            const daysSinceBase = Math.floor((dateObj.getTime() - baseWeekA_Monday) / msPerDay);
+                            let cycleDay = daysSinceBase % 14;
+                            if (cycleDay < 0) cycleDay += 14;
+                            isWorking = workingDaysCycle.includes(cycleDay);
+                        } else {
+                            // New dual-job schedule — every day is open for OT (12h/shift cap
+                            // enforced in the Log Overtime modal); dots just show contracted days
+                            const ftSchedule = JSON.parse(localStorage.getItem('myndarcFullTimeSchedule') || 'null') || defaultFtSchedule;
+                            const ptSchedule = JSON.parse(localStorage.getItem('myndarcPartTimeSchedule') || 'null') || defaultPtSchedule;
+                            const dowIndex = (dateObj.getDay() + 6) % 7; // Mon=0 ... Sun=6
+                            ftScheduled = !!(ftSchedule[dowIndex] && ftSchedule[dowIndex].working);
+                            ptScheduled = !!(ptSchedule[dowIndex] && ptSchedule[dowIndex].working);
+                            isWorking = false;
+                        }
+
                         const isCompleted = status === 'completed';
                         const isConfirmedOT = status === 'confirmed';
                         const isPendingOT = status === 'pending';
                         const isToday = year === realToday.getFullYear() && month === realToday.getMonth() && day === realToday.getDate();
                         
-                        let classes = "day-cell aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition-all ";
+                        let classes = "day-cell relative aspect-square flex items-center justify-center rounded-lg text-xs font-bold transition-all ";
                         if (isCompleted) {
                             classes += "bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:scale-110 cursor-pointer";
                         } else if (isConfirmedOT) {
@@ -3927,46 +4124,134 @@
                         } else {
                             classes += "bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 opacity-60 hover:opacity-100 cursor-pointer hover:ring-2 hover:ring-indigo-400";
                         }
-                        
+
                         if (isToday) {
                             classes += " ring-2 ring-indigo-500 dark:ring-indigo-400 ring-offset-2 dark:ring-offset-slate-900";
                         }
-                        
+
                         let titleStr = '';
                         if (isToday) titleStr += 'Today - ';
-                        if (isCompleted) titleStr += 'Completed OT (Click to cycle)';
-                        else if (isConfirmedOT) titleStr += 'Confirmed OT (Click to cycle)';
+                        if (isCompleted) titleStr += 'Completed OT (Click to edit)';
+                        else if (isConfirmedOT) titleStr += 'Confirmed OT (Click to log hours)';
                         else if (isPendingOT) titleStr += 'Pending OT (Click to cycle)';
-                        else titleStr += isWorking ? 'Standard Working Day' : 'Rest Day (Click to add OT)';
+                        else if (isWorking) titleStr += 'Standard Working Day';
+                        else {
+                            const scheduledParts = [];
+                            if (ftScheduled) scheduledParts.push('Full-Time');
+                            if (ptScheduled) scheduledParts.push('Part-Time');
+                            titleStr += scheduledParts.length > 0
+                                ? `${scheduledParts.join(' + ')} scheduled — click to add extra OT (max 12h/shift)`
+                                : 'Click to add OT';
+                        }
 
-                        html += `<div class="${classes}" title="${titleStr}" data-date="${formattedDate}" data-working="${isWorking}">${day}</div>`;
+                        const dots = (ftScheduled || ptScheduled) && !isCompleted && !isConfirmedOT && !isPendingOT
+                            ? `<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-0.5">${ftScheduled ? '<span class="w-1 h-1 rounded-full bg-blue-500"></span>' : ''}${ptScheduled ? '<span class="w-1 h-1 rounded-full bg-purple-500"></span>' : ''}</span>`
+                            : '';
+
+                        html += `<div class="${classes}" title="${titleStr}" data-date="${formattedDate}" data-working="${isWorking}">${day}${dots}</div>`;
                     }
                     calContainer.innerHTML = html;
                 }
 
                 document.getElementById('cal-prev-month')?.addEventListener('click', () => {
                     currentCalDate.setMonth(currentCalDate.getMonth() - 1);
-                    renderMiniCalendar();
+                    renderOT();
                 });
                 document.getElementById('cal-next-month')?.addEventListener('click', () => {
                     currentCalDate.setMonth(currentCalDate.getMonth() + 1);
-                    renderMiniCalendar();
+                    renderOT();
                 });
 
                 startInput.addEventListener('change', () => {
                     if(startInput.value) {
                         const parts = startInput.value.split('-');
                         currentCalDate = new Date(parts[0], parts[1]-1, parts[2]);
-                        renderMiniCalendar();
+                        renderOT();
                     }
                 });
+
+                function openLogOvertimeModal(index) {
+                    const modal = document.getElementById('log-overtime-modal');
+                    const dateLabel = document.getElementById('log-ot-date-label');
+                    const startInput2 = document.getElementById('log-ot-start');
+                    const endInput2 = document.getElementById('log-ot-end');
+                    const rateInput = document.getElementById('log-ot-rate');
+                    const preview = document.getElementById('log-ot-preview');
+                    const saveBtn = document.getElementById('log-ot-save-btn');
+                    const cancelBtn = document.getElementById('log-ot-cancel-btn');
+                    if (!modal) return;
+
+                    const record = generatedResults[index];
+                    dateLabel.textContent = record.date;
+
+                    let defaultStart = '19:00', defaultEnd = '05:00';
+                    if (record.time) {
+                        const timeParts = record.time.split('-').map(s => s.trim());
+                        if (timeParts.length === 2) { defaultStart = timeParts[0]; defaultEnd = timeParts[1]; }
+                    }
+                    startInput2.value = record.actualStart || defaultStart;
+                    endInput2.value = record.actualEnd || defaultEnd;
+                    rateInput.value = record.rate != null ? record.rate : (parseFloat(localStorage.getItem('myndarcOtRate')) || '');
+
+                    function calcHours() {
+                        if (!startInput2.value || !endInput2.value) return 0;
+                        const [sh, sm] = startInput2.value.split(':').map(Number);
+                        const [eh, em] = endInput2.value.split(':').map(Number);
+                        let mins = (eh * 60 + em) - (sh * 60 + sm);
+                        if (mins <= 0) mins += 24 * 60;
+                        return mins / 60;
+                    }
+
+                    function updatePreview() {
+                        const hours = calcHours();
+                        const rate = parseFloat(rateInput.value) || 0;
+                        preview.textContent = `${hours.toFixed(1)}h · £${(hours * rate).toFixed(2)}`;
+                    }
+                    updatePreview();
+
+                    startInput2.oninput = updatePreview;
+                    endInput2.oninput = updatePreview;
+                    rateInput.oninput = updatePreview;
+
+                    function close() {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        saveBtn.onclick = null;
+                        cancelBtn.onclick = null;
+                    }
+
+                    cancelBtn.onclick = close;
+                    saveBtn.onclick = () => {
+                        const hours = calcHours();
+                        const rate = parseFloat(rateInput.value) || 0;
+                        if (hours <= 0 || rate <= 0) {
+                            if (typeof showAlert === 'function') showAlert('Please enter valid start/end times and a rate.');
+                            return;
+                        }
+                        if (hours > 12) {
+                            if (typeof showAlert === 'function') showAlert('A single overtime shift can\'t be more than 12 hours. Please adjust the start/end times.');
+                            return;
+                        }
+                        generatedResults[index].actualStart = startInput2.value;
+                        generatedResults[index].actualEnd = endInput2.value;
+                        generatedResults[index].hours = Math.round(hours * 100) / 100;
+                        generatedResults[index].rate = rate;
+                        generatedResults[index].status = 'completed';
+                        generatedResults[index].confirmed = true;
+                        close();
+                        saveAndRenderOT();
+                    };
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
 
                 const calContainer = document.getElementById('ot-mini-calendar');
                 if (calContainer) {
                     calContainer.addEventListener('click', (e) => {
                         const dayEl = e.target.closest('.day-cell');
                         if (!dayEl) return;
-                        
+
                         if (dayEl.dataset.working === 'true') {
                             if (typeof showAlert === 'function') showAlert("You are already scheduled to work on this day.");
                             return;
@@ -3974,21 +4259,24 @@
 
                         const dateStr = dayEl.dataset.date;
                         const existingIdx = generatedResults.findIndex(r => r.date === dateStr);
-                        
+
                         if (existingIdx > -1) {
                             let currentStatus = generatedResults[existingIdx].status || (generatedResults[existingIdx].confirmed ? 'confirmed' : 'pending');
                             if (currentStatus === 'pending') {
                                 generatedResults[existingIdx].status = 'confirmed';
                                 generatedResults[existingIdx].confirmed = true;
                             } else if (currentStatus === 'confirmed') {
-                                generatedResults[existingIdx].status = 'completed';
-                                generatedResults[existingIdx].confirmed = true;
+                                openLogOvertimeModal(existingIdx);
+                                return;
                             } else {
                                 generatedResults[existingIdx].status = 'pending';
                                 generatedResults[existingIdx].confirmed = false;
+                                delete generatedResults[existingIdx].hours;
+                                delete generatedResults[existingIdx].rate;
+                                delete generatedResults[existingIdx].actualStart;
+                                delete generatedResults[existingIdx].actualEnd;
                             }
                         } else {
-                            // Instantly Add as confirmed OT
                             const timeStr = document.getElementById('ot-gen-time').value || "19:00 - 05:00";
                             const selectedDuties = Array.from(document.querySelectorAll('.duty-toggle[data-selected="true"]'))
                                                         .map(b => b.dataset.duty)
@@ -4007,7 +4295,6 @@
                 }
 
                 renderMiniCalendar();
-                // --- End Mini Calendar Logic ---
 
                 function saveAndRenderOT() {
                     localStorage.setItem('myndarcOTRequests', JSON.stringify(generatedResults));
@@ -4015,22 +4302,35 @@
                 }
 
                 function renderOT() {
+                    const genMonthLabelEl = document.getElementById('ot-gen-month-label');
+                    const viewedDateForGen = currentCalDate || new Date();
+                    const padGen = n => String(n).padStart(2, '0');
+                    const viewedMonthKeyForGen = `${viewedDateForGen.getFullYear()}-${padGen(viewedDateForGen.getMonth() + 1)}`;
+                    if (genMonthLabelEl) {
+                        genMonthLabelEl.textContent = viewedDateForGen.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    }
+
                     if (tbody) {
                         tbody.innerHTML = '';
-                        
-                        if (generatedResults.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500 italic font-sans">No overtime requests tracked. Generate some to begin.</td></tr>`;
-                        } else {
-                            // Sort by actual date ascending
-                            generatedResults.sort((a,b) => {
-                                const partsA = a.date.split('/');
-                                const dateA = new Date(partsA[2], partsA[1]-1, partsA[0]);
-                                const partsB = b.date.split('/');
-                                const dateB = new Date(partsB[2], partsB[1]-1, partsB[0]);
-                                return dateA - dateB;
-                            });
 
-                            generatedResults.forEach((row, i) => {
+                        generatedResults.sort((a,b) => {
+                            const partsA = a.date.split('/');
+                            const dateA = new Date(partsA[2], partsA[1]-1, partsA[0]);
+                            const partsB = b.date.split('/');
+                            const dateB = new Date(partsB[2], partsB[1]-1, partsB[0]);
+                            return dateA - dateB;
+                        });
+
+                        const monthRows = generatedResults.filter(row => {
+                            const parts = row.date.split('/');
+                            return parts.length === 3 && `${parts[2]}-${parts[1]}` === viewedMonthKeyForGen;
+                        });
+
+                        if (monthRows.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500 italic font-sans">No overtime requests for ${viewedDateForGen.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}.</td></tr>`;
+                        } else {
+                            monthRows.forEach((row) => {
+                                const i = generatedResults.indexOf(row);
                                 let status = row.status || (row.confirmed ? 'confirmed' : 'pending');
                                 
                                 let statusBtnClass = 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400';
@@ -4065,31 +4365,173 @@
                         }
                     }
                     
-                    // Update calendar to reflect confirmed shifts immediately
                     renderMiniCalendar();
+                    renderOtLogAndStats();
                     if(typeof renderFinanceStats === 'function') renderFinanceStats();
                 }
 
-                // Table Event Delegation (Toggle Status & Delete)
+                function renderOtLogAndStats() {
+                    const hoursEl = document.getElementById('ot-stats-hours');
+                    const earningsEl = document.getElementById('ot-stats-earnings');
+                    const targetPercentEl = document.getElementById('ot-stats-target-percent');
+                    const targetBarEl = document.getElementById('ot-stats-target-bar');
+                    const targetLabelEl = document.getElementById('ot-stats-target-label');
+                    const logListEl = document.getElementById('ot-log-list');
+                    const monthLabelEl = document.getElementById('ot-log-month-label');
+                    if (!hoursEl || !logListEl) return;
+
+                    // Follows whichever month is currently browsed in the Shift Pattern calendar above
+                    const viewedDate = currentCalDate || new Date();
+                    const padStats = n => String(n).padStart(2, '0');
+                    const currentMonthKey = `${viewedDate.getFullYear()}-${padStats(viewedDate.getMonth() + 1)}`;
+                    const globalOtRate = parseFloat(localStorage.getItem('myndarcOtRate')) || 0;
+
+                    if (monthLabelEl) {
+                        monthLabelEl.textContent = viewedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    }
+
+                    const completed = generatedResults.filter(r => (r.status || (r.confirmed ? 'confirmed' : 'pending')) === 'completed');
+
+                    let hoursThisMonth = 0, earningsThisMonth = 0;
+                    completed.forEach(r => {
+                        const parts = r.date.split('/');
+                        if (parts.length === 3 && `${parts[2]}-${parts[1]}` === currentMonthKey) {
+                            const rec = getOtRecordAmount(r, globalOtRate);
+                            hoursThisMonth += rec.hours;
+                            earningsThisMonth += rec.amount;
+                        }
+                    });
+
+                    hoursEl.textContent = hoursThisMonth.toFixed(1);
+                    earningsEl.textContent = '£' + Math.round(earningsThisMonth).toLocaleString();
+
+                    // Overtime is paid a month behind — OT worked in the previous month lands in
+                    // THIS month's paycheck, so pay-related figures (target progress, pay breakdown)
+                    // use last month's completed OT, not the currently-viewed month's.
+                    const prevDate = new Date(viewedDate.getFullYear(), viewedDate.getMonth() - 1, 1);
+                    const prevMonthKey = `${prevDate.getFullYear()}-${padStats(prevDate.getMonth() + 1)}`;
+                    let payOtHours = 0, payOtEarnings = 0;
+                    completed.forEach(r => {
+                        const parts = r.date.split('/');
+                        if (parts.length === 3 && `${parts[2]}-${parts[1]}` === prevMonthKey) {
+                            const rec = getOtRecordAmount(r, globalOtRate);
+                            payOtHours += rec.hours;
+                            payOtEarnings += rec.amount;
+                        }
+                    });
+
+                    const targets = JSON.parse(localStorage.getItem('myndarcMonthlyTargets')) || {};
+                    const targetAmount = targets[currentMonthKey] || 0;
+                    if (targetAmount > 0) {
+                        const percent = Math.min(100, Math.max(0, (payOtEarnings / targetAmount) * 100));
+                        targetPercentEl.textContent = `${Math.round(percent)}%`;
+                        targetBarEl.style.width = `${percent}%`;
+                        targetLabelEl.textContent = `£${Math.round(payOtEarnings).toLocaleString()} of £${Math.round(targetAmount).toLocaleString()} target (OT paid this month, from ${prevDate.toLocaleDateString('en-US', { month: 'long' })})`;
+                    } else {
+                        targetPercentEl.textContent = '0%';
+                        targetBarEl.style.width = '0%';
+                        targetLabelEl.textContent = 'Set a target in the Income Calculator.';
+                    }
+
+                    // Actual Pay Breakdown: fixed basic pay (FT + PT) + confirmed OT this month
+                    const actualMonthLabelEl = document.getElementById('ot-actual-month-label');
+                    const actualTargetLabelEl = document.getElementById('ot-actual-target-label');
+                    const actualGrossEl = document.getElementById('ot-actual-gross');
+                    const actualGrossSubEl = document.getElementById('ot-actual-gross-sub');
+                    const actualTaxEl = document.getElementById('ot-actual-tax');
+                    const actualNiEl = document.getElementById('ot-actual-ni');
+                    const actualPensionEl = document.getElementById('ot-actual-pension');
+                    const actualNetEl = document.getElementById('ot-actual-net');
+                    if (actualGrossEl) {
+                        if (actualMonthLabelEl) actualMonthLabelEl.textContent = viewedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        if (actualTargetLabelEl) {
+                            actualTargetLabelEl.textContent = targetAmount > 0
+                                ? `Monthly Target: £${Math.round(targetAmount).toLocaleString()}`
+                                : 'No monthly target set for this month.';
+                        }
+
+                        // New full-time job (and old job going part-time) starts Sept 7 2026 —
+                        // use whichever pay is actually in effect for the viewed month.
+                        const isPostCutoverMonth = currentMonthKey >= '2026-09';
+                        const ftBasic = isPostCutoverMonth
+                            ? (parseFloat(localStorage.getItem('myndarcBasicPayNew')) || 0)
+                            : (parseFloat(localStorage.getItem('myndarcBasicPay')) || 0);
+                        const ptEnabled = isPostCutoverMonth && localStorage.getItem('myndarcPartTimeEnabled') === 'true';
+                        const ptBasic = ptEnabled ? (parseFloat(localStorage.getItem('myndarcPartTimePay')) || 0) : 0;
+
+                        const ftRes = calculateDeductions(ftBasic + payOtEarnings);
+                        const ptRes = ptBasic > 0 ? calculateDeductions(ptBasic, true) : { tax: 0, ni: 0, pension: 0, net: 0 };
+
+                        actualGrossEl.textContent = fmtMoney(ftBasic + payOtEarnings + ptBasic);
+                        if (actualGrossSubEl) {
+                            const parts = [`Basic ${fmtMoney(ftBasic)}`];
+                            if (payOtEarnings > 0) parts.push(`OT ${fmtMoney(payOtEarnings)} (${payOtHours.toFixed(1)}h, worked ${prevDate.toLocaleDateString('en-US', { month: 'long' })})`);
+                            if (ptBasic > 0) parts.push(`Part-time ${fmtMoney(ptBasic)}`);
+                            actualGrossSubEl.textContent = parts.length > 1 ? parts.join(' + ') : '';
+                        }
+                        actualTaxEl.textContent = fmtMoney(ftRes.tax + ptRes.tax);
+                        actualNiEl.textContent = fmtMoney(ftRes.ni + ptRes.ni);
+                        actualPensionEl.textContent = fmtMoney(ftRes.pension + ptRes.pension);
+                        actualNetEl.textContent = fmtMoney(ftRes.net + ptRes.net);
+                    }
+
+                    const completedThisMonth = completed.filter(r => {
+                        const parts = r.date.split('/');
+                        return parts.length === 3 && `${parts[2]}-${parts[1]}` === currentMonthKey;
+                    });
+
+                    if (completedThisMonth.length === 0) {
+                        logListEl.innerHTML = `<p class="text-center py-8 text-slate-400 italic text-sm">No overtime logged for ${viewedDate.toLocaleDateString('en-US', { month: 'long' })} yet.</p>`;
+                        return;
+                    }
+
+                    const sorted = completedThisMonth.map((r) => ({ r, idx: generatedResults.indexOf(r) }))
+                        .sort((a, b) => {
+                            const pa = a.r.date.split('/'), pb = b.r.date.split('/');
+                            return new Date(pb[2], pb[1]-1, pb[0]) - new Date(pa[2], pa[1]-1, pa[0]);
+                        });
+
+                    logListEl.innerHTML = sorted.map(({ r, idx }) => {
+                        const rec = getOtRecordAmount(r, globalOtRate);
+                        const timeStr = (r.actualStart && r.actualEnd) ? `${r.actualStart} - ${r.actualEnd}` : r.time;
+                        return `
+                            <div class="ot-log-entry flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 cursor-pointer transition-colors" data-index="${idx}" title="Click to edit this log entry">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-200">${r.date}</p>
+                                    <p class="text-[10px] text-slate-400 font-mono">${timeStr} &middot; ${rec.hours.toFixed(1)}h @ £${rec.rate.toFixed(2)}/hr</p>
+                                </div>
+                                <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">£${rec.amount.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }).join('');
+
+                    logListEl.querySelectorAll('.ot-log-entry').forEach(el => {
+                        el.addEventListener('click', () => openLogOvertimeModal(parseInt(el.dataset.index, 10)));
+                    });
+                }
+
                 if (tbody) {
                     tbody.addEventListener('click', (e) => {
                         const statusBtn = e.target.closest('.ot-status-btn');
                         if (statusBtn) {
-                            const idx = statusBtn.dataset.index;
+                            const idx = parseInt(statusBtn.dataset.index, 10);
                             let currentStatus = generatedResults[idx].status || (generatedResults[idx].confirmed ? 'confirmed' : 'pending');
-                            
-                            // Cycle: pending -> confirmed -> completed -> pending
+
                             if (currentStatus === 'pending') {
                                 generatedResults[idx].status = 'confirmed';
                                 generatedResults[idx].confirmed = true;
+                                saveAndRenderOT();
                             } else if (currentStatus === 'confirmed') {
-                                generatedResults[idx].status = 'completed';
-                                generatedResults[idx].confirmed = true;
+                                openLogOvertimeModal(idx);
                             } else {
                                 generatedResults[idx].status = 'pending';
                                 generatedResults[idx].confirmed = false;
+                                delete generatedResults[idx].hours;
+                                delete generatedResults[idx].rate;
+                                delete generatedResults[idx].actualStart;
+                                delete generatedResults[idx].actualEnd;
+                                saveAndRenderOT();
                             }
-                            saveAndRenderOT();
                         }
                         
                         const delBtn = e.target.closest('.ot-delete-btn');
@@ -4115,7 +4557,6 @@
                     renderOT();
                 });
 
-                // Initial render from local storage
                 saveAndRenderOT();
 
                 btn.addEventListener('click', () => {
@@ -4143,16 +4584,9 @@
                     while (currentDateMs < endDateMs) {
                         const daysSinceBase = Math.floor((currentDateMs - baseWeekA_Monday) / msPerDay);
                         
-                        // Modulo 14 for the 14-day bi-weekly cycle
                         let cycleDay = daysSinceBase % 14;
                         if (cycleDay < 0) cycleDay += 14; 
                         
-                        /* * Cycle Day Map (Starts Monday Week A)
-                         * Week A working: Mon(0), Tue(1), Thu(3), Sat(5). 
-                         * Week A Off: Wed(2), Fri(4), Sun(6 - Reserved) -> OT on 2, 4
-                         * Week B working: Wed(9), Thu(10), Sat(12).
-                         * Week B Off: Mon(7), Tue(8), Fri(11), Sun(13 - Reserved) -> OT on 7, 8, 11
-                         */
                         const availableOTDays = [2, 4, 7, 8, 11];
 
                         if (availableOTDays.includes(cycleDay)) {
@@ -4160,7 +4594,6 @@
                             const pad = n => String(n).padStart(2, '0');
                             const formattedDate = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
                             
-                            // Prevent adding exact duplicate dates
                             if (!generatedResults.some(r => r.date === formattedDate)) {
                                 generatedResults.push({
                                     date: formattedDate,
@@ -4184,21 +4617,28 @@
                 });
 
                 copyBtn.addEventListener('click', () => {
-                    if (generatedResults.length === 0) {
-                        if (typeof showAlert === 'function') return showAlert("Generate some dates first before copying.");
-                        else return alert("Generate some dates first before copying.");
+                    const viewedDateForCopy = currentCalDate || new Date();
+                    const padCopy = n => String(n).padStart(2, '0');
+                    const viewedMonthKeyForCopy = `${viewedDateForCopy.getFullYear()}-${padCopy(viewedDateForCopy.getMonth() + 1)}`;
+                    const rowsToCopy = generatedResults.filter(row => {
+                        const parts = row.date.split('/');
+                        return parts.length === 3 && `${parts[2]}-${parts[1]}` === viewedMonthKeyForCopy;
+                    });
+
+                    if (rowsToCopy.length === 0) {
+                        const msg = `No overtime requests for ${viewedDateForCopy.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} to copy.`;
+                        if (typeof showAlert === 'function') return showAlert(msg);
+                        else return alert(msg);
                     }
 
-                    // Build HTML Table for Rich Text paste (Teams/Word/Excel)
-                    // Explicitly omits Status & Delete columns to match the request exactly
                     let htmlString = '<table style="border-collapse: collapse; border: 1px solid #94a3b8; font-family: sans-serif; text-align: left; width: 100%;">';
                     htmlString += '<thead><tr>';
                     htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">OT Request Date</th>';
                     htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">Time</th>';
                     htmlString += '<th style="border: 1px solid #94a3b8; padding: 8px; background-color: #f1f5f9; font-weight: bold; color: #334155;">Duties Trained on</th>';
                     htmlString += '</tr></thead><tbody>';
-                    
-                    generatedResults.forEach(row => {
+
+                    rowsToCopy.forEach(row => {
                         htmlString += '<tr>';
                         htmlString += `<td style="border: 1px solid #94a3b8; padding: 8px; color: #334155;">${row.date}</td>`;
                         htmlString += `<td style="border: 1px solid #94a3b8; padding: 8px; color: #334155;">${row.time}</td>`;
@@ -4207,7 +4647,6 @@
                     });
                     htmlString += '</tbody></table>';
 
-                    // Use a hidden div to execute a rich text copy
                     const tempDiv = document.createElement('div');
                     tempDiv.style.position = 'absolute';
                     tempDiv.style.left = '-9999px';
@@ -4221,11 +4660,9 @@
                     selection.addRange(range);
 
                     try {
-                        // Copy the formatted HTML to keep the borders
                         document.execCommand('copy');
                     } catch (err) {
                         console.error('Failed to copy rich text table: ', err);
-                        // Fallback to TSV if HTML copy fails
                         let tsvString = "OT Request Date\tTime\tDuties Trained on\n";
                         generatedResults.forEach(row => {
                             tsvString += `${row.date}\t${row.time}\t${row.duties}\n`;
@@ -4249,38 +4686,204 @@
 
             function setupIncomeCalculator() {
                 const basicPayInput = document.getElementById('inc-basic-pay');
+                const basicPayNewInput = document.getElementById('inc-basic-pay-new');
                 const otRateInput = document.getElementById('inc-ot-rate');
+                const partTimeToggle = document.getElementById('inc-parttime-toggle');
+                const partTimeFields = document.getElementById('inc-parttime-fields');
+                const partTimePayInput = document.getElementById('inc-parttime-pay');
                 const targetNetInput = document.getElementById('inc-target-net');
                 const targetMonthInput = document.getElementById('inc-target-month');
                 const saveTargetBtn = document.getElementById('save-monthly-target-btn');
                 const calcBtn = document.getElementById('calc-income-btn');
                 
-                // Displays
                 const outGross = document.getElementById('inc-out-gross');
                 const outTax = document.getElementById('inc-out-tax');
                 const outNi = document.getElementById('inc-out-ni');
                 const outPension = document.getElementById('inc-out-pension');
                 const outNet = document.getElementById('inc-out-net');
                 
-                // Engine
                 const resultsContainer = document.getElementById('inc-target-results');
                 const emptyContainer = document.getElementById('inc-target-empty');
                 const reqOtHours = document.getElementById('inc-req-ot-hours');
                 const reqOtGross = document.getElementById('inc-req-ot-gross');
                 const reqOtNet = document.getElementById('inc-req-ot-net');
                 const reqShifts = document.getElementById('inc-req-shifts');
+                const projGross = document.getElementById('inc-proj-gross');
+                const projTax = document.getElementById('inc-proj-tax');
+                const projNi = document.getElementById('inc-proj-ni');
+                const projPension = document.getElementById('inc-proj-pension');
+                const projNet = document.getElementById('inc-proj-net');
                 const suggestedDatesContainer = document.getElementById('inc-suggested-dates');
                 const pushToOtBtn = document.getElementById('inc-push-to-ot-btn');
                 
                 if (!calcBtn) return;
                 
-                // Load saved values
+                // Job transition: current full-time job runs until Sept 7, then becomes part-time
+                // while a new full-time job (different pay) starts. Default to the real figures
+                // given so the app reflects reality until the user overrides them.
                 const savedBasic = localStorage.getItem('myndarcBasicPay');
+                const savedBasicNew = localStorage.getItem('myndarcBasicPayNew');
                 const savedOtRate = localStorage.getItem('myndarcOtRate');
-                if (savedBasic) basicPayInput.value = savedBasic;
+                basicPayInput.value = savedBasic || 2206;
+                if (!savedBasic) localStorage.setItem('myndarcBasicPay', basicPayInput.value);
+                if (basicPayNewInput) {
+                    basicPayNewInput.value = savedBasicNew || 2585;
+                    if (!savedBasicNew) localStorage.setItem('myndarcBasicPayNew', basicPayNewInput.value);
+                }
                 if (savedOtRate) otRateInput.value = savedOtRate;
+                if (basicPayNewInput) {
+                    basicPayNewInput.addEventListener('change', () => {
+                        const val = parseFloat(basicPayNewInput.value) || 0;
+                        if (val > 0) localStorage.setItem('myndarcBasicPayNew', val);
+                    });
+                }
 
-                // Month handling
+                // Second job (old job going part-time) starts Sept 7 2026 at £1,103/month by default —
+                // the cutover date logic elsewhere only applies this from that month onward regardless.
+                const savedPartTimePay = localStorage.getItem('myndarcPartTimePay');
+                const rawPartTimeEnabled = localStorage.getItem('myndarcPartTimeEnabled');
+                const savedPartTimeEnabled = rawPartTimeEnabled === null ? true : rawPartTimeEnabled === 'true';
+                partTimePayInput.value = savedPartTimePay || 1103;
+                if (!savedPartTimePay) localStorage.setItem('myndarcPartTimePay', partTimePayInput.value);
+                if (rawPartTimeEnabled === null) localStorage.setItem('myndarcPartTimeEnabled', 'true');
+                if (partTimeToggle) {
+                    partTimeToggle.checked = savedPartTimeEnabled;
+                    partTimeFields.classList.toggle('hidden', !savedPartTimeEnabled);
+                    partTimeToggle.addEventListener('change', () => {
+                        partTimeFields.classList.toggle('hidden', !partTimeToggle.checked);
+                        localStorage.setItem('myndarcPartTimeEnabled', partTimeToggle.checked ? 'true' : 'false');
+                    });
+                }
+
+                function setupWeeklySchedule(prefix, storageKey, rateStorageKey, defaultSchedule, applyInput) {
+                    const toggleBtn = document.getElementById(`${prefix}-sched-toggle-btn`);
+                    const panel = document.getElementById(`${prefix}-sched-panel`);
+                    const rowsContainer = document.getElementById(`${prefix}-schedule-rows`);
+                    const rateInput = document.getElementById(`${prefix}-sched-rate`);
+                    const preview = document.getElementById(`${prefix}-sched-preview`);
+                    const applyBtn = document.getElementById(`${prefix}-sched-apply-btn`);
+                    if (!toggleBtn || !rowsContainer) return;
+
+                    const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    let schedule = JSON.parse(localStorage.getItem(storageKey) || 'null') || JSON.parse(JSON.stringify(defaultSchedule));
+                    const savedRate = localStorage.getItem(rateStorageKey);
+                    if (savedRate) rateInput.value = savedRate;
+
+                    function calcHoursForDay(start, end) {
+                        const [sh, sm] = start.split(':').map(Number);
+                        const [eh, em] = end.split(':').map(Number);
+                        let mins = (eh * 60 + em) - (sh * 60 + sm);
+                        if (mins <= 0) mins += 24 * 60;
+                        return mins / 60;
+                    }
+
+                    function updatePreview() {
+                        const weeklyHours = schedule.reduce((sum, d) => d.working ? sum + calcHoursForDay(d.start, d.end) : sum, 0);
+                        const monthlyHours = weeklyHours * 52 / 12;
+                        const rate = parseFloat(rateInput.value) || 0;
+                        const monthlyPay = monthlyHours * rate;
+                        if (preview) {
+                            preview.textContent = `Weekly: ${weeklyHours.toFixed(1)}h · Monthly: ~${monthlyHours.toFixed(1)}h` + (rate > 0 ? ` · Est. £${monthlyPay.toFixed(2)}/mo` : '');
+                        }
+                        return { weeklyHours, monthlyHours, monthlyPay };
+                    }
+
+                    function renderRows() {
+                        rowsContainer.innerHTML = DAYS.map((day, i) => {
+                            const d = schedule[i];
+                            const disabledCls = d.working ? '' : 'opacity-40 pointer-events-none';
+                            return `
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-1.5 w-14 shrink-0 cursor-pointer select-none">
+                                        <input type="checkbox" class="sched-day-toggle rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" data-day-index="${i}" ${d.working ? 'checked' : ''}>
+                                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">${day}</span>
+                                    </label>
+                                    <input type="time" class="sched-day-start flex-1 min-w-0 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-[11px] font-bold dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 ${disabledCls}" data-day-index="${i}" value="${d.start}">
+                                    <span class="text-slate-400 text-xs">-</span>
+                                    <input type="time" class="sched-day-end flex-1 min-w-0 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-[11px] font-bold dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 ${disabledCls}" data-day-index="${i}" value="${d.end}">
+                                </div>
+                            `;
+                        }).join('');
+
+                        rowsContainer.querySelectorAll('.sched-day-toggle').forEach(cb => {
+                            cb.addEventListener('change', () => {
+                                schedule[parseInt(cb.dataset.dayIndex, 10)].working = cb.checked;
+                                persist();
+                            });
+                        });
+                        rowsContainer.querySelectorAll('.sched-day-start').forEach(inp => {
+                            inp.addEventListener('change', () => {
+                                schedule[parseInt(inp.dataset.dayIndex, 10)].start = inp.value;
+                                persist();
+                            });
+                        });
+                        rowsContainer.querySelectorAll('.sched-day-end').forEach(inp => {
+                            inp.addEventListener('change', () => {
+                                schedule[parseInt(inp.dataset.dayIndex, 10)].end = inp.value;
+                                persist();
+                            });
+                        });
+                    }
+
+                    function persist() {
+                        localStorage.setItem(storageKey, JSON.stringify(schedule));
+                        renderRows();
+                        updatePreview();
+                    }
+
+                    if (rateInput) {
+                        rateInput.addEventListener('input', () => {
+                            localStorage.setItem(rateStorageKey, rateInput.value);
+                            updatePreview();
+                        });
+                    }
+
+                    if (toggleBtn && panel) {
+                        toggleBtn.addEventListener('click', () => panel.classList.toggle('hidden'));
+                    }
+
+                    if (applyBtn) {
+                        applyBtn.addEventListener('click', () => {
+                            const { monthlyPay } = updatePreview();
+                            if (monthlyPay <= 0) {
+                                if (typeof showAlert === 'function') showAlert('Set your working days, times, and hourly rate first.');
+                                return;
+                            }
+                            applyInput.value = monthlyPay.toFixed(2);
+                            const originalHtml = applyBtn.innerHTML;
+                            applyBtn.textContent = '✓ Applied!';
+                            applyBtn.classList.add('bg-emerald-600');
+                            setTimeout(() => {
+                                applyBtn.innerHTML = originalHtml;
+                                applyBtn.classList.remove('bg-emerald-600');
+                            }, 1200);
+                        });
+                    }
+
+                    renderRows();
+                    updatePreview();
+                }
+
+                setupWeeklySchedule('ft', 'myndarcFullTimeSchedule', 'myndarcFullTimeHourlyRate', [
+                    { working: true,  start: '09:00', end: '17:00' }, // Mon
+                    { working: true,  start: '09:00', end: '17:00' }, // Tue
+                    { working: true,  start: '09:00', end: '17:00' }, // Wed
+                    { working: true,  start: '09:00', end: '17:00' }, // Thu
+                    { working: true,  start: '09:00', end: '17:00' }, // Fri
+                    { working: false, start: '09:00', end: '17:00' }, // Sat
+                    { working: false, start: '09:00', end: '17:00' }, // Sun
+                ], basicPayInput);
+
+                setupWeeklySchedule('pt', 'myndarcPartTimeSchedule', 'myndarcPartTimeHourlyRate', [
+                    { working: false, start: '19:00', end: '00:00' }, // Mon
+                    { working: false, start: '19:00', end: '00:00' }, // Tue
+                    { working: false, start: '19:00', end: '00:00' }, // Wed
+                    { working: false, start: '19:00', end: '00:00' }, // Thu
+                    { working: true,  start: '19:00', end: '00:00' }, // Fri
+                    { working: true,  start: '19:00', end: '05:00' }, // Sat
+                    { working: true,  start: '19:00', end: '00:00' }, // Sun
+                ], partTimePayInput);
+
                 const now = new Date();
                 const pad = n => String(n).padStart(2, '0');
                 const currentMonthKey = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
@@ -4292,7 +4895,7 @@
                     const monthKey = targetMonthInput ? targetMonthInput.value : currentMonthKey;
                     const targets = JSON.parse(localStorage.getItem('myndarcMonthlyTargets')) || {};
                     if(targetNetInput) {
-                        targetNetInput.value = targets[monthKey] || '';
+                        targetNetInput.value = targets[monthKey] || 3500;
                     }
                 }
 
@@ -4313,7 +4916,6 @@
                         targets[monthKey] = targetVal;
                         localStorage.setItem('myndarcMonthlyTargets', JSON.stringify(targets));
                         
-                        // Show visual feedback
                         const originalHtml = saveTargetBtn.innerHTML;
                         saveTargetBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Saved!`;
                         saveTargetBtn.classList.replace('bg-emerald-500', 'bg-emerald-600');
@@ -4327,72 +4929,85 @@
                 }
                 loadTargetForMonth();
                 
-                // UK Tax thresholds (Approx 2024-2026 constants, monthly)
-                const taxFreeAllowance = 1047.50; // £12570 / 12
-                const niThreshold = 1048.00; // Primary threshold
-                const pensionThreshold = 520.00;
-                
-                // Formatter
-                const fmt = (num) => '£' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                
-                function calculateDeductions(gross) {
-                    // Tax 20% over allowance
-                    const taxable = Math.max(0, gross - taxFreeAllowance);
-                    const tax = taxable * 0.20;
-                    
-                    // NI 8% over threshold
-                    const niable = Math.max(0, gross - niThreshold);
-                    const ni = niable * 0.08;
-                    
-                    // Pension 4% over £520
-                    const pensionable = Math.max(0, gross - pensionThreshold);
-                    const pension = pensionable * 0.04;
-                    
-                    const net = gross - tax - ni - pension;
-                    return { tax, ni, pension, net };
-                }
-                
+                const fmt = fmtMoney;
+
                 let suggestedDatesForOT = [];
-                
+
                 calcBtn.addEventListener('click', () => {
-                    const basicGross = parseFloat(basicPayInput.value) || 0;
+                    const currentBasicGross = parseFloat(basicPayInput.value) || 0;
+                    const newBasicGross = parseFloat(basicPayNewInput?.value) || 0;
                     const otRate = parseFloat(otRateInput.value) || 0;
-                    const targetNet = parseFloat(targetNetInput.value) || 0;
-                    
-                    if (basicGross <= 0) {
-                        if (typeof showAlert === 'function') showAlert("Please enter your basic monthly pay.");
+                    let targetNet = parseFloat(targetNetInput.value) || 0;
+
+                    if (currentBasicGross <= 0 && newBasicGross <= 0) {
+                        if (typeof showAlert === 'function') showAlert("Please enter your full-time pay.");
                         return;
                     }
-                    
-                    // Save for convenience
-                    localStorage.setItem('myndarcBasicPay', basicGross);
+
+                    if (currentBasicGross > 0) localStorage.setItem('myndarcBasicPay', currentBasicGross);
+                    if (newBasicGross > 0) localStorage.setItem('myndarcBasicPayNew', newBasicGross);
                     if (otRate > 0) localStorage.setItem('myndarcOtRate', otRate);
-                    
-                    // 1. Calculate Base Pay
-                    const baseRes = calculateDeductions(basicGross);
-                    
-                    outGross.textContent = fmt(basicGross);
-                    outTax.textContent = fmt(baseRes.tax);
-                    outNi.textContent = fmt(baseRes.ni);
-                    outPension.textContent = fmt(baseRes.pension);
-                    outNet.textContent = fmt(baseRes.net);
-                    
-                    // 2. Goal Engine Calculation
-                    if (targetNet > baseRes.net && otRate > 0) {
+
+                    // The new full-time job (and old job going part-time) starts Sept 7 2026 —
+                    // use whichever pay applies to the selected target month.
+                    const scheduleCutoverMonthKey = '2026-09';
+                    const effectiveMonthKey = (targetMonthInput && targetMonthInput.value) || currentMonthKey;
+                    const isPostCutover = effectiveMonthKey >= scheduleCutoverMonthKey;
+                    const basicGross = isPostCutover ? newBasicGross : currentBasicGross;
+
+                    const hasPartTime = isPostCutover && !!(partTimeToggle && partTimeToggle.checked);
+                    const partTimeGross = hasPartTime ? (parseFloat(partTimePayInput.value) || 0) : 0;
+                    if (partTimeToggle && partTimeToggle.checked) localStorage.setItem('myndarcPartTimePay', parseFloat(partTimePayInput.value) || 0);
+
+                    // A target below your guaranteed (basic + part-time) net income isn't an overtime goal — warn and ignore it
+                    const guaranteedNet = calculateDeductions(basicGross).net + (partTimeGross > 0 ? calculateDeductions(partTimeGross, true).net : 0);
+                    if (targetNet > 0 && targetNet < guaranteedNet) {
+                        if (typeof showAlert === 'function') showAlert(`Your target (${fmt(targetNet)}) is lower than your normal net income of ${fmt(guaranteedNet)}. Set a target higher than that to plan overtime.`);
+                        targetNet = 0;
+                    }
+
+                    // This page shows POTENTIAL income only (basic pay + what-if overtime plan).
+                    // Actual confirmed pay for the month lives in the OT Manager's Pay Breakdown.
+                    const combinedGross = basicGross;
+
+                    const baseRes = calculateDeductions(combinedGross);
+                    const partTimeRes = partTimeGross > 0
+                        ? calculateDeductions(partTimeGross, true)
+                        : { tax: 0, ni: 0, pension: 0, net: 0 };
+
+                    const totalGrossAll = combinedGross + partTimeGross;
+                    const totalTaxAll = baseRes.tax + partTimeRes.tax;
+                    const totalNiAll = baseRes.ni + partTimeRes.ni;
+                    const totalPensionAll = baseRes.pension + partTimeRes.pension;
+                    const totalNetAll = baseRes.net + partTimeRes.net;
+
+                    outGross.textContent = fmt(totalGrossAll);
+                    const outGrossSub = document.getElementById('inc-out-gross-sub');
+                    if (outGrossSub) {
+                        const parts = [`Basic ${fmt(basicGross)}`];
+                        if (partTimeGross > 0) parts.push(`Part-time ${fmt(partTimeGross)}`);
+                        outGrossSub.textContent = parts.length > 1 ? parts.join(' + ') : '';
+                    }
+                    outTax.textContent = fmt(totalTaxAll);
+                    outNi.textContent = fmt(totalNiAll);
+                    outPension.textContent = fmt(totalPensionAll);
+                    outNet.textContent = fmt(totalNetAll);
+
+                    if (targetNet > totalNetAll && otRate > 0) {
                         emptyContainer.classList.add('hidden');
                         resultsContainer.classList.remove('hidden');
-                        
-                        // Binary search to find required Gross to hit target Net
-                        let low = basicGross;
-                        let high = basicGross + 10000;
-                        let requiredGross = basicGross;
-                        let bestNet = baseRes.net;
-                        
+
+                        // Part-time net is a fixed offset here — only the primary+OT gross is solved for
+                        let low = combinedGross;
+                        let high = combinedGross + 10000;
+                        let requiredGross = combinedGross;
+                        let bestNet = totalNetAll;
+
                         for (let i = 0; i < 50; i++) {
                             const mid = (low + high) / 2;
                             const res = calculateDeductions(mid);
-                            bestNet = res.net;
-                            
+                            bestNet = res.net + partTimeRes.net;
+
                             if (Math.abs(bestNet - targetNet) < 0.01) {
                                 requiredGross = mid;
                                 break;
@@ -4403,40 +5018,66 @@
                             }
                             requiredGross = mid;
                         }
-                        
-                        const requiredOtGross = requiredGross - basicGross;
-                        const requiredOtNet = targetNet - baseRes.net;
+
+                        const requiredOtGross = requiredGross - combinedGross;
+                        const requiredOtNet = targetNet - totalNetAll;
                         const otHoursNeeded = requiredOtGross / otRate;
-                        const shiftsNeeded = Math.ceil(otHoursNeeded / 10); // Assuming 10 hours paid per shift
-                        
+                        const shiftsNeeded = Math.ceil(otHoursNeeded / 10);
+
                         reqOtHours.textContent = otHoursNeeded.toFixed(1);
                         reqOtGross.textContent = fmt(requiredOtGross);
                         reqOtNet.textContent = fmt(requiredOtNet);
                         reqShifts.textContent = shiftsNeeded.toString();
+
+                        // Full deduction breakdown for the "with this overtime" scenario, including part-time
+                        const projectedPrimaryRes = calculateDeductions(requiredGross);
+                        projGross.textContent = fmt(requiredGross + partTimeGross);
+                        projTax.textContent = fmt(projectedPrimaryRes.tax + partTimeRes.tax);
+                        projNi.textContent = fmt(projectedPrimaryRes.ni + partTimeRes.ni);
+                        projPension.textContent = fmt(projectedPrimaryRes.pension + partTimeRes.pension);
+                        projNet.textContent = fmt(projectedPrimaryRes.net + partTimeRes.net);
                         
-                        // Suggest Dates (Uses exact logic from OT Generator)
                         const baseWeekA_Monday = new Date('2026-04-27T00:00:00').getTime();
                         const msPerDay = 1000 * 60 * 60 * 24;
-                        const availableOTDays = [2, 4, 7, 8, 11]; // Week A Off: 2, 4 | Week B Off: 7, 8, 11
-                        
-                        let currentDateMs = Date.now();
-                        
+                        // From this date the old bi-weekly rotation ends and OT can be logged on
+                        // ANY day (up to 12h/shift) — mirrors the cutover logic in the OT Generator's calendar.
+                        const scheduleCutoverDate = new Date('2026-09-07T00:00:00').getTime();
+                        const workingDaysCycle = [0, 1, 3, 5, 9, 10, 12];
+
+                        // Overtime is paid a month behind — OT for the selected target month must be
+                        // worked in the PREVIOUS calendar month, so only suggest dates within that month.
+                        const [targetY, targetM] = (targetMonthInput && targetMonthInput.value ? targetMonthInput.value : currentMonthKey).split('-').map(Number);
+                        const otWorkMonthStart = new Date(targetY, targetM - 2, 1);
+                        const otWorkMonthEndMs = new Date(targetY, targetM - 1, 0).getTime();
+                        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+                        let currentDateMs = Math.max(otWorkMonthStart.getTime(), todayStart.getTime());
+
+                        const suggestedDatesHeadingEl = document.getElementById('inc-suggested-dates-heading');
+                        if (suggestedDatesHeadingEl) {
+                            suggestedDatesHeadingEl.textContent = `Suggested OT Dates (${otWorkMonthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} — paid in ${new Date(targetY, targetM - 1, 1).toLocaleDateString('en-US', { month: 'long' })})`;
+                        }
+
                         suggestedDatesForOT = [];
                         let dateHtml = '';
-                        
-                        // Look ahead for the next 30 days to find shifts
+
                         let shiftsFound = 0;
-                        while (shiftsFound < shiftsNeeded && shiftsFound < 15) { // Cap at 15 to prevent infinite loops if target is huge
-                            const daysSinceBase = Math.floor((currentDateMs - baseWeekA_Monday) / msPerDay);
-                            let cycleDay = daysSinceBase % 14;
-                            if (cycleDay < 0) cycleDay += 14;
-                            
-                            if (availableOTDays.includes(cycleDay)) {
+                        while (shiftsFound < shiftsNeeded && shiftsFound < 15 && currentDateMs <= otWorkMonthEndMs) {
+                            let isAvailable;
+                            if (currentDateMs < scheduleCutoverDate) {
+                                const daysSinceBase = Math.floor((currentDateMs - baseWeekA_Monday) / msPerDay);
+                                let cycleDay = daysSinceBase % 14;
+                                if (cycleDay < 0) cycleDay += 14;
+                                isAvailable = !workingDaysCycle.includes(cycleDay);
+                            } else {
+                                isAvailable = true;
+                            }
+
+                            if (isAvailable) {
                                 const d = new Date(currentDateMs);
                                 const pad = n => String(n).padStart(2, '0');
                                 const formattedDate = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
                                 const shortDate = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
-                                
+
                                 suggestedDatesForOT.push(formattedDate);
                                 dateHtml += `<span class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-lg border border-emerald-200 dark:border-emerald-800 shadow-sm">${shortDate}</span>`;
                                 shiftsFound++;
@@ -4445,14 +5086,16 @@
                         }
                         
                         if (shiftsFound === 0) {
-                            dateHtml = '<span class="text-xs text-slate-500 italic">No available dates found in schedule.</span>';
+                            dateHtml = '<span class="text-xs text-slate-500 italic">No available dates left in that month to work this overtime.</span>';
+                        } else if (shiftsFound < shiftsNeeded) {
+                            dateHtml += `<span class="w-full text-xs text-amber-600 dark:text-amber-400 italic mt-1">Only ${shiftsFound} of ${shiftsNeeded} shifts fit in that month — target may not be fully reachable.</span>`;
                         }
                         suggestedDatesContainer.innerHTML = dateHtml;
                         
                     } else {
                         emptyContainer.classList.remove('hidden');
                         resultsContainer.classList.add('hidden');
-                        if (targetNet > baseRes.net && otRate <= 0) {
+                        if (targetNet > totalNetAll && otRate <= 0) {
                             if (typeof showAlert === 'function') showAlert("Please enter your Overtime Hourly Rate to calculate the target.");
                         }
                     }
@@ -4501,8 +5144,6 @@
                 const presetEarly = document.getElementById('preset-early-btn');
                 const presetOT = document.getElementById('preset-ot-btn');
 
-                const presetOvertime = document.getElementById('preset-overtime-btn');
-
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
 
@@ -4512,14 +5153,12 @@
                 let totalDuration;
                 let totalSegments = 0;
                 let currentVibeIndex = -1;
-                let nextVibeWarnedIndex = -1;
                 let shiftBreaks = []; 
                 let warnedBreaksStart = new Set();
                 let warnedBreaksEnd = new Set();
                 let adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                 let shiftVibeStatus = [];
 
-                // --- Native Notifications ---
                 function showBrowserNotification(title, body) {
                     if ("Notification" in window && Notification.permission === "granted") {
                         try {
@@ -4534,12 +5173,10 @@
                     }
                 }
 
-                // --- PiP Engine Setup ---
                 const pipBtn = document.getElementById('pip-btn');
                 const pipCanvas = document.getElementById('pip-canvas');
                 const pipVideo = document.getElementById('pip-video');
 
-                // Request Notification Permission on load
                 if ("Notification" in window && Notification.permission === "default") {
                     Notification.requestPermission();
                 }
@@ -4549,18 +5186,15 @@
                     const ctx = pipCanvas.getContext('2d');
                     if (!ctx) return;
 
-                    // Clear & Background
-                    ctx.fillStyle = isBreak ? '#064e3b' : '#0f172a'; // emerald-950 or slate-900
+                    ctx.fillStyle = isBreak ? '#064e3b' : '#0f172a';
                     ctx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
 
-                    // Draw Label (Vibe or Break Status)
-                    ctx.fillStyle = isBreak ? '#34d399' : '#94a3b8'; // emerald-400 or slate-400
+                    ctx.fillStyle = isBreak ? '#34d399' : '#94a3b8';
                     ctx.font = 'bold 24px Inter, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'top';
                     ctx.fillText((label || '').toUpperCase(), pipCanvas.width / 2, 30);
 
-                    // Draw Timer
                     ctx.fillStyle = '#ffffff';
                     ctx.font = 'bold 90px monospace';
                     ctx.textBaseline = 'middle';
@@ -4570,21 +5204,19 @@
                     timeText += `${pad(m)}:${pad(s)}`;
                     ctx.fillText(timeText, pipCanvas.width / 2, pipCanvas.height / 2 + 10);
 
-                    // Draw Extra Subtitle Info (e.g. Next break or Shift remaining)
                     if (extraInfo) {
-                        ctx.fillStyle = isBreak ? '#a7f3d0' : '#64748b'; // emerald-200 or slate-500
+                        ctx.fillStyle = isBreak ? '#a7f3d0' : '#64748b';
                         ctx.font = 'bold 16px Inter, sans-serif';
                         ctx.fillText(extraInfo, pipCanvas.width / 2, pipCanvas.height - 70);
                     }
 
-                    // Draw Progress Bar
                     const barWidth = pipCanvas.width - 80;
                     ctx.fillStyle = 'rgba(255,255,255,0.1)';
                     ctx.beginPath();
                     ctx.roundRect(40, pipCanvas.height - 40, barWidth, 12, 6);
                     ctx.fill();
                     
-                    ctx.fillStyle = isBreak ? '#10b981' : '#2dd4bf'; // emerald-500 or teal-400
+                    ctx.fillStyle = isBreak ? '#10b981' : '#2dd4bf';
                     ctx.beginPath();
                     ctx.roundRect(40, pipCanvas.height - 40, barWidth * Math.max(0, Math.min(1, progress)), 12, 6);
                     ctx.fill();
@@ -4596,7 +5228,6 @@
                             await document.exitPictureInPicture();
                         } else {
                             if (pipVideo && pipCanvas) {
-                                // Initialize the video stream from the canvas at 10fps (plenty for a timer)
                                 if (!pipVideo.srcObject) {
                                     pipVideo.srcObject = pipCanvas.captureStream(10); 
                                     await pipVideo.play();
@@ -4611,7 +5242,6 @@
                         }
                     });
                 }
-                // --- End PiP Engine Setup ---
 
                 const defaultVibes = [
                     { title: "Ignition", icon: "🚀", desc: "Clear the deck. Review priorities. Set the pace." },
@@ -4724,7 +5354,6 @@
                         </div>
                     `;
 
-                    // Move Up logic
                     div.querySelector('.move-up-vibe-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (div.previousElementSibling && div.previousElementSibling.classList.contains('vibe-row')) {
@@ -4733,7 +5362,6 @@
                         }
                     });
 
-                    // Move Down logic
                     div.querySelector('.move-down-vibe-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (div.nextElementSibling && div.nextElementSibling.classList.contains('vibe-row')) {
@@ -4742,16 +5370,13 @@
                         }
                     });
 
-                    // Remove logic
                     div.querySelector('.remove-vibe-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         div.remove();
                         updateVibeRowIndices();
                     });
 
-                    // Drag and Drop Logic (Desktop)
                     div.addEventListener('dragstart', (e) => {
-                        // Don't drag if user is just trying to select text in an input
                         if(e.target.tagName === 'INPUT') {
                             e.preventDefault();
                             return;
@@ -4893,7 +5518,6 @@
                     
                     div.querySelector('.remove-break').addEventListener('click', () => div.remove());
                     
-                    // Auto-calculate end time if a duration is specified
                     if (durationMins) {
                         const startIn = div.querySelector('.break-start');
                         const endIn = div.querySelector('.break-end');
@@ -5251,7 +5875,6 @@
                     const now = new Date().getTime();
 
                     if (now < startTimeValue) {
-                        // PRE-SHIFT MODE: Countdown to start time
                         const startsIn = startTimeValue - now;
                         const h = Math.floor((startsIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         const m = Math.floor((startsIn % (1000 * 60 * 60)) / (1000 * 60));
@@ -5271,34 +5894,11 @@
                             const mTitle = document.getElementById('current-hour-title');
                             const mIcon = document.getElementById('current-hour-icon');
                             const mDesc = document.getElementById('current-hour-content');
-                    const markDoneBtn = document.getElementById('mark-vibe-done-btn');
-                    const progCounter = document.getElementById('vibe-progress-counter');
+                            if(mTitle) { mTitle.textContent = "Getting ready to start..."; mTitle.classList.remove('opacity-50', 'line-through'); }
+                            if(mIcon) mIcon.textContent = "⏳";
+                            if(mDesc) mDesc.innerHTML = `<p>Your shift will begin shortly.</p>`;
 
-                    if(mTitle) {
-                        mTitle.textContent = vibe.title;
-                        if (shiftVibeStatus && shiftVibeStatus[index]) {
-                            mTitle.classList.add('opacity-50', 'line-through');
-                        } else {
-                            mTitle.classList.remove('opacity-50', 'line-through');
-                        }
-                    }
-                    if(mIcon) mIcon.textContent = vibe.icon;
-                    if(mDesc) mDesc.innerHTML = `<p>${vibe.desc}</p>`;
-
-                    if (markDoneBtn) {
-                        if (shiftVibeStatus && shiftVibeStatus[index]) {
-                            markDoneBtn.className = 'p-1.5 bg-emerald-500 text-white rounded-md transition-all border border-emerald-400 flex items-center justify-center cursor-pointer relative z-20 shadow-[0_0_10px_rgba(16,185,129,0.4)] scale-105 ml-1';
-                        } else {
-                            markDoneBtn.className = 'p-1.5 bg-white/5 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 rounded-md transition-all border border-white/10 flex items-center justify-center cursor-pointer relative z-20 group ml-1';
-                        }
-                    }
-
-                    if (progCounter && shiftVibeStatus) {
-                        const completedCount = shiftVibeStatus.filter(v => v).length;
-                        progCounter.textContent = `${completedCount} / ${totalSegments} Done`;
-                    }
-
-                    const dTitle = document.getElementById('dash-vibe-title');
+                            const dTitle = document.getElementById('dash-vibe-title');
                             const dIcon = document.getElementById('dash-vibe-icon');
                             const dTask = document.getElementById('dash-vibe-task');
                             if(dTitle) dTitle.textContent = "Pre-Shift Prep";
@@ -5306,10 +5906,8 @@
                             if(dTask) dTask.textContent = "Getting ready to start...";
                         }
                     } else {
-                        // NORMAL SHIFT MODE: Shift is active
                         const remaining = endTime - now;
 
-                        // Adherence: Shift End
                         if (now >= endTime && !adherenceFlags.end) {
                             adherenceFlags.end = true;
                             saveShiftData();
@@ -5323,7 +5921,6 @@
                             return;
                         }
 
-                        // Restore normal labels the second the shift actually starts
                         const dashEnd = document.getElementById('dash-mini-timer-end');
                         if (dashEnd && dashEnd.textContent === "PRE-SHIFT") {
                             const endDateObj = new Date(endTime);
@@ -5332,9 +5929,8 @@
                             dashEnd.textContent = endStr;
                             const breachEnd = document.getElementById('breach-mini-timer-end');
                             if(breachEnd) breachEnd.textContent = endStr;
-                            currentVibeIndex = -1; // Force vibe update
+                            currentVibeIndex = -1;
                             
-                            // Adherence: Shift Start
                             if (!adherenceFlags.start) {
                                 adherenceFlags.start = true;
                                 saveShiftData();
@@ -5361,7 +5957,6 @@
                         }
                     }
 
-                    // Manage Active Break Display Overlay (runs in both modes)
                     const activeBreak = shiftBreaks.find(b => now >= b.startMs && now < b.endMs);
                     const breakDisplay = document.getElementById('break-active-display');
                     const breakTimerLarge = document.getElementById('break-timer-large');
@@ -5411,7 +6006,6 @@
                         }
                     }
 
-                    // Manage Next Break Countdown on Dashboard
                     const nextBreakLabel = document.getElementById('next-break-time-label');
                     const nextBreakCountdown = document.getElementById('time-to-next-break');
                     const breachMiniBreak = document.getElementById('breach-mini-timer-break');
@@ -5440,9 +6034,7 @@
                         if (breachMiniBreak) breachMiniBreak.textContent = "--:--";
                     }
 
-                    // Break Adherence Check & Notifications
                     shiftBreaks.forEach((brk, index) => {
-                        // 60-second warning before break starts
                         if (now >= brk.startMs - 60000 && now < brk.startMs && !warnedBreaksStart.has(index)) {
                             warnedBreaksStart.add(index);
                             triggerBreakAlert('start', brk.isHealthBreak);
@@ -5452,7 +6044,6 @@
                             );
                         }
                         
-                        // 60-second warning before break ends
                         if (now >= brk.endMs - 60000 && now < brk.endMs && !warnedBreaksEnd.has(index)) {
                             warnedBreaksEnd.add(index);
                             triggerBreakAlert('end', brk.isHealthBreak);
@@ -5462,7 +6053,6 @@
                             );
                         }
 
-                        // Adherence: Standard Breaks
                         if (!brk.isHealthBreak) {
                             if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
                                 adherenceFlags.breakStarts.push(index);
@@ -5482,7 +6072,6 @@
                                 showBrowserNotification("Break Ended", "Welcome back! Let's get to it.");
                             }
                         } else {
-                            // Notify silently for health breaks when they start
                             if (now >= brk.startMs && !adherenceFlags.breakStarts.includes(index)) {
                                 adherenceFlags.breakStarts.push(index);
                                 saveShiftData();
@@ -5491,7 +6080,6 @@
                         }
                     });
 
-                    // Update Picture-in-Picture Canvas Frame
                     if (pipVideo && document.pictureInPictureElement === pipVideo) {
                         const remaining = endTime - now;
                         const shiftH = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -5539,18 +6127,16 @@
                         const now = new Date().getTime();
                         
                         if (savedShift.endMs > now) {
-                            // Check if this is just an update to the CURRENTLY running shift (e.g., syncing from another device)
                             if (startTimeValue === savedShift.startMs && endTime === savedShift.endMs) {
                                 shiftBreaks = savedShift.breaks || [];
                                 adherenceFlags = savedShift.adherence || { start: false, end: false, breakStarts: [], breakEnds: [] };
                                 shiftVibeStatus = savedShift.vibeStatus || new Array(totalSegments).fill(false);
                                 if (currentVibeIndex !== -1) {
-                                    updateVibeUI(currentVibeIndex); // Soft update to prevent full UI flash
+                                    updateVibeUI(currentVibeIndex);
                                 }
                                 return true;
                             }
 
-                            // Completely new or different shift, rebuild fully
                             startTimeValue = savedShift.startMs;
                             endTime = savedShift.endMs;
                             totalDuration = endTime - startTimeValue;
@@ -5578,7 +6164,6 @@
                             if(countdownView) countdownView.classList.remove('hidden');
                             if(endMessage) endMessage.classList.add('hidden');
                             
-                            // Initialize dash text based on current time context
                             const dashEnd = document.getElementById('dash-mini-timer-end');
                             const breachEnd = document.getElementById('breach-mini-timer-end');
                             if (now < startTimeValue) {
@@ -5601,7 +6186,6 @@
                         }
                     }
                     
-                    // If we reach here, there is no active shift. Clean up if one was running locally.
                     if (shiftInterval) {
                         clearInterval(shiftInterval);
                         shiftInterval = null;
@@ -5642,27 +6226,20 @@
                     restoreActiveShift();
                 });
 
-                // --- Automatic Shift Detection System ---
-                // Automatically start a standard 12-hour shift if we login during typical night/early shift hours
                 function attemptAutoStartShift() {
-                    if (localStorage.getItem('activeShiftData')) return; // Already running
+                    if (localStorage.getItem('activeShiftData')) return;
 
                     const now = new Date();
                     const currentHour = now.getHours();
                     
-                    // Pre-fill shift if between 16:00 and 07:00 based on standard schedule
-                    // CRITICAL: We DO NOT auto-start the timer here anymore, to prevent race conditions 
-                    // where a new device logs in and overwrites an active cloud shift before it finishes downloading.
                     if (currentHour >= 16 || currentHour < 7) {
-                        setTimes(19, 7); // Default logic to 19:00 - 07:00
-                        if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click(); // Load default breaks
+                        setTimes(19, 7);
+                        if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click();
                     }
                 }
                 
-                // Immediately restore the UI if a shift is already active
                 restoreActiveShift();
 
-                // Fire auto-start only once when dashboard fully initializes
                 setTimeout(attemptAutoStartShift, 1500);
 
                 if(startBtn) {
@@ -5705,16 +6282,14 @@
                         
                         totalSegments = Math.max(1, Math.ceil(totalDuration / (1000 * 60 * 60)));
 
-                        // Generate Health Breaks if toggled
                         const healthToggle = document.getElementById('health-breaks-toggle');
                         if (healthToggle && healthToggle.checked) {
                             for (let i = 0; i < totalSegments; i++) {
                                 const hStart = startTimeValue + i * 3600000;
-                                const hbStart = hStart + 55 * 60000; // 55 mins into the hour
-                                const hbEnd = hStart + 60 * 60000; // 60 mins into the hour (end of hour)
+                                const hbStart = hStart + 55 * 60000;
+                                const hbEnd = hStart + 60 * 60000;
                                 
                                 if (hbEnd <= endTime) {
-                                    // Make sure it doesn't overlap with a manual break
                                     const overlap = shiftBreaks.some(b => (hbStart < b.endMs && hbEnd > b.startMs));
                                     if (!overlap) {
                                         shiftBreaks.push({ startMs: hbStart, endMs: hbEnd, isHealthBreak: true });
@@ -5737,7 +6312,6 @@
                         if(countdownView) countdownView.classList.remove('hidden');
                         if(endMessage) endMessage.classList.add('hidden');
                         
-                        // Set text labels depending on if we are in Pre-Shift or not
                         const dashEnd = document.getElementById('dash-mini-timer-end');
                         const breachEnd = document.getElementById('breach-mini-timer-end');
                         const nowMs = Date.now();
@@ -5805,7 +6379,6 @@
                     });
                 }
 
-                // Shift Register Logic
                 document.querySelectorAll('.shift-reg-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const targetBtn = e.currentTarget;
@@ -5858,7 +6431,7 @@
                         btn.innerHTML = `<span class="relative z-10 block">${comment}</span>`;
                         
                         btn.addEventListener('click', () => {
-                            if (btn.dataset.copied === 'true') return; // Prevent double-click bugs
+                            if (btn.dataset.copied === 'true') return;
                             btn.dataset.copied = 'true';
 
                             navigator.clipboard.writeText(comment).catch(() => {
@@ -5919,14 +6492,12 @@
                 appLayout.classList.remove('hidden-fade');
                 appLayout.classList.add('visible-fade');
                 
-                // Fetch the absolute latest data from the server before initializing
                 fetchLatestCloudData(username).then(() => {
                     initializeDashboard();
                     
+                    const hashView = location.hash ? location.hash.slice(1) : null;
                     const lastView = localStorage.getItem('lastActiveView');
-                    if (lastView) {
-                        navigateToView(lastView);
-                    }
+                    navigateToView(hashView || lastView || 'dashboard-home');
                     
                     setupRealtimeSubscription(username);
                 });
