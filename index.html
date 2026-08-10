@@ -1124,24 +1124,42 @@
                                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Generated Dates</h2>
                                     <span id="ot-gen-month-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full"></span>
                                 </div>
-                                <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
-                                    <span>Copy Table</span>
-                                </button>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div id="ot-bulk-actions" class="hidden items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-800/50 mr-2">
+                                        <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mr-1"><span id="ot-selected-count">0</span> selected</span>
+                                        <select id="ot-bulk-action-select" class="text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option value="">Bulk Action...</option>
+                                            <option value="confirmed">Mark Confirmed</option>
+                                            <option value="completed">Mark Completed</option>
+                                            <option value="pending">Mark Pending</option>
+                                            <option value="delete">Delete Selected</option>
+                                        </select>
+                                        <button id="ot-bulk-apply-btn" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors">Apply</button>
+                                    </div>
+                                    <button id="ot-copy-btn" class="px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-colors text-sm flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
+                                        <span>Copy Table</span>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-600 flex-1">
                                 <table class="w-full text-left text-sm text-slate-800 dark:text-slate-300">
                                     <thead class="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-600">
                                         <tr>
+                                            <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-600 w-12 text-center">
+                                                <input type="checkbox" id="ot-select-all" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800 cursor-pointer w-4 h-4">
+                                            </th>
                                             <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">OT Request Date</th>
                                             <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">Time</th>
-                                            <th class="px-4 py-3 font-bold">Duties Trained on</th>
+                                            <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600">Duties Trained on</th>
+                                            <th class="px-4 py-3 font-bold border-r border-slate-200 dark:border-slate-600 text-center">Status</th>
+                                            <th class="px-4 py-3 font-bold text-center w-12">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="ot-gen-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800/50 font-mono text-xs">
                                         <tr>
-                                            <td colspan="3" class="px-4 py-8 text-center text-slate-500 italic font-sans">Click "Generate Requests" to calculate dates.</td>
+                                            <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic font-sans">Click "Generate Requests" to calculate dates.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -3967,8 +3985,92 @@
                 const copyBtn = document.getElementById('ot-copy-btn');
                 const clearBtn = document.getElementById('ot-clear-btn');
                 
+                const selectAllCheckbox = document.getElementById('ot-select-all');
+                const bulkActionsPanel = document.getElementById('ot-bulk-actions');
+                const selectedCountLabel = document.getElementById('ot-selected-count');
+                const bulkActionSelect = document.getElementById('ot-bulk-action-select');
+                const bulkApplyBtn = document.getElementById('ot-bulk-apply-btn');
+                let selectedOTIndices = new Set();
+                
                 if (!startInput || !btn) return;
                 
+                function updateBulkUI() {
+                    if (!bulkActionsPanel) return;
+                    if (selectedOTIndices.size > 0) {
+                        bulkActionsPanel.classList.remove('hidden');
+                        bulkActionsPanel.classList.add('flex');
+                        if (selectedCountLabel) selectedCountLabel.textContent = selectedOTIndices.size;
+                    } else {
+                        bulkActionsPanel.classList.add('hidden');
+                        bulkActionsPanel.classList.remove('flex');
+                    }
+                    
+                    if (tbody && selectAllCheckbox) {
+                        const visibleCheckboxes = tbody.querySelectorAll('.ot-row-checkbox');
+                        if (visibleCheckboxes.length > 0) {
+                            const allChecked = Array.from(visibleCheckboxes).every(cb => cb.checked);
+                            selectAllCheckbox.checked = allChecked;
+                        } else {
+                            selectAllCheckbox.checked = false;
+                        }
+                    }
+                }
+
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', (e) => {
+                        const visibleCheckboxes = tbody.querySelectorAll('.ot-row-checkbox');
+                        const isChecked = e.target.checked;
+                        visibleCheckboxes.forEach(cb => {
+                            cb.checked = isChecked;
+                            const idx = parseInt(cb.dataset.index, 10);
+                            if (isChecked) selectedOTIndices.add(idx);
+                            else selectedOTIndices.delete(idx);
+                        });
+                        updateBulkUI();
+                    });
+                }
+
+                if (bulkApplyBtn) {
+                    bulkApplyBtn.addEventListener('click', () => {
+                        const action = bulkActionSelect.value;
+                        if (!action || selectedOTIndices.size === 0) return;
+                        
+                        if (action === 'delete') {
+                            if (confirm(`Are you sure you want to delete ${selectedOTIndices.size} selected requests?`)) {
+                                generatedResults = generatedResults.filter((_, i) => !selectedOTIndices.has(i));
+                                selectedOTIndices.clear();
+                                saveAndRenderOT();
+                            }
+                        } else {
+                            const defaultRate = parseFloat(localStorage.getItem('myndarcOtRate')) || 0;
+                            selectedOTIndices.forEach(idx => {
+                                const req = generatedResults[idx];
+                                if (!req) return;
+                                
+                                if (action === 'confirmed') {
+                                    req.status = 'confirmed';
+                                    req.confirmed = true;
+                                } else if (action === 'pending') {
+                                    req.status = 'pending';
+                                    req.confirmed = false;
+                                    delete req.hours;
+                                    delete req.rate;
+                                    delete req.actualStart;
+                                    delete req.actualEnd;
+                                } else if (action === 'completed') {
+                                    req.status = 'completed';
+                                    req.confirmed = true;
+                                    if (req.hours == null) req.hours = 10;
+                                    if (req.rate == null) req.rate = defaultRate;
+                                }
+                            });
+                            selectedOTIndices.clear();
+                            bulkActionSelect.value = '';
+                            saveAndRenderOT();
+                        }
+                    });
+                }
+
                 const today = new Date();
                 const offset = today.getTimezoneOffset() * 60000;
                 const localISOTime = (new Date(Date.now() - offset)).toISOString().split('T')[0];
@@ -4333,6 +4435,9 @@
                 }
 
                 function renderOT() {
+                    selectedOTIndices.clear();
+                    updateBulkUI();
+
                     const genMonthLabelEl = document.getElementById('ot-gen-month-label');
                     const viewedDateForGen = currentCalDate || new Date();
                     const padGen = n => String(n).padStart(2, '0');
@@ -4358,7 +4463,7 @@
                         });
 
                         if (monthRows.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500 italic font-sans">No overtime requests for ${viewedDateForGen.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}.</td></tr>`;
+                            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 italic font-sans">No overtime requests for ${viewedDateForGen.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}.</td></tr>`;
                         } else {
                             monthRows.forEach((row) => {
                                 const i = generatedResults.indexOf(row);
@@ -4374,9 +4479,14 @@
                                     statusText = '✓ Completed';
                                 }
 
+                                const isChecked = selectedOTIndices.has(i) ? 'checked' : '';
+
                                 const tr = document.createElement('tr');
                                 tr.className = "hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group";
                                 tr.innerHTML = `
+                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-center align-middle">
+                                        <input type="checkbox" class="ot-row-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800 cursor-pointer w-4 h-4" data-index="${i}" ${isChecked}>
+                                    </td>
                                     <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold whitespace-nowrap">${row.date}</td>
                                     <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">${row.time}</td>
                                     <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${row.duties}</td>
@@ -4542,6 +4652,15 @@
                 }
 
                 if (tbody) {
+                    tbody.addEventListener('change', (e) => {
+                        if (e.target.classList.contains('ot-row-checkbox')) {
+                            const idx = parseInt(e.target.dataset.index, 10);
+                            if (e.target.checked) selectedOTIndices.add(idx);
+                            else selectedOTIndices.delete(idx);
+                            updateBulkUI();
+                        }
+                    });
+
                     tbody.addEventListener('click', (e) => {
                         const statusBtn = e.target.closest('.ot-status-btn');
                         if (statusBtn) {
