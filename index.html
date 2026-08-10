@@ -4487,9 +4487,15 @@
                                     <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-center align-middle">
                                         <input type="checkbox" class="ot-row-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800 cursor-pointer w-4 h-4" data-index="${i}" ${isChecked}>
                                     </td>
-                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 font-bold whitespace-nowrap">${row.date}</td>
-                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">${row.time}</td>
-                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${row.duties}</td>
+                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap text-indigo-600 dark:text-indigo-400 font-bold">
+                                        ${row.date}
+                                    </td>
+                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                                        <input type="text" class="ot-inline-edit bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-indigo-500 w-32 px-1 py-0.5 transition-colors text-slate-800 dark:text-slate-300 focus:outline-none" data-index="${i}" data-field="time" value="${row.time}" title="Click to edit time">
+                                    </td>
+                                    <td class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">
+                                        <input type="text" class="ot-inline-edit bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-indigo-500 w-full min-w-[120px] px-1 py-0.5 transition-colors text-slate-600 dark:text-slate-400 focus:outline-none" data-index="${i}" data-field="duties" value="${row.duties}" title="Click to edit duties">
+                                    </td>
                                     <td class="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-700 align-middle">
                                         <button class="ot-status-btn px-3 py-1.5 rounded border ${statusBtnClass} text-[10px] font-bold uppercase tracking-wider transition-all w-full max-w-[100px]" data-index="${i}">
                                             ${statusText}
@@ -4658,6 +4664,16 @@
                             if (e.target.checked) selectedOTIndices.add(idx);
                             else selectedOTIndices.delete(idx);
                             updateBulkUI();
+                        } else if (e.target.classList.contains('ot-inline-edit')) {
+                            const idx = parseInt(e.target.dataset.index, 10);
+                            const field = e.target.dataset.field;
+                            generatedResults[idx][field] = e.target.value;
+                            
+                            if (field === 'date') {
+                                saveAndRenderOT(); 
+                            } else {
+                                localStorage.setItem('myndarcOTRequests', JSON.stringify(generatedResults));
+                            }
                         }
                     });
 
