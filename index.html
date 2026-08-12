@@ -3272,7 +3272,71 @@
                 const hourlyCount = document.getElementById('breach-hourly-count');
                 const todayTotal = document.getElementById('breach-today-total');
                 if(!blocksContainer) return;
-                
+
+                let draggedBreachId = null;
+                const dropHighlightClass = ['ring-2', 'ring-indigo-400', 'dark:ring-indigo-500'];
+
+                blocksContainer.addEventListener('dragstart', (e) => {
+                    const itemEl = e.target.closest('.breach-item');
+                    if (!itemEl) return;
+                    draggedBreachId = itemEl.dataset.id;
+                    itemEl.classList.add('opacity-40');
+                    if (e.dataTransfer) {
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', draggedBreachId);
+                    }
+                });
+
+                blocksContainer.addEventListener('dragend', (e) => {
+                    const itemEl = e.target.closest('.breach-item');
+                    if (itemEl) itemEl.classList.remove('opacity-40');
+                    draggedBreachId = null;
+                    blocksContainer.querySelectorAll('.hour-scroll-container').forEach(el => el.classList.remove(...dropHighlightClass));
+                });
+
+                blocksContainer.addEventListener('dragover', (e) => {
+                    const dropZone = e.target.closest('.hour-scroll-container');
+                    if (!dropZone) return;
+                    e.preventDefault();
+                    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                });
+
+                blocksContainer.addEventListener('dragenter', (e) => {
+                    const dropZone = e.target.closest('.hour-scroll-container');
+                    if (!dropZone) return;
+                    e.preventDefault();
+                    dropZone.classList.add(...dropHighlightClass);
+                });
+
+                blocksContainer.addEventListener('dragleave', (e) => {
+                    const dropZone = e.target.closest('.hour-scroll-container');
+                    if (!dropZone) return;
+                    if (dropZone.contains(e.relatedTarget)) return;
+                    dropZone.classList.remove(...dropHighlightClass);
+                });
+
+                blocksContainer.addEventListener('drop', (e) => {
+                    const dropZone = e.target.closest('.hour-scroll-container');
+                    if (!dropZone) return;
+                    e.preventDefault();
+                    dropZone.classList.remove(...dropHighlightClass);
+
+                    const id = draggedBreachId || (e.dataTransfer ? e.dataTransfer.getData('text/plain') : null);
+                    const newHour = dropZone.dataset.hour;
+                    if (!id || !newHour) return;
+
+                    const items = JSON.parse(localStorage.getItem('breachItems')) || [];
+                    const idx = items.findIndex(i => i.id === id);
+                    if (idx > -1 && items[idx].targetHour !== newHour) {
+                        items[idx].targetHour = newHour;
+                        localStorage.setItem('breachItems', JSON.stringify(items));
+                        renderList();
+                        renderBreachCompletionTable();
+                        renderBreachStats();
+                    }
+                    draggedBreachId = null;
+                });
+
                 function updateCurrentSessionHour() {
                     const labelEl = document.getElementById('breach-current-hour-label');
                     if(labelEl) {
@@ -3423,8 +3487,9 @@
                             itemsHtml = '<p class="text-sm text-center text-slate-400 py-8 italic">No breaches logged for this hour.</p>';
                         } else {
                             itemsHtml = blockItems.map(item => `
-                                <div class="${item.completed ? 'completed-item' : 'uncompleted-item'} flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 group transition-colors hover:border-indigo-200 dark:hover:border-indigo-800/50 hover:bg-white dark:hover:bg-slate-800">
+                                <div class="breach-item ${item.completed ? 'completed-item' : 'uncompleted-item'} flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/30 group transition-colors hover:border-indigo-200 dark:hover:border-indigo-800/50 hover:bg-white dark:hover:bg-slate-800 cursor-grab active:cursor-grabbing" draggable="true" data-id="${item.id}">
                                     <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                                        <svg class="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20" title="Drag to move"><path d="M7 4a1 1 0 11-2 0 1 1 0 012 0zM7 10a1 1 0 11-2 0 1 1 0 012 0zM7 16a1 1 0 11-2 0 1 1 0 012 0zM15 4a1 1 0 11-2 0 1 1 0 012 0zM15 10a1 1 0 11-2 0 1 1 0 012 0zM15 16a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
                                         <button class="toggle-complete w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-500'}" data-id="${item.id}">
                                             ${item.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
                                         </button>
