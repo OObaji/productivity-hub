@@ -712,7 +712,7 @@
                              <div class="space-y-6">
                                 <div class="text-left">
                                     <label class="block text-xs font-bold text-teal-200 uppercase tracking-widest mb-2 ml-1">Shift Name</label>
-                                    <input type="text" id="shift-title-input" placeholder="e.g., Night Shift Grind" value="Let's get this bread!" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg placeholder-gray-500 font-medium">
+                                    <input type="text" id="shift-title-input" placeholder="e.g., Day Shift" value="Let's get this bread!" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg placeholder-gray-500 font-medium">
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div class="text-left">
@@ -724,9 +724,17 @@
                                         <input type="datetime-local" id="shift-end-time-input" class="w-full p-4 rounded-2xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-lg appearance-none font-mono">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 sm:gap-4">
-                                    <button id="preset-normal-btn" class="p-3 sm:p-4 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-2xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">Normal (19:00 - 07:00)</button>
-                                    <button id="preset-early-btn" class="p-3 sm:p-4 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-100 rounded-2xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">Early (17:00 - 05:00)</button>
+                                <div class="bg-teal-500/10 p-4 rounded-2xl border border-teal-500/30">
+                                    <div class="flex items-center justify-between gap-3 mb-3">
+                                        <label class="text-xs font-bold text-teal-200 uppercase tracking-widest">Usual Hours</label>
+                                        <p class="text-[10px] text-teal-100/50">Saved as your default</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="time" id="usual-shift-start" class="flex-1 min-w-0 p-3 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-sm font-mono">
+                                        <span class="text-white/50">-</span>
+                                        <input type="time" id="usual-shift-end" class="flex-1 min-w-0 p-3 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-sm font-mono">
+                                    </div>
+                                    <button id="preset-usual-btn" class="mt-3 w-full p-3 bg-teal-500/10 hover:bg-teal-500/30 border border-teal-500/30 text-teal-100 rounded-xl transition-all font-bold text-xs sm:text-sm hover:scale-[1.02]">Use Usual Hours</button>
                                 </div>
                                 <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
                                     <div class="flex justify-between items-center mb-4">
@@ -1138,7 +1146,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcBasicPayNew', 'myndarcOtRate', 'myndarcPartTimePay', 'myndarcPartTimeEnabled'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcBasicPayNew', 'myndarcOtRate', 'myndarcPartTimePay', 'myndarcPartTimeEnabled', 'myndarcUsualShiftHours'];
         let isSyncingFromServer = false; 
         let realtimeSubscription = null;
         const cloudDataStore = {}; 
@@ -2366,8 +2374,20 @@
                 const startInput = document.getElementById('shift-start-time-input');
                 const endInput = document.getElementById('shift-end-time-input');
                 
-                const presetNormal = document.getElementById('preset-normal-btn');
-                const presetEarly = document.getElementById('preset-early-btn');
+                const presetUsual = document.getElementById('preset-usual-btn');
+                const usualStartInput = document.getElementById('usual-shift-start');
+                const usualEndInput = document.getElementById('usual-shift-end');
+
+                // The user's normal working hours (editable in Shift Setup); defaults to a 07:00-15:00 day shift.
+                const DEFAULT_USUAL_HOURS = { start: '07:00', end: '15:00' };
+                function getUsualHours() {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('myndarcUsualShiftHours'));
+                        if (saved && saved.start && saved.end) return saved;
+                    } catch (e) {}
+                    return { ...DEFAULT_USUAL_HOURS };
+                }
+                const toMins = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
 
                 const locHomeBtn = document.getElementById('loc-home-btn');
                 const locOfficeBtn = document.getElementById('loc-office-btn');
@@ -2531,7 +2551,8 @@
                         baseTimeMs = new Date(startInput.value).getTime();
                     } else {
                         const now = new Date();
-                        now.setHours(19, 0, 0, 0);
+                        const startMins = toMins(getUsualHours().start);
+                        now.setHours(Math.floor(startMins / 60), startMins % 60, 0, 0);
                         baseTimeMs = now.getTime();
                     }
 
@@ -2784,20 +2805,22 @@
                     return date.getTime();
                 }
 
-                function setTimes(startHour, endHour) {
+                // Fills the start/end inputs with the next (or current) shift for the given "HH:MM" times.
+                function setTimes(startTime, endTime) {
+                    const startMins = toMins(startTime);
+                    const endMins = toMins(endTime);
                     const now = new Date();
                     const end = new Date(now);
-                    end.setHours(endHour, 0, 0, 0);
+                    end.setHours(Math.floor(endMins / 60), endMins % 60, 0, 0);
                     
                     if (end.getTime() <= now.getTime()) {
                         end.setDate(end.getDate() + 1);
                     }
                     
-                    let durationHours = endHour - startHour;
-                    if (durationHours <= 0) durationHours += 24;
+                    let durationMins = endMins - startMins;
+                    if (durationMins <= 0) durationMins += 24 * 60;
                     
-                    const start = new Date(end);
-                    start.setHours(end.getHours() - durationHours);
+                    const start = new Date(end.getTime() - durationMins * 60 * 1000);
 
                     const toLocalISO = (d) => {
                         const pad = (n) => String(n).padStart(2, '0');
@@ -2808,12 +2831,37 @@
                     if(endInput) endInput.value = toLocalISO(end);
                 }
 
-                if(startInput && !startInput.value) {
-                    setTimes(19, 7);
+                const applyUsualHours = () => { const u = getUsualHours(); setTimes(u.start, u.end); };
+
+                function renderUsualHours() {
+                    const u = getUsualHours();
+                    if (usualStartInput) usualStartInput.value = u.start;
+                    if (usualEndInput) usualEndInput.value = u.end;
+                    if (presetUsual) presetUsual.textContent = `Use Usual Hours (${u.start} - ${u.end})`;
                 }
 
-                if(presetNormal) presetNormal.addEventListener('click', () => setTimes(19, 7));
-                if(presetEarly) presetEarly.addEventListener('click', () => setTimes(17, 5));
+                function saveUsualHours() {
+                    if (!usualStartInput.value || !usualEndInput.value) return;
+                    if (usualStartInput.value === usualEndInput.value) {
+                        showAlert('Start and end time can\'t be the same.');
+                        renderUsualHours();
+                        return;
+                    }
+                    localStorage.setItem('myndarcUsualShiftHours', JSON.stringify({ start: usualStartInput.value, end: usualEndInput.value }));
+                    renderUsualHours();
+                    if (!localStorage.getItem('activeShiftData')) applyUsualHours();
+                }
+
+                if (usualStartInput) usualStartInput.addEventListener('change', saveUsualHours);
+                if (usualEndInput) usualEndInput.addEventListener('change', saveUsualHours);
+                window.addEventListener('cloudDataSynced', renderUsualHours);
+                renderUsualHours();
+
+                if(startInput && !startInput.value) {
+                    applyUsualHours();
+                }
+
+                if(presetUsual) presetUsual.addEventListener('click', applyUsualHours);
 
                 function renderTimeline(segments, startMs, endMs) {
                     const container = document.getElementById('shift-blocks-container');
@@ -3432,11 +3480,18 @@
                 function attemptAutoStartShift() {
                     if (localStorage.getItem('activeShiftData')) return;
 
+                    // Pre-fill the usual shift (and break template) from 3h before it starts until it ends.
                     const now = new Date();
-                    const currentHour = now.getHours();
+                    const u = getUsualHours();
+                    const nowMins = now.getHours() * 60 + now.getMinutes();
+                    const windowStart = (toMins(u.start) - 180 + 1440) % 1440;
+                    const windowEnd = toMins(u.end);
+                    const inWindow = windowStart < windowEnd
+                        ? nowMins >= windowStart && nowMins < windowEnd
+                        : nowMins >= windowStart || nowMins < windowEnd;
                     
-                    if (currentHour >= 16 || currentHour < 7) {
-                        setTimes(19, 7);
+                    if (inWindow) {
+                        applyUsualHours();
                         if (document.getElementById('load-my-breaks-btn')) document.getElementById('load-my-breaks-btn').click();
                     }
                 }
