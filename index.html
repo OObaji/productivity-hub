@@ -584,6 +584,7 @@
                                     <span id="dash-vibe-icon" class="text-4xl filter drop-shadow-md">💤</span>
                                 </div>
                                 <p id="dash-vibe-task" class="text-slate-600 dark:text-slate-400 font-medium relative z-10 text-lg">Start a shift to see your vibe.</p>
+                                <p id="dash-case-ref" class="hidden mt-3 text-sm font-mono font-bold text-teal-600 dark:text-teal-400 relative z-10"></p>
                                 <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 relative z-10 flex justify-between items-center">
                                     <span class="text-sm text-slate-500 dark:text-slate-400 font-medium">Keep up the momentum!</span>
                                     <span class="text-sm text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">Go to Shift Station <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
@@ -708,6 +709,10 @@
                                 <button id="edit-plan-btn" class="text-[10px] uppercase font-bold tracking-wider px-4 py-3 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 rounded-xl border border-indigo-500/20 transition-all flex items-center gap-2 shadow-lg">
                                     ✏️ Edit Vibes
                                 </button>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 -mt-4 mb-8">
+                                <span class="text-[10px] font-bold text-teal-200 uppercase tracking-widest">WFH Days</span>
+                                <div id="wfh-days" class="flex gap-1.5"></div>
                             </div>
                              <div class="space-y-6">
                                 <div class="text-left">
@@ -934,6 +939,17 @@
                                         <div class="w-16 h-16 bg-white/5 rounded-2xl flex flex-shrink-0 items-center justify-center border border-white/10 shadow-inner self-start"><span id="current-hour-icon" class="text-4xl filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🚀</span></div>
                                     </div>
                                     <div id="current-hour-content" class="relative z-10 text-gray-300 text-lg leading-relaxed font-light grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                                    <div class="relative z-10 mt-6 bg-black/20 p-4 rounded-2xl border border-white/5">
+                                        <label for="current-case-ref" class="block text-[10px] font-bold text-teal-200 uppercase tracking-widest mb-2">Case Ref This Hour</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="current-case-ref" autocomplete="off" spellcheck="false" placeholder="e.g. FR-102938" class="flex-1 min-w-0 p-3 rounded-xl bg-black/40 text-white border border-white/10 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 transition-all text-sm font-mono placeholder-gray-500">
+                                            <button id="copy-case-ref-btn" type="button" class="px-4 py-3 bg-white/5 hover:bg-white/10 text-teal-200 text-xs font-bold uppercase tracking-widest rounded-xl border border-white/10 transition-all">Copy</button>
+                                        </div>
+                                        <div id="case-log" class="hidden mt-4 pt-4 border-t border-white/5">
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Case Log This Shift</p>
+                                            <div id="case-log-list" class="space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar pr-2"></div>
+                                        </div>
+                                    </div>
                                     <div class="pt-6 mt-6 border-t border-white/5 relative z-10 flex justify-end">
                                         <button id="reset-shift-btn" class="text-xs text-red-400/60 hover:text-red-300 hover:bg-red-500/10 py-2 px-4 rounded-lg transition-all uppercase tracking-widest font-bold flex items-center gap-2 group-btn"><span>End Shift Early</span><span class="opacity-0 group-btn-hover:opacity-100 transition-opacity">→</span></button>
                                     </div>
@@ -1146,7 +1162,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmcGdjcXRidGdmbW1ic2dxZGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNDEzNjMsImV4cCI6MjEwMDkxNzM2M30.hEqqe79Sr90HnjwjdZcZP6uyI1eRUhRHE4DVv3FWLq0';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcBasicPayNew', 'myndarcOtRate', 'myndarcPartTimePay', 'myndarcPartTimeEnabled', 'myndarcUsualShiftHours'];
+        const syncKeys = ['breachItems', 'customShiftVibes', 'activeShiftData', 'mindfulnessSessions', 'shiftNotificationSound', 'myndarcOTRequests', 'myndarcIdeaBoard', 'customOTDuties', 'myndarcEmailTemplate', 'myndarcEmailSignature', 'myndarcMonthlyTargets', 'myndarcBasicPay', 'myndarcBasicPayNew', 'myndarcOtRate', 'myndarcPartTimePay', 'myndarcPartTimeEnabled', 'myndarcUsualShiftHours', 'myndarcWfhDays', 'myndarcCaseRefs'];
         let isSyncingFromServer = false; 
         let realtimeSubscription = null;
         const cloudDataStore = {}; 
@@ -2400,6 +2416,87 @@
                 let currentVibeIndex = -1;
                 let shiftBreaks = []; 
                 let warnedBreaksStart = new Set();
+
+                // Case refs worked on each hour, stored as { [shiftStartMs]: { [hourIndex]: ref } }.
+                const caseRefInput = document.getElementById('current-case-ref');
+                const copyCaseRefBtn = document.getElementById('copy-case-ref-btn');
+                const MAX_STORED_SHIFTS = 60;
+                let caseRefShownIndex = null;
+                function getCaseRefs() {
+                    try { return JSON.parse(localStorage.getItem('myndarcCaseRefs')) || {}; } catch (e) { return {}; }
+                }
+                function getShiftCaseRefs() {
+                    return (startTimeValue && getCaseRefs()[startTimeValue]) || {};
+                }
+                function saveCaseRef(index, ref) {
+                    if (!startTimeValue || index < 0) return;
+                    const all = getCaseRefs();
+                    const shiftRefs = all[startTimeValue] || {};
+                    if (ref) shiftRefs[index] = ref; else delete shiftRefs[index];
+                    if (Object.keys(shiftRefs).length) all[startTimeValue] = shiftRefs; else delete all[startTimeValue];
+                    Object.keys(all).sort((a, b) => b - a).slice(MAX_STORED_SHIFTS).forEach(k => delete all[k]);
+                    localStorage.setItem('myndarcCaseRefs', JSON.stringify(all));
+                }
+                function hourLabel(index) {
+                    const pad = (n) => String(n).padStart(2, '0');
+                    const fmt = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                    const blockStart = new Date(startTimeValue + index * 60 * 60 * 1000);
+                    const blockEnd = new Date(Math.min(startTimeValue + (index + 1) * 60 * 60 * 1000, endTime || Infinity));
+                    return `${fmt(blockStart)} - ${fmt(blockEnd)}`;
+                }
+                function renderCaseRefs() {
+                    const refs = getShiftCaseRefs();
+                    const currentRef = currentVibeIndex >= 0 ? (refs[currentVibeIndex] || '') : '';
+                    // Don't clobber typing, unless the hour has rolled over and the field now belongs to a new hour.
+                    if (caseRefInput && (document.activeElement !== caseRefInput || caseRefShownIndex !== currentVibeIndex)) {
+                        caseRefInput.value = currentRef;
+                    }
+                    caseRefShownIndex = currentVibeIndex;
+
+                    const dashRef = document.getElementById('dash-case-ref');
+                    if (dashRef) {
+                        dashRef.textContent = currentRef ? `Case: ${currentRef}` : '';
+                        dashRef.classList.toggle('hidden', !currentRef);
+                    }
+
+                    const log = document.getElementById('case-log');
+                    const list = document.getElementById('case-log-list');
+                    if (!log || !list) return;
+                    const indices = Object.keys(refs).map(Number).sort((a, b) => a - b);
+                    log.classList.toggle('hidden', indices.length === 0);
+                    list.innerHTML = '';
+                    indices.forEach(i => {
+                        const row = document.createElement('div');
+                        row.className = `flex items-center justify-between gap-3 text-xs font-mono px-3 py-2 rounded-lg ${i === currentVibeIndex ? 'bg-teal-500/15 text-teal-100' : 'bg-white/5 text-slate-300'}`;
+                        const time = document.createElement('span');
+                        time.className = 'text-slate-500 shrink-0';
+                        time.textContent = `H${i + 1} · ${hourLabel(i)}`;
+                        const ref = document.createElement('button');
+                        ref.type = 'button';
+                        ref.title = 'Copy';
+                        ref.className = 'font-bold truncate hover:text-white transition-colors';
+                        ref.textContent = refs[i];
+                        ref.addEventListener('click', () => navigator.clipboard.writeText(refs[i]).catch(() => {}));
+                        row.append(time, ref);
+                        list.appendChild(row);
+                    });
+                }
+                if (caseRefInput) {
+                    caseRefInput.addEventListener('input', () => {
+                        saveCaseRef(currentVibeIndex, caseRefInput.value.trim());
+                        renderCaseRefs();
+                    });
+                }
+                if (copyCaseRefBtn) {
+                    copyCaseRefBtn.addEventListener('click', () => {
+                        const ref = caseRefInput ? caseRefInput.value.trim() : '';
+                        if (!ref) return;
+                        navigator.clipboard.writeText(ref).catch(() => {});
+                        copyCaseRefBtn.textContent = 'Copied';
+                        setTimeout(() => { copyCaseRefBtn.textContent = 'Copy'; }, 1200);
+                    });
+                }
+                window.addEventListener('cloudDataSynced', renderCaseRefs);
                 let warnedBreaksEnd = new Set();
                 let adherenceFlags = { start: false, end: false, breakStarts: [], breakEnds: [] };
                 let shiftVibeStatus = [];
@@ -2732,21 +2829,62 @@
                 });
 
                 if(locHomeBtn && locOfficeBtn) {
-                    locHomeBtn.addEventListener('click', () => {
+                    const selectHome = () => {
                         locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-teal-500/20 text-teal-300 border border-teal-500/50 shadow-[0_0_15px_rgba(45,212,191,0.15)]";
                         locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
-                    });
-                    locOfficeBtn.addEventListener('click', () => {
+                    };
+                    const selectOffice = () => {
                         locOfficeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]";
                         locHomeBtn.className = "px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-gray-400 hover:text-white border border-transparent";
-                    });
+                    };
+                    locHomeBtn.addEventListener('click', selectHome);
+                    locOfficeBtn.addEventListener('click', selectOffice);
+
+                    // Days worked from home (0 = Sun ... 6 = Sat); defaults to Thursday & Friday.
+                    const wfhDaysContainer = document.getElementById('wfh-days');
+                    const DEFAULT_WFH_DAYS = [4, 5];
+                    const getWfhDays = () => {
+                        try {
+                            const saved = JSON.parse(localStorage.getItem('myndarcWfhDays'));
+                            if (Array.isArray(saved)) return saved;
+                        } catch (e) {}
+                        return DEFAULT_WFH_DAYS;
+                    };
+                    const applyWfhLocation = () => {
+                        const startVal = startInput && startInput.value ? new Date(startInput.value) : new Date();
+                        getWfhDays().includes(startVal.getDay()) ? selectHome() : selectOffice();
+                    };
+                    const renderWfhDays = () => {
+                        if (!wfhDaysContainer) return;
+                        const days = getWfhDays();
+                        wfhDaysContainer.innerHTML = '';
+                        [['M', 1], ['T', 2], ['W', 3], ['T', 4], ['F', 5], ['S', 6], ['S', 0]].forEach(([label, day]) => {
+                            const on = days.includes(day);
+                            const chip = document.createElement('button');
+                            chip.type = 'button';
+                            chip.textContent = label;
+                            chip.title = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
+                            chip.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all border ${on ? 'bg-teal-500/30 text-teal-200 border-teal-500/50' : 'bg-black/30 text-gray-500 border-white/10 hover:text-white'}`;
+                            chip.addEventListener('click', () => {
+                                const next = on ? days.filter(d => d !== day) : [...days, day];
+                                localStorage.setItem('myndarcWfhDays', JSON.stringify(next));
+                                renderWfhDays();
+                                applyWfhLocation();
+                            });
+                            wfhDaysContainer.appendChild(chip);
+                        });
+                    };
+                    renderWfhDays();
+                    applyWfhLocation();
+                    if (startInput) startInput.addEventListener('change', applyWfhLocation);
+                    window.addEventListener('cloudDataSynced', renderWfhDays);
                 }
 
                 const breaksContainer = document.getElementById('break-times-container');
                 const addBreakBtn = document.getElementById('add-break-btn');
                 const loadBreaksBtn = document.getElementById('load-my-breaks-btn');
 
-                function createBreakRow(labelText = 'Custom Break', durationMins = null) {
+                function createBreakRow(labelText = 'Custom Break', durationMins = null, startTime = null) {
                     const div = document.createElement('div');
                     div.className = 'flex flex-col gap-1.5 break-row animate-[fadeIn_0.3s_ease-out] bg-black/20 p-3 rounded-xl border border-white/5';
                     
@@ -2775,6 +2913,10 @@
                                 endIn.value = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
                             }
                         });
+                        if (startTime) {
+                            startIn.value = startTime;
+                            startIn.dispatchEvent(new Event('change'));
+                        }
                     }
                     
                     breaksContainer.appendChild(div);
@@ -2787,10 +2929,7 @@
                 if(loadBreaksBtn) {
                     loadBreaksBtn.addEventListener('click', () => {
                         if(breaksContainer) breaksContainer.innerHTML = '';
-                        createBreakRow('Break 1 (10m)', 10);
-                        createBreakRow('Break 2 (10m)', 10);
-                        createBreakRow('Lunch Break (30m)', 30);
-                        createBreakRow('Break 3 (10m)', 10);
+                        createBreakRow('Lunch Break (20m)', 20, '13:00');
                     });
                 }
 
@@ -2827,7 +2966,10 @@
                         return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
                     };
 
-                    if(startInput) startInput.value = toLocalISO(start);
+                    if(startInput) {
+                        startInput.value = toLocalISO(start);
+                        startInput.dispatchEvent(new Event('change'));
+                    }
                     if(endInput) endInput.value = toLocalISO(end);
                 }
 
@@ -2912,10 +3054,7 @@
                 function updateVibeUI(index) {
                     const vibe = shiftVibes[index % shiftVibes.length];
 
-                    const blockStart = new Date(startTimeValue + index * 60 * 60 * 1000);
-                    const blockEnd = new Date(startTimeValue + (index + 1) * 60 * 60 * 1000);
-                    const pad = (n) => String(n).padStart(2, '0');
-                    const hourText = `Hour ${index + 1} (${pad(blockStart.getHours())}:00 - ${pad(blockEnd.getHours())}:00)`;
+                    const hourText = `Hour ${index + 1} (${hourLabel(index)})`;
                     
                     const badge = document.getElementById('current-hour-badge');
                     if(badge) badge.textContent = hourText;
@@ -2956,6 +3095,8 @@
                     if(dTitle) dTitle.textContent = vibe.title;
                     if(dIcon) dIcon.textContent = vibe.icon;
                     if(dTask) dTask.textContent = vibe.desc;
+
+                    renderCaseRefs();
 
                     for (let i = 0; i < totalSegments; i++) {
                         const block = document.getElementById(`timeline-block-${i}`);
@@ -3164,6 +3305,7 @@
                             if(dTitle) dTitle.textContent = "Pre-Shift Prep";
                             if(dIcon) dIcon.textContent = "⏳";
                             if(dTask) dTask.textContent = "Getting ready to start...";
+                            renderCaseRefs();
                         }
                     } else {
                         const remaining = endTime - now;
@@ -3464,6 +3606,7 @@
                             if(iEl) iEl.textContent = "💤";
                             if(mEl) mEl.textContent = r.sub;
                         });
+                        renderCaseRefs();
                     }
                     return false;
                 }
@@ -3613,6 +3756,7 @@
                         if(iEl) iEl.textContent = "💤";
                         if(mEl) mEl.textContent = r.sub;
                     });
+                    renderCaseRefs();
                 });
                 
                 if(newShiftBtn) newShiftBtn.addEventListener('click', () => {
