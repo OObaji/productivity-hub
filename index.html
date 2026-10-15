@@ -469,7 +469,7 @@
                 </a>
                 <a href="#pomodoro" class="sidebar-link nav-link flex items-center p-3 rounded-xl hover:bg-slate-800/50 text-sm font-medium" data-view="pomodoro">
                     <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Pomodoro
+                    Focus Timer
                 </a>
 
                 <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">Work zone</p>
@@ -601,8 +601,8 @@
 
                 <!-- Pomodoro View -->
                 <div id="pomodoro" class="page-view h-full">
-                    <div class="overlay flex flex-col items-center justify-center h-full p-6 text-white bg-black/40">
-                        <div class="w-full max-w-lg bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 shadow-2xl mb-8 transform hover:scale-[1.01] transition-transform duration-300">
+                    <div class="overlay flex flex-col items-center h-full p-6 text-white bg-black/40 overflow-y-auto">
+                        <div class="mt-auto w-full max-w-lg bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 shadow-2xl mb-8 transform hover:scale-[1.01] transition-transform duration-300">
                             <label for="focus-task-input" class="text-xs font-bold uppercase tracking-widest text-white/60 mb-2 block">Current Objective</label>
                             <input id="focus-task-input" type="text" placeholder="What are you working on?" class="w-full bg-transparent border-b-2 border-white/20 focus:border-white focus:outline-none py-3 text-2xl font-medium placeholder-white/30 transition-colors">
                         </div>
@@ -627,6 +627,28 @@
                             <div class="text-center bg-white/10 px-6 py-2 rounded-xl backdrop-blur-md border border-white/10">
                                 <div id="pomodoro-session-count" class="text-2xl font-bold">0</div>
                                 <div class="text-[10px] uppercase font-bold tracking-widest text-white/60">Sessions</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-auto w-full max-w-lg mt-8 bg-white/10 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 shadow-2xl space-y-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">Focus Length</p>
+                                    <div id="focus-length-options" class="flex flex-wrap gap-2"></div>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">Break Length</p>
+                                    <div id="break-length-options" class="flex flex-wrap gap-2"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">Focus Sound <span class="normal-case tracking-normal font-medium text-white/40">· plays while you focus</span></p>
+                                <div id="focus-sound-options" class="flex flex-wrap gap-2"></div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm">🔈</span>
+                                <input type="range" id="focus-sound-volume" min="0" max="100" class="flex-1 accent-white cursor-pointer" aria-label="Focus sound volume">
+                                <span class="text-sm">🔊</span>
                             </div>
                         </div>
                     </div>
@@ -1896,13 +1918,144 @@
             function setupPomodoro() {
                 const pomodoroPage = document.getElementById('pomodoro');
                 if(!pomodoroPage) return;
+
+                const FOCUS_LENGTHS = [25, 45, 60, 90];
+                const BREAK_LENGTHS = [5, 10, 15];
+                const SOUNDS = [
+                    { id: 'off', label: 'Off' },
+                    { id: 'brown', label: '🌊 Brown Noise' },
+                    { id: 'white', label: '📻 White Noise' },
+                    { id: 'rain', label: '🌧️ Rain' },
+                    { id: 'binaural', label: '🎧 Binaural Focus' }
+                ];
+                const PREFS_KEY = 'myndarcFocusPrefs';
+                let prefs = { focus: 25, break: 5, sound: 'brown', volume: 40 };
+                try { prefs = { ...prefs, ...(JSON.parse(localStorage.getItem(PREFS_KEY)) || {}) }; } catch (e) {}
+                const savePrefs = () => localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+
                 const modes = {
-                    pomodoro: { name: 'Focus', time: 25, color: '#6366f1', icon: '🍅', next: 'shortBreak', background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop' },
-                    shortBreak: { name: 'Relax', time: 5, color: '#3b82f6', icon: '☕', next: 'pomodoro', background: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2940&auto=format&fit=crop' },
+                    pomodoro: { name: 'Focus', icon: '🎯', next: 'shortBreak', background: 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=3132&auto=format&fit=crop' },
+                    shortBreak: { name: 'Relax', icon: '☕', next: 'pomodoro', background: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=2940&auto=format&fit=crop' },
                 };
-                let timer; let currentMode = 'pomodoro'; let totalSeconds = modes[currentMode].time * 60; let remainingSeconds = totalSeconds; let isPaused = true; let sessionCount = 0;
+                const modeMinutes = (key) => key === 'pomodoro' ? prefs.focus : prefs.break;
+
+                let timer = null; let currentMode = 'pomodoro'; let totalSeconds = modeMinutes(currentMode) * 60; let remainingSeconds = totalSeconds; let isPaused = true; let sessionCount = 0; let endAt = 0;
                 const canvas = document.getElementById('pomodoro-canvas'); const ctx = canvas ? canvas.getContext('2d') : null; const timeDisplay = document.getElementById('pomodoro-time'); const modeDisplay = document.getElementById('pomodoro-mode'); const iconDisplay = document.getElementById('pomodoro-icon'); const playPauseBtn = document.getElementById('pomodoro-play-pause'); const playIcon = document.getElementById('play-icon'); const pauseIcon = document.getElementById('pause-icon'); const switchModeBtn = document.getElementById('pomodoro-switch-mode'); const sessionCountDisplay = document.getElementById('pomodoro-session-count');
-                
+                const volumeInput = document.getElementById('focus-sound-volume');
+
+                // --- Focus sounds, generated with Web Audio (no audio files to load) ---
+                let audioCtx = null; let masterGain = null; let soundNodes = [];
+                function noiseBuffer(type) {
+                    const length = audioCtx.sampleRate * 4;
+                    const buffer = audioCtx.createBuffer(2, length, audioCtx.sampleRate);
+                    for (let ch = 0; ch < 2; ch++) {
+                        const data = buffer.getChannelData(ch);
+                        let last = 0, b0 = 0, b1 = 0, b2 = 0;
+                        for (let i = 0; i < length; i++) {
+                            const white = Math.random() * 2 - 1;
+                            if (type === 'brown') {
+                                last = (last + 0.02 * white) / 1.02;
+                                data[i] = last * 3.5;
+                            } else if (type === 'pink') {
+                                b0 = 0.99765 * b0 + white * 0.0990460;
+                                b1 = 0.96300 * b1 + white * 0.2965164;
+                                b2 = 0.57000 * b2 + white * 1.0526913;
+                                data[i] = (b0 + b1 + b2 + white * 0.1848) * 0.11;
+                            } else {
+                                data[i] = white * 0.35;
+                            }
+                        }
+                    }
+                    return buffer;
+                }
+                function loopSource(buffer) {
+                    const src = audioCtx.createBufferSource();
+                    src.buffer = buffer; src.loop = true; src.start();
+                    soundNodes.push(src);
+                    return src;
+                }
+                function stopFocusSound() {
+                    soundNodes.forEach(n => { try { n.stop(); } catch (e) {} try { n.disconnect(); } catch (e) {} });
+                    soundNodes = [];
+                }
+                function startFocusSound() {
+                    stopFocusSound();
+                    if (prefs.sound === 'off') return;
+                    try {
+                        if (!audioCtx) {
+                            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            masterGain = audioCtx.createGain();
+                            masterGain.connect(audioCtx.destination);
+                        }
+                        if (audioCtx.state === 'suspended') audioCtx.resume();
+                        masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+                        masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                        masterGain.gain.linearRampToValueAtTime(prefs.volume / 100, audioCtx.currentTime + 1.5);
+
+                        if (prefs.sound === 'brown' || prefs.sound === 'white') {
+                            loopSource(noiseBuffer(prefs.sound)).connect(masterGain);
+                        } else if (prefs.sound === 'rain') {
+                            const src = loopSource(noiseBuffer('pink'));
+                            const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+                            const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5000;
+                            const swell = audioCtx.createGain(); swell.gain.value = 0.85;
+                            const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.08;
+                            const lfoDepth = audioCtx.createGain(); lfoDepth.gain.value = 0.15;
+                            lfo.connect(lfoDepth).connect(swell.gain); lfo.start();
+                            soundNodes.push(lfo, hp, lp, swell, lfoDepth);
+                            src.connect(hp).connect(lp).connect(swell).connect(masterGain);
+                        } else if (prefs.sound === 'binaural') {
+                            // 200Hz left / 210Hz right = a 10Hz beat; best with headphones.
+                            [[200, -1], [210, 1]].forEach(([freq, pan]) => {
+                                const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.value = freq;
+                                const level = audioCtx.createGain(); level.gain.value = 0.25;
+                                const panner = audioCtx.createStereoPanner(); panner.pan.value = pan;
+                                osc.connect(level).connect(panner).connect(masterGain); osc.start();
+                                soundNodes.push(osc, level, panner);
+                            });
+                            const bed = loopSource(noiseBuffer('brown'));
+                            const bedLevel = audioCtx.createGain(); bedLevel.gain.value = 0.3;
+                            bed.connect(bedLevel).connect(masterGain);
+                            soundNodes.push(bedLevel);
+                        }
+                    } catch (e) { console.error('Focus sound failed', e); }
+                }
+                const syncSound = () => (!isPaused && currentMode === 'pomodoro') ? startFocusSound() : stopFocusSound();
+
+                function renderChips(containerId, items, isActive, onPick) {
+                    const container = document.getElementById(containerId);
+                    if (!container) return;
+                    container.innerHTML = '';
+                    items.forEach(item => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.textContent = item.label;
+                        btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${isActive(item) ? 'bg-white text-indigo-900 border-white' : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/20'}`;
+                        btn.addEventListener('click', () => { onPick(item); renderOptions(); });
+                        container.appendChild(btn);
+                    });
+                }
+                function renderOptions() {
+                    renderChips('focus-length-options', FOCUS_LENGTHS.map(m => ({ value: m, label: `${m}m` })), i => i.value === prefs.focus, i => {
+                        prefs.focus = i.value; savePrefs();
+                        if (currentMode === 'pomodoro' && isPaused) setMode('pomodoro');
+                    });
+                    renderChips('break-length-options', BREAK_LENGTHS.map(m => ({ value: m, label: `${m}m` })), i => i.value === prefs.break, i => {
+                        prefs.break = i.value; savePrefs();
+                        if (currentMode === 'shortBreak' && isPaused) setMode('shortBreak');
+                    });
+                    renderChips('focus-sound-options', SOUNDS, i => i.id === prefs.sound, i => {
+                        prefs.sound = i.id; savePrefs(); syncSound();
+                    });
+                }
+                if (volumeInput) {
+                    volumeInput.value = prefs.volume;
+                    volumeInput.addEventListener('input', () => {
+                        prefs.volume = Number(volumeInput.value); savePrefs();
+                        if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(prefs.volume / 100, audioCtx.currentTime, 0.1);
+                    });
+                }
+
                 function drawCircle(progress) {
                     if(!canvas || !ctx) return;
                     const centerX = canvas.width / 2; const centerY = canvas.height / 2; const radius = canvas.width / 2 - 10;
@@ -1911,11 +2064,34 @@
                     if (progress > 0) { ctx.beginPath(); ctx.arc(centerX, centerY, radius, -0.5 * Math.PI, (progress * 2 * Math.PI) - 0.5 * Math.PI); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(255,255,255,0.5)'; ctx.stroke(); ctx.shadowBlur = 0; }
                 }
                 function updateDisplay() { const minutes = Math.floor(remainingSeconds / 60); const seconds = remainingSeconds % 60; if(timeDisplay) timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`; const progress = (totalSeconds - remainingSeconds) / totalSeconds; drawCircle(progress); }
-                function setMode(modeKey) { currentMode = modeKey; const mode = modes[currentMode]; totalSeconds = mode.time * 60; remainingSeconds = totalSeconds; if(modeDisplay) modeDisplay.textContent = mode.name; if(iconDisplay) iconDisplay.textContent = mode.icon; if(switchModeBtn) switchModeBtn.textContent = mode.next === 'pomodoro' ? 'Start Focus' : 'Take a Break'; pomodoroPage.style.backgroundImage = `url('${mode.background}')`; updateDisplay(); }
-                function countdown() { if (isPaused) return; if (remainingSeconds > 0) { remainingSeconds--; updateDisplay(); } else { clearInterval(timer); isPaused = true; if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); if (currentMode === 'pomodoro') { sessionCount++; if(sessionCountDisplay) sessionCountDisplay.textContent = sessionCount; } showAlert(`${modes[currentMode].name} session is over!`); setMode(modes[currentMode].next); } }
-                if(playPauseBtn) playPauseBtn.addEventListener('click', () => { hideAlert(); isPaused = !isPaused; if (!isPaused) { timer = setInterval(countdown, 1000); if(playIcon) playIcon.classList.add('hidden'); if(pauseIcon) pauseIcon.classList.remove('hidden'); } else { clearInterval(timer); if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); } });
-                if(switchModeBtn) switchModeBtn.addEventListener('click', () => { hideAlert(); isPaused = true; clearInterval(timer); if(playIcon) playIcon.classList.remove('hidden'); if(pauseIcon) pauseIcon.classList.add('hidden'); setMode(modes[currentMode].next); });
+                function setMode(modeKey) { currentMode = modeKey; const mode = modes[currentMode]; totalSeconds = modeMinutes(currentMode) * 60; remainingSeconds = totalSeconds; if(modeDisplay) modeDisplay.textContent = mode.name; if(iconDisplay) iconDisplay.textContent = mode.icon; if(switchModeBtn) switchModeBtn.textContent = mode.next === 'pomodoro' ? 'Start Focus' : 'Take a Break'; pomodoroPage.style.backgroundImage = `url('${mode.background}')`; updateDisplay(); }
+                function setPaused(paused) {
+                    isPaused = paused;
+                    clearInterval(timer);
+                    if (!isPaused) {
+                        // Count down against the clock so the timer stays accurate in a background tab.
+                        endAt = Date.now() + remainingSeconds * 1000;
+                        timer = setInterval(countdown, 250);
+                    }
+                    if(playIcon) playIcon.classList.toggle('hidden', !isPaused);
+                    if(pauseIcon) pauseIcon.classList.toggle('hidden', isPaused);
+                    syncSound();
+                }
+                function countdown() {
+                    if (isPaused) return;
+                    const left = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+                    if (left !== remainingSeconds) { remainingSeconds = left; updateDisplay(); }
+                    if (left > 0) return;
+                    setPaused(true);
+                    if (currentMode === 'pomodoro') { sessionCount++; if(sessionCountDisplay) sessionCountDisplay.textContent = sessionCount; }
+                    if (typeof window.playVibeAlertSound === 'function') window.playVibeAlertSound();
+                    showAlert(`${modes[currentMode].name} session is over!`);
+                    setMode(modes[currentMode].next);
+                }
+                if(playPauseBtn) playPauseBtn.addEventListener('click', () => { hideAlert(); setPaused(!isPaused); });
+                if(switchModeBtn) switchModeBtn.addEventListener('click', () => { hideAlert(); setPaused(true); setMode(modes[currentMode].next); });
                 setMode('pomodoro');
+                renderOptions();
             }
 
             function setupMindfulness() {
